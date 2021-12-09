@@ -11,16 +11,24 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 
 import com.gda.cfdi.dao.inte.IConsultaDao;
+import com.gda.cfdi.dao.mapper.CClaveProductoServicioSatMapper;
 import com.gda.cfdi.dao.mapper.CControlFolioMapper;
 import com.gda.cfdi.dao.mapper.CFormaPagoCfdiMapper;
 import com.gda.cfdi.dao.mapper.CTipoPagoMapper;
+import com.gda.cfdi.dao.mapper.TFacturaCanceladaMapper;
+import com.gda.cfdi.dao.mapper.TOrdenExamenSucursalMapper;
 import com.gda.cfdi.dao.mapper.TOrdenSucursalMapper;
 import com.gda.cfdi.dao.mapper.TPagoPacienteMapper;
+import com.gda.cfdi.dao.mapper.TSociedadCivilMapper;
+import com.gda.cfdi.dto.CClaveProductoServicioSatDto;
 import com.gda.cfdi.dto.CControlFolioDto;
 import com.gda.cfdi.dto.CFormaPagoCfdiDto;
 import com.gda.cfdi.dto.CTipoPagoDto;
+import com.gda.cfdi.dto.TFacturaCanceladaDto;
+import com.gda.cfdi.dto.TOrdenExamenSucursalDto;
 import com.gda.cfdi.dto.TOrdenSucursalDto;
 import com.gda.cfdi.dto.TPagoPacienteDto;
+import com.gda.cfdi.dto.TSociedadCivilDto;
 
 @Repository("consultaDaoImpl")
 public class ConsultaDaoImpl extends JdbcDaoSupport implements IConsultaDao{
@@ -149,6 +157,93 @@ public class ConsultaDaoImpl extends JdbcDaoSupport implements IConsultaDao{
 		return dto;
 	}
 	
+	@Override
+	@SuppressWarnings("deprecation")
+	public List<TFacturaCanceladaDto> getFacturasCanceladasByKorden(Integer kordensucursal){
+		logger.info("ejecutando getFacturasCanceladasByKorden");
+		List<TFacturaCanceladaDto> list;
+		String query = "SELECT tc.factura_id,tc.kfactura,tc.acuse_cancelacion,tc.fecha_creacion,tc.folio_fiscal FROM t_factura_cancelada tc "
+				+ "INNER JOIN t_orden_sucursal_fac tosf  "
+				+ "ON tc.kfactura = tosf.kfactura\r\n" + 
+				"where tosf.kordensucursal = ? ORDER BY fecha_creacion DESC" ;
+		list = this.getJdbcTemplate().query(query, new Object[]{kordensucursal},new TFacturaCanceladaMapper());
+		logger.info("getFacturasCanceladasByKorden ejecutado:"+list.size());
+		return list;
+	}
+	
+	@Override
+	@SuppressWarnings("deprecation")
+	public List<TOrdenExamenSucursalDto> getTOrdenExamenSucursalByKOrdenSucursal(Integer kordensucursal) {
+		logger.info("ejecutando getTOrdenExamenSucursalByKOrdenSucursal: kordensucursal="+kordensucursal);
+		List<TOrdenExamenSucursalDto> list = null;
+		String query = "SELECT * FROM t_orden_examen_sucursal "
+				+ "WHERE kordensucursal = ? "
+				+ "ORDER BY 1 DESC" ;
+		try {
+			list = this.getJdbcTemplate().query(query, new Object[]{kordensucursal},new TOrdenExamenSucursalMapper());
+			logger.info("getTOrdenExamenSucursalByKOrdenSucursal ejecutado:"+list.size());			
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		}
+		return list;
+	}
+	
+	@Override
+	@SuppressWarnings("deprecation")
+	public List<TSociedadCivilDto> getTSociedadCivilByKOrdenSucursal(Integer kordensucursal) {
+		logger.info("ejecutando getTSociedadCivilByKOrdenSucursal");
+		List<TSociedadCivilDto> list = null;
+		String query = "SELECT toessc.* " +
+				"FROM t_orden_sucursal tos INNER JOIN public.t_orden_examen_sucursal toes ON tos.kordensucursal=toes.kordensucursal " +
+				"INNER JOIN sociedadcivil.t_orden_examen_sucursal_sociedadcivil toessc ON toes.kordenexamensucursal = toessc.kordenexamensucursal " +
+				"WHERE tos.kordensucursal IN (?) " ;
+		try {
+			list = this.getJdbcTemplate().query(query, new Object[]{kordensucursal},new TSociedadCivilMapper());
+			logger.info("getTSociedadCivilByKOrdenSucursal ejecutado:");			
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		}
+		return list;
+	}
+	
+	@Override
+	@SuppressWarnings("deprecation")
+	public CClaveProductoServicioSatDto findCClaveProductoServicioSatById(Integer cexamen) {
+		CClaveProductoServicioSatDto dto = null;
+		logger.info("ejecutando findCClaveProductoServicioSatById:: cexamen="+cexamen);
+		
+		String query = "SELECT ccpss.* FROM c_clave_producto_servicio_sat ccpss\r\n"
+				+ "inner join web2lablis.c_examen ce on ce.cclaveproductoserviciosat = ccpss.cclaveproductoserviciosat\r\n"
+				+ "where ce.cexamen = ?";
+		try {
+			dto = this.getJdbcTemplate().queryForObject(query, new Object[] {cexamen}, new CClaveProductoServicioSatMapper());			
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		}
+
+		logger.info("findCClaveProductoServicioSatById ejecutado");
+		return dto;
+	}
+	
+	@Override
+	@SuppressWarnings("deprecation")
+	public Integer getCTipoConvenioByConvenio(Integer cconvenio) {
+		Integer cpostal = null;
+		logger.info("ejecutando getCTipoConvenioByConvenio:: cconvenio="+cconvenio);		
+		String query = "select ctipoconvenio from c_convenio where cconvenio = ?";
+		try {
+			cpostal = this.getJdbcTemplate().queryForObject(query, new Object[] {cconvenio}, Integer.class);			
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		}
+		logger.info("getCTipoConvenioByConvenio ejecutado");
+		return cpostal;
+	}
+	
 	
 //	@Override
 //	@SuppressWarnings("deprecation")
@@ -170,43 +265,10 @@ public class ConsultaDaoImpl extends JdbcDaoSupport implements IConsultaDao{
 //	}
 //	
 //	
-//	@Override
-//	@SuppressWarnings("deprecation")
-//	public List<TOrdenExamenSucursalDto> getTOrdenExamenSucursalByKOrdenSucursal(Integer kordensucursal) {
-//		logger.info("ejecutando getTOrdenExamenSucursalByKOrdenSucursal: kordensucursal="+kordensucursal);
-//		List<TOrdenExamenSucursalDto> list = null;
-//		String query = "SELECT * FROM t_orden_examen_sucursal "
-//				+ "WHERE kordensucursal = ? "
-//				+ "ORDER BY 1 DESC" ;
-//		try {
-//			list = this.getJdbcTemplate().query(query, new Object[]{kordensucursal},new TOrdenExamenSucursalMapper());
-//			logger.info("getTOrdenExamenSucursalByKOrdenSucursal ejecutado:"+list.size());			
-//		} catch (Exception e) {
-//			logger.error(e.getMessage());
-//			return null;
-//		}
-//		return list;
-//	}
+
 //	
 //	
-//	@Override
-//	@SuppressWarnings("deprecation")
-//	public List<TSociedadCivilDto> getTSociedadCivilByKOrdenSucursal(Integer kordensucursal) {
-//		logger.info("ejecutando getTSociedadCivilByKOrdenSucursal");
-//		List<TSociedadCivilDto> list = null;
-//		String query = "SELECT toessc.* " +
-//				"FROM t_orden_sucursal tos INNER JOIN public.t_orden_examen_sucursal toes ON tos.kordensucursal=toes.kordensucursal " +
-//				"INNER JOIN sociedadcivil.t_orden_examen_sucursal_sociedadcivil toessc ON toes.kordenexamensucursal = toessc.kordenexamensucursal " +
-//				"WHERE tos.kordensucursal IN (?) " ;
-//		try {
-//			list = this.getJdbcTemplate().query(query, new Object[]{kordensucursal},new TSociedadCivilMapper());
-//			logger.info("getTSociedadCivilByKOrdenSucursal ejecutado:");			
-//		} catch (Exception e) {
-//			logger.error(e.getMessage());
-//			return null;
-//		}
-//		return list;
-//	}
+
 //	
 //	
 
@@ -230,25 +292,7 @@ public class ConsultaDaoImpl extends JdbcDaoSupport implements IConsultaDao{
 //		return tFactura;
 //	}
 //	
-//	@Override
-//	@SuppressWarnings("deprecation")
-//	public CClaveProductoServicioSatDto findCClaveProductoServicioSatById(Integer cexamen) {
-//		CClaveProductoServicioSatDto dto = null;
-//		logger.info("ejecutando findCClaveProductoServicioSatById:: cexamen="+cexamen);
-//		
-//		String query = "SELECT ccpss.* FROM c_clave_producto_servicio_sat ccpss\r\n"
-//				+ "inner join web2lablis.c_examen ce on ce.cclaveproductoserviciosat = ccpss.cclaveproductoserviciosat\r\n"
-//				+ "where ce.cexamen = ?";
-//		try {
-//			dto = this.getJdbcTemplate().queryForObject(query, new Object[] {cexamen}, new CClaveProductoServicioSatMapper());			
-//		} catch (Exception e) {
-//			logger.error(e.getMessage());
-//			return null;
-//		}
-//
-//		logger.info("findCClaveProductoServicioSatById ejecutado");
-//		return dto;
-//	}
+
 //	
 //	
 
@@ -262,21 +306,7 @@ public class ConsultaDaoImpl extends JdbcDaoSupport implements IConsultaDao{
 
 //	
 //	
-//	@Override
-//	@SuppressWarnings("deprecation")
-//	public Integer getCTipoConvenioByConvenio(Integer cconvenio) {
-//		Integer cpostal = null;
-//		logger.info("ejecutando getCTipoConvenioByConvenio:: cconvenio="+cconvenio);		
-//		String query = "select ctipoconvenio from c_convenio where cconvenio = ?";
-//		try {
-//			cpostal = this.getJdbcTemplate().queryForObject(query, new Object[] {cconvenio}, Integer.class);			
-//		} catch (Exception e) {
-//			logger.error(e.getMessage());
-//			return null;
-//		}
-//		logger.info("getCTipoConvenioByConvenio ejecutado");
-//		return cpostal;
-//	}
+
 //	
 //	@Override
 //	@SuppressWarnings("deprecation")
@@ -404,19 +434,7 @@ public class ConsultaDaoImpl extends JdbcDaoSupport implements IConsultaDao{
 //	
 
 //	
-//	@Override
-//	@SuppressWarnings("deprecation")
-//	public List<TFacturaCanceladaDto> getFacturasCanceladasByKorden(Integer kordensucursal){
-//		logger.info("ejecutando getFacturasCanceladasByKorden");
-//		List<TFacturaCanceladaDto> list;
-//		String query = "SELECT tc.factura_id,tc.kfactura,tc.acuse_cancelacion,tc.fecha_creacion,tc.folio_fiscal FROM t_factura_cancelada tc "
-//				+ "INNER JOIN t_orden_sucursal_fac tosf  "
-//				+ "ON tc.kfactura = tosf.kfactura\r\n" + 
-//				"where tosf.kordensucursal = ? ORDER BY fecha_creacion DESC" ;
-//		list = this.getJdbcTemplate().query(query, new Object[]{kordensucursal},new TFacturaCanceladaMapper());
-//		logger.info("getFacturasCanceladasByKorden ejecutado:"+list.size());
-//		return list;
-//	}
+
 //	
 //	
 //	@Override

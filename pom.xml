@@ -36,8 +36,14 @@
 		
 		<dependency>
 			<groupId>com.gda</groupId>
-			<artifactId>facturacion-utils-sat</artifactId>
+			<artifactId>facturacion-domain-sat</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>ca.juliusdavies</groupId>
+			<artifactId>not-yet-commons-ssl</artifactId>
+			<version>0.3.11</version>
 		</dependency>
 		
 		<dependency>
@@ -47,6 +53,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.axis</groupId>
+			<artifactId>axis</artifactId>
+			<version>1.4</version>
 		</dependency>
 		
 	</dependencies>
