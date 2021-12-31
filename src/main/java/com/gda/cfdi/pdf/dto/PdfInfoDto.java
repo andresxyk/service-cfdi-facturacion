@@ -8,7 +8,34 @@ public class PdfInfoDto {
 	private Integer consecutivo;
 	private String nombrePaciente;
 	private String cadenaOriginal;
+	private Integer kfactura;
+	private String descripcionMetodoPago;
+	private String descripcionUsoCfdi;
 	
+	public String getDescripcionUsoCfdi() {
+		return descripcionUsoCfdi;
+	}
+
+	public void setDescripcionUsoCfdi(String descripcionUsoCfdi) {
+		this.descripcionUsoCfdi = descripcionUsoCfdi;
+	}
+
+	public String getDescripcionMetodoPago() {
+		return descripcionMetodoPago;
+	}
+
+	public void setDescripcionMetodoPago(String descripcionMetodoPago) {
+		this.descripcionMetodoPago = descripcionMetodoPago;
+	}
+
+	public Integer getKfactura() {
+		return kfactura;
+	}
+
+	public void setKfactura(Integer kfactura) {
+		this.kfactura = kfactura;
+	}
+
 	public String getCadenaOriginal() {
 		return cadenaOriginal;
 	}
