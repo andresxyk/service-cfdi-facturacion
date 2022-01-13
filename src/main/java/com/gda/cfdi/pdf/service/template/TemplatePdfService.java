@@ -83,7 +83,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 		for(Comprobante.Conceptos.Concepto infConcepto: comprobante.getConceptos().getConcepto()){
 			
 			if(infConcepto.getDescripcion().equals("Honorario Medico") && infConcepto.getClaveProdServ().equals("85121600")){
-				montoTerceros = infConcepto.getImpuestos().getTraslados().getTraslado().get(cont1).getBase().toString();
+				montoTerceros = infConcepto.getImpuestos().getTraslados().getTraslado().get(0).getBase().toString();
 			}
 			cont1++;
 		}
