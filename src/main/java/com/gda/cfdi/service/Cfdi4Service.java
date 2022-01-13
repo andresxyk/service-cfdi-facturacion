@@ -58,19 +58,20 @@ import com.gda.cfdi.dto.TOrdenSucursalDto;
 import com.gda.cfdi.dto.TPagoPacienteDto;
 import com.gda.cfdi.dto.TSociedadCivilDto;
 
-import mx.gob.sat.cfd._3.Comprobante;
-import mx.gob.sat.cfd._3.Comprobante.CfdiRelacionados;
-import mx.gob.sat.cfd._3.Comprobante.CfdiRelacionados.CfdiRelacionado;
-import mx.gob.sat.cfd._3.Comprobante.Conceptos;
-import mx.gob.sat.cfd._3.Comprobante.Conceptos.Concepto;
-import mx.gob.sat.cfd._3.Comprobante.Conceptos.Concepto.ComplementoConcepto;
-import mx.gob.sat.cfd._3.Comprobante.Conceptos.Concepto.Impuestos;
-import mx.gob.sat.cfd._3.Comprobante.Conceptos.Concepto.Impuestos.Traslados;
-import mx.gob.sat.cfd._3.Comprobante.Conceptos.Concepto.Impuestos.Traslados.Traslado;
-import mx.gob.sat.cfd._3.Comprobante.Emisor;
-import mx.gob.sat.cfd._3.Comprobante.Receptor;
-import mx.gob.sat.cfd._3.ObjectFactory;
-import mx.gob.sat.cfd._3.terceros.PorCuentadeTerceros;
+import mx.gob.sat.cfd._4.Comprobante;
+import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados;
+import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados.CfdiRelacionado;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.ACuentaTerceros;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.ComplementoConcepto;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados.Traslado;
+import mx.gob.sat.cfd._4.Comprobante.Emisor;
+import mx.gob.sat.cfd._4.Comprobante.Receptor;
+import mx.gob.sat.cfd._4.ObjectFactory;
+
 import mx.gob.sat.sitio_internet.cfd.catalogos.CMetodoPago;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CMoneda;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CRegimenFiscal;
@@ -80,7 +81,7 @@ import mx.gob.sat.sitio_internet.cfd.catalogos.CUsoCFDI;
 import mx.gob.sat.timbrefiscaldigital.TimbreFiscalDigital;
 
 @Service
-public class CfdiService {
+public class Cfdi4Service {
 
 	private static final Logger log = LoggerFactory.getLogger(CfdiController .class);
 	
@@ -90,16 +91,12 @@ public class CfdiService {
 	@Autowired
 	private IConsultaDao consultaDao;
 	
-	@Autowired
-	private ConsultaService consultaService;
-	
 	public String generarCfdi(Integer kordensucursal) throws Exception {	
 		try {
 			Integer cusoCfdi = 3;
 			Boolean bandAzteca;
-			
-			List<TPagoPacienteDto> list = consultaService.getTPagoPacienteDto(kordensucursal);
-			List<TOrdenSucursalDto> listTos = consultaService.getListTOrdenSucursalByKordensucursal(kordensucursal);
+			List<TPagoPacienteDto> list =  consultaDao.getTPagoPacienteDto(kordensucursal);
+			List<TOrdenSucursalDto> listTos = consultaDao.getListTOrdenSucursalByKordensucursal(kordensucursal);
 			Boolean contieneSaldo = list.get(0).getMsaldo().intValue() > 0 ? true :false;
 			Integer csucursal = listTos.get(0).getCsucursal();
 			Integer cmarca = listTos.get(0).getCmarca();
@@ -145,10 +142,11 @@ public class CfdiService {
 			
 			ObjectFactory of = new ObjectFactory();
 			Comprobante cfdi = of.createComprobante();
-			cfdi.setVersion(env.getProperty("cfdi.version"));
-			CControlFolioDto controlFolioDto = consultaService.getControlFolioDto(csucursal);
+			cfdi.setVersion(env.getProperty("cfdi.version.4"));
+			CControlFolioDto controlFolioDto = consultaDao.getControlFolioDto(csucursal);
+			Integer ufolio = obtenerFolio(controlFolioDto); 
 			
-			cfdi.setFolio(String.valueOf(controlFolioDto.getUfolioactual()));
+			cfdi.setFolio(String.valueOf(ufolio));
 			cfdi.setSerie(controlFolioDto.getSserie());
 			cfdi.setTipoCambio(BigDecimal.valueOf(1));
 			cfdi.setFecha(value);
@@ -158,18 +156,18 @@ public class CfdiService {
 			cfdi.setMoneda(CMoneda.MXN);
 			cfdi.setTipoDeComprobante(CTipoDeComprobante.I);
 			
-			cfdi.setLugarExpedicion(consultaService.getCPostalByCsucursal(csucursal));
+			cfdi.setLugarExpedicion(consultaDao.getCPostalByCsucursal(csucursal));
 			
-			CTipoPagoDto tipoPagoDto = consultaService.getCTipoPagoById(pacienteDto.getCtipopago());
+			CTipoPagoDto tipoPagoDto = consultaDao.getCTipoPagoById(pacienteDto.getCtipopago());
 			
 			log.info("tip pago infogda-->>  "+tipoPagoDto.getCtipopago());
-			CFormaPagoCfdiDto cFormaPagoCfdiDto = consultaService.getCFormaPagoCfdiById(tipoPagoDto.getCformapagocfdi());
+			CFormaPagoCfdiDto cFormaPagoCfdiDto = consultaDao.getCFormaPagoCfdiById(tipoPagoDto.getCformapagocfdi());
 			log.info("Forma Pago cfdi"+cFormaPagoCfdiDto.getSclaveformapagocfdi()
 				+" form "+cFormaPagoCfdiDto.getSformapagocfdi());
 			cfdi.setFormaPago(cFormaPagoCfdiDto.getSclaveformapagocfdi());
 			cfdi.setMetodoPago(contieneSaldo ? CMetodoPago.PPD : CMetodoPago.PUE);
 			
-			List<TFacturaCanceladaDto> lstFacturasCanceladas = consultaService.getFacturasCanceladasByKorden(kordensucursal);
+			List<TFacturaCanceladaDto> lstFacturasCanceladas = consultaDao.getFacturasCanceladasByKorden(kordensucursal);
 			if(lstFacturasCanceladas.size() > 0){
 				log.info("UDDI::   "+lstFacturasCanceladas.get(0).getFactura_id());
 				if(!lstFacturasCanceladas.get(0).getFactura_id().equals("File no found") && lstFacturasCanceladas.get(0).getFactura_id().trim().length()>5 ){
@@ -179,7 +177,7 @@ public class CfdiService {
 					cfdiRelacionado.setUUID(lstFacturasCanceladas.get(0).getFactura_id());
 					cfdiRelacionados.setTipoRelacion("04");
 					cfdiRelacionados.getCfdiRelacionado().add(cfdiRelacionado);
-					cfdi.setCfdiRelacionados(cfdiRelacionados);
+					cfdi.getCfdiRelacionados().add(cfdiRelacionados);
 				}
 			}
 			
@@ -382,30 +380,39 @@ public class CfdiService {
 				trasladosTerceros.getTraslado().add(trasladoTerceros);						
 				impuestosTerceros.setTraslados(trasladosTerceros);
 				conceptoTerceros.setImpuestos(impuestosTerceros);
-				ComplementoConcepto complementoConcepto = of.createComprobanteConceptosConceptoComplementoConcepto();				
-				PorCuentadeTerceros porCuentadeTerceros = new PorCuentadeTerceros();				
-				porCuentadeTerceros.setVersion("1.1");
-				porCuentadeTerceros.setRfc("SAE190815RA5");
-				porCuentadeTerceros.setNombre("SERVICIOS ADMINISTRATIVOS ESPECIALIZADOS EN LABORATORIOS DE ANALISIS SC");
-				mx.gob.sat.cfd._3.terceros.PorCuentadeTerceros.Parte parte = new mx.gob.sat.cfd._3.terceros.PorCuentadeTerceros.Parte();
-				parte.setCantidad(new BigDecimal("1.00"));
-				parte.setDescripcion("Honorario Medico");
-				parte.setImporte(importeTerceros.setScale(2, BigDecimal.ROUND_DOWN));
-				parte.setNoIdentificacion("001");
-				parte.setUnidad("ACT");
-				parte.setValorUnitario(importeTerceros.setScale(2, BigDecimal.ROUND_DOWN));				
-				porCuentadeTerceros.getParte().add(parte);				
-				mx.gob.sat.cfd._3.terceros.PorCuentadeTerceros.Impuestos impuestos = new mx.gob.sat.cfd._3.terceros.PorCuentadeTerceros.Impuestos();
-				mx.gob.sat.cfd._3.terceros.PorCuentadeTerceros.Impuestos.Traslados traslados = new mx.gob.sat.cfd._3.terceros.PorCuentadeTerceros.Impuestos.Traslados();
-				mx.gob.sat.cfd._3.terceros.PorCuentadeTerceros.Impuestos.Traslados.Traslado traslado = new mx.gob.sat.cfd._3.terceros.PorCuentadeTerceros.Impuestos.Traslados.Traslado();
-				traslado.setImporte(new BigDecimal("0.000000").setScale(6));
-				traslado.setTasa(new BigDecimal("0.000").setScale(3));
-				traslado.setImpuesto("IVA");				
-				traslados.getTraslado().add(traslado);	
-				impuestos.setTraslados(traslados);				
-				porCuentadeTerceros.setImpuestos(impuestos);				
-				complementoConcepto.getAny().add(porCuentadeTerceros);				
-				conceptoTerceros.setComplementoConcepto(complementoConcepto);				
+				
+				ACuentaTerceros cuentaTerceros = of.createComprobanteConceptosConceptoACuentaTerceros();
+				cuentaTerceros.setRfcACuentaTerceros("SAE190815RA5");
+				cuentaTerceros.setNombreACuentaTerceros("SERVICIOS ADMINISTRATIVOS ESPECIALIZADOS EN LABORATORIOS DE ANALISIS SC");
+				cuentaTerceros.setRegimenFiscalACuentaTerceros("PENDIENTE");
+				cuentaTerceros.setDomicilioFiscalACuentaTerceros("PENDIENTE");
+				
+				conceptoTerceros.setACuentaTerceros(cuentaTerceros);
+				
+//				ComplementoConcepto complementoConcepto = of.createComprobanteConceptosConceptoComplementoConcepto();				
+//				PorCuentadeTerceros porCuentadeTerceros = new PorCuentadeTerceros();				
+//				porCuentadeTerceros.setVersion("1.1");
+//				porCuentadeTerceros.setRfc("SAE190815RA5");
+//				porCuentadeTerceros.setNombre("SERVICIOS ADMINISTRATIVOS ESPECIALIZADOS EN LABORATORIOS DE ANALISIS SC");
+//				mx.gob.sat.cfd._4.terceros.PorCuentadeTerceros.Parte parte = new mx.gob.sat.cfd._4.terceros.PorCuentadeTerceros.Parte();
+//				parte.setCantidad(new BigDecimal("1.00"));
+//				parte.setDescripcion("Honorario Medico");
+//				parte.setImporte(importeTerceros.setScale(2, BigDecimal.ROUND_DOWN));
+//				parte.setNoIdentificacion("001");
+//				parte.setUnidad("ACT");
+//				parte.setValorUnitario(importeTerceros.setScale(2, BigDecimal.ROUND_DOWN));				
+//				porCuentadeTerceros.getParte().add(parte);				
+//				mx.gob.sat.cfd._4.terceros.PorCuentadeTerceros.Impuestos impuestos = new mx.gob.sat.cfd._4.terceros.PorCuentadeTerceros.Impuestos();
+//				mx.gob.sat.cfd._4.terceros.PorCuentadeTerceros.Impuestos.Traslados traslados = new mx.gob.sat.cfd._4.terceros.PorCuentadeTerceros.Impuestos.Traslados();
+//				mx.gob.sat.cfd._4.terceros.PorCuentadeTerceros.Impuestos.Traslados.Traslado traslado = new mx.gob.sat.cfd._4.terceros.PorCuentadeTerceros.Impuestos.Traslados.Traslado();
+//				traslado.setImporte(new BigDecimal("0.000000").setScale(6));
+//				traslado.setTasa(new BigDecimal("0.000").setScale(3));
+//				traslado.setImpuesto("IVA");				
+//				traslados.getTraslado().add(traslado);	
+//				impuestos.setTraslados(traslados);				
+//				porCuentadeTerceros.setImpuestos(impuestos);				
+//				complementoConcepto.getAny().add(porCuentadeTerceros);				
+//				conceptoTerceros.setComplementoConcepto(complementoConcepto);				
 				cfdi.setConceptos(conceptos);				
 				importePadre = importePadre.add(importeTerceros);
 			}
@@ -417,9 +424,9 @@ public class CfdiService {
 			}			
 			System.out.println("importeTotal-->>>  " + importeTotal);
 			log.info("Tota::::::   " + cfdi.getTotal());		
-			mx.gob.sat.cfd._3.Comprobante.Impuestos impuestos = new mx.gob.sat.cfd._3.Comprobante.Impuestos();
-			mx.gob.sat.cfd._3.Comprobante.Impuestos.Traslados traslados = new mx.gob.sat.cfd._3.Comprobante.Impuestos.Traslados();
-			mx.gob.sat.cfd._3.Comprobante.Impuestos.Traslados.Traslado trasladosTotales = new mx.gob.sat.cfd._3.Comprobante.Impuestos.Traslados.Traslado();
+			mx.gob.sat.cfd._4.Comprobante.Impuestos impuestos = new mx.gob.sat.cfd._4.Comprobante.Impuestos();
+			mx.gob.sat.cfd._4.Comprobante.Impuestos.Traslados traslados = new mx.gob.sat.cfd._4.Comprobante.Impuestos.Traslados();
+			mx.gob.sat.cfd._4.Comprobante.Impuestos.Traslados.Traslado trasladosTotales = new mx.gob.sat.cfd._4.Comprobante.Impuestos.Traslados.Traslado();
 			trasladosTotales.setImporte(importeTotal.setScale(2, BigDecimal.ROUND_HALF_UP));
 			System.out.println("trasladosTotales.getImporte()-->>  " + trasladosTotales.getImporte());
 			trasladosTotales.setImpuesto("002");
@@ -508,15 +515,15 @@ public class CfdiService {
 		String xml;
 		JAXBContext jaxbContext;
 		List<Class<?>> classesMarshall = new ArrayList<Class<?>>();
-		comprobante.getComplemento().forEach(complemento -> {
-			complemento.getAny().forEach(object -> {
+		if(comprobante.getComplemento()!=null) {
+			comprobante.getComplemento().getAny().forEach(object -> {
 				if (object instanceof TimbreFiscalDigital) {
 					classesMarshall.add(TimbreFiscalDigital.class);
 				}
-			});
-		});
+			});			
+		}
 		classesMarshall.add(Comprobante.class);
-		classesMarshall.add(PorCuentadeTerceros.class);
+//		classesMarshall.add(PorCuentadeTerceros.class);
 //		classesMarshall.add(Pagos.class);
 		jaxbContext = JAXBContext.newInstance(classesMarshall.toArray(new Class<?>[classesMarshall.size()]));
 		Marshaller marshaller = jaxbContext.createMarshaller();
@@ -584,15 +591,15 @@ public class CfdiService {
         return calendar.getTime(); 	
     }
 	
-//	private Integer obtenerFolio(CControlFolioDto ccontrol) {
-//		log.info("ENTRY::: insertarFacturaCancelada:::  " + ccontrol.getCcontrolfolio() + " folioActual "
-//				+ ccontrol.getUfolioactual());
-//		Integer actualizo = ccontrol.getUfolioactual() + 1;
-//		ccontrol.setUfolioactual(actualizo);
-//		log.info("ufolio + 1 *********   "+actualizo);
-//		consultaDao.updateCControlFolio(ccontrol.getCcontrolfolio(), actualizo);
-//		return actualizo;
-//	}
+	private Integer obtenerFolio(CControlFolioDto ccontrol) {
+		log.info("ENTRY::: insertarFacturaCancelada:::  " + ccontrol.getCcontrolfolio() + " folioActual "
+				+ ccontrol.getUfolioactual());
+		Integer actualizo = ccontrol.getUfolioactual() + 1;
+		ccontrol.setUfolioactual(actualizo);
+		log.info("ufolio + 1 *********   "+actualizo);
+		consultaDao.updateCControlFolio(ccontrol.getCcontrolfolio(), actualizo);
+		return actualizo;
+	}
 	
 	private TPagoPacienteDto obtenerPago(List<TPagoPacienteDto> list) {
 		Integer mayor = list.get(0).getMpagopacienteparcial().intValue();
@@ -614,7 +621,7 @@ public class CfdiService {
 		List<String> listPrado = new ArrayList<String>(Arrays.asList(sucursalesPrado.split(",")));
 		List<String> listLean = new ArrayList<String>(Arrays.asList(sucursalesLean.split(",")));
 		
-		String rutaCadenaOriginal = env.getProperty("path.file.cadena.original");
+		String rutaCadenaOriginal = env.getProperty("path.file.cadena.original.4");
 		String pasword = "";
 		String rfcMarca = "";
 		String razonSocialMarca = "";

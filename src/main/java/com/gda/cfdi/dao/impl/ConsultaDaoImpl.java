@@ -71,7 +71,7 @@ public class ConsultaDaoImpl extends JdbcDaoSupport implements IConsultaDao{
 				+ "kordensucursal = ? ORDER BY kpagopaciente DESC" ;
 		try {
 			list = this.getJdbcTemplate().query(query, new Object[]{kordensucursal},new TPagoPacienteMapper());
-			logger.info("getTPagoPacienteDto ejecutado:");			
+			logger.info("getTPagoPacienteDto ejecutado:"+list.size());			
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
