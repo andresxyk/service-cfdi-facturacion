@@ -48,11 +48,15 @@ import com.gda.cfdi.controller.CfdiController;
 import com.gda.cfdi.dao.inte.IConsultaDao;
 import com.gda.cfdi.dto.CClaveProductoServicioSatDto;
 import com.gda.cfdi.dto.CControlFolioDto;
+import com.gda.cfdi.dto.CConvenioDto;
 import com.gda.cfdi.dto.CFormaPagoCfdiDto;
 import com.gda.cfdi.dto.CTipoPagoDto;
+import com.gda.cfdi.dto.CfdiDto;
 import com.gda.cfdi.dto.DatosMarcaDto;
 import com.gda.cfdi.dto.SelloDto;
+import com.gda.cfdi.dto.TDatoFiscalDto;
 import com.gda.cfdi.dto.TFacturaCanceladaDto;
+import com.gda.cfdi.dto.TFacturaEntityDto;
 import com.gda.cfdi.dto.TOrdenExamenSucursalDto;
 import com.gda.cfdi.dto.TOrdenSucursalDto;
 import com.gda.cfdi.dto.TPagoPacienteDto;
@@ -93,18 +97,48 @@ public class CfdiService {
 	@Autowired
 	private ConsultaService consultaService;
 	
-	public String generarCfdi(Integer kordensucursal) throws Exception {	
+	@Autowired
+	private UtilsService utilsService;
+	
+	public TFacturaEntityDto generarCfdi(Integer kordensucursal, Integer cusocfdi, Integer kdatofiscal) throws Exception {	
+		ArrayList<Integer> arrPrado = new ArrayList<Integer>(Arrays.asList(117,118,126,127,128,129,130,132,134,138,139,140,141,142,143,196,198,199,200));
+		ArrayList<Integer> arrLean = new ArrayList<Integer>(Arrays.asList(115,116,119,120,121,122,123,124,125,131,133,135,136,137,177,146,197));
+		
 		try {
-			Integer cusoCfdi = 3;
+			Integer cusoCfdi = cusocfdi;
 			Boolean bandAzteca;
 			
+			TDatoFiscalDto datoFiscalDto = consultaService.getTDatoFiscalById(kdatofiscal);		
 			List<TPagoPacienteDto> list = consultaService.getTPagoPacienteDto(kordensucursal);
 			List<TOrdenSucursalDto> listTos = consultaService.getListTOrdenSucursalByKordensucursal(kordensucursal);
 			Boolean contieneSaldo = list.get(0).getMsaldo().intValue() > 0 ? true :false;
 			Integer csucursal = listTos.get(0).getCsucursal();
+			String ssucursal = listTos.get(0).getSsucursal();
 			Integer cmarca = listTos.get(0).getCmarca();
 			Integer cconvenio = listTos.get(0).getCconvenio();
-			TPagoPacienteDto pacienteDto = this.obtenerPago(list);			
+			CConvenioDto convenioDto = consultaService.getCcovenioDtoById(cconvenio);
+			TPagoPacienteDto pacienteDto = this.obtenerPago(list);	
+			Integer centidadlegal = null;
+			if(cmarca.equals(7)){
+				if(arrPrado.contains(csucursal)){
+					centidadlegal = 7;
+		        }else if(arrLean.contains(csucursal)){
+		        	centidadlegal = 8;
+		        }				
+			}else if(cmarca.equals(1)){
+				centidadlegal = 1;
+			}else if(cmarca.equals(4)){
+				centidadlegal = 5;
+			}else if(cmarca.equals(5)){
+				centidadlegal = 6;
+			}else if(cmarca.equals(15)){
+				centidadlegal = 16;
+			}else if(cmarca.equals(17)){
+				centidadlegal = 18;
+			}
+			
+			
+			
 			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");			
 			Date fechaInicio = null;
 			Date fechaFin = null;			
@@ -122,7 +156,8 @@ public class CfdiService {
 			} else {
 				tipoPago = "PUE";
 			}
-			DatosMarcaDto datosMarcaDto = obtenerDatosMarca(cmarca, csucursal, bandAzteca);
+			
+			DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosMarca(cmarca, csucursal, bandAzteca);
 			
 			String FORMATER = "yyyy-MM-dd'T'HH:mm:ss";
 			DateFormat format = new SimpleDateFormat(FORMATER);
@@ -193,9 +228,9 @@ public class CfdiService {
 			
 			// Receptor
 			Receptor receptor = of.createComprobanteReceptor();
-			receptor.setNombre("PUBLICO EN GENERAL");  
+			receptor.setNombre(datoFiscalDto.getSrazonsocial());  
 			log.info("Nombre:::-----    "+receptor.getNombre());
-			receptor.setRfc("XAXX010101000");
+			receptor.setRfc(datoFiscalDto.getSrfc());
 			log.info("cusoCfdi--->>>   " + cusoCfdi);
 			switch (cusoCfdi) {
 			case 3:
@@ -436,7 +471,36 @@ public class CfdiService {
 			cfdi.setSello(selloDto.getSelloCFDI());
 			
 			String xmlOriginalSello = createXmlFromComprobante(cfdi);
-			return xmlOriginalSello;
+			
+			TFacturaEntityDto tfactura = new TFacturaEntityDto();
+			tfactura.setKdatofiscal(kdatofiscal);
+			tfactura.setSsucursal(ssucursal);
+			tfactura.setUfoliofactura(Integer.parseInt(cfdi.getFolio()));
+			tfactura.setCcliente(convenioDto.getCcliente()); //
+			tfactura.setCsucursal(csucursal);
+			tfactura.setCformapago(tipoPago.equals("PUE") ? 1 : 2);
+			tfactura.setMdescuento(BigDecimal.ZERO);
+			tfactura.setMsubtotal(cfdi.getSubTotal());
+			tfactura.setMcopago(BigDecimal.ZERO);
+			tfactura.setMiva(importeTotal);
+			tfactura.setMtotal(cfdi.getTotal());
+			tfactura.setCtipoimpuesto(1);
+			tfactura.setCconvenio(cconvenio);
+			tfactura.setScadenaoriginal("");
+			tfactura.setCentidadlegal(centidadlegal);
+			tfactura.setDregistro(new Date());
+			tfactura.setCestadoregistro(33);
+			tfactura.setUser_id_change(1);
+			tfactura.setUser_id(1);
+			tfactura.setSxml(xmlOriginalSello);
+			tfactura.setSxmlsello("");
+			tfactura.setSserie(cfdi.getSerie());
+			tfactura.setSurl("");
+			tfactura.setSuddi("");
+			tfactura.setScadenaoriginal(selloDto.getCadenaOriginal().length()>4000?selloDto.getCadenaOriginal().substring(0, 3999):selloDto.getCadenaOriginal());
+			tfactura.setSsellodigital(selloDto.getSelloCFDI());
+			
+			return tfactura;
 		} catch (Exception e) {
 			throw e;
 		}
@@ -608,94 +672,7 @@ public class CfdiService {
 	}
 	
 	
-	private DatosMarcaDto obtenerDatosMarca(Integer marca, Integer csucursal, boolean bandAzteca){
-		String sucursalesPrado = env.getProperty("list.sucursal.jenner.prado");
-		String sucursalesLean = env.getProperty("list.sucursal.jenner.lean");
-		List<String> listPrado = new ArrayList<String>(Arrays.asList(sucursalesPrado.split(",")));
-		List<String> listLean = new ArrayList<String>(Arrays.asList(sucursalesLean.split(",")));
-		
-		String rutaCadenaOriginal = env.getProperty("path.file.cadena.original");
-		String pasword = "";
-		String rfcMarca = "";
-		String razonSocialMarca = "";
-		String numeroCertificado = "";
-		String rutaKey = "";
-		String rutaCer = "";
-		switch (marca) {
-		case 1:
-			log.info("**** OLAB *****");
-			rutaKey = env.getProperty("path.file.key.olab");
-			rutaCer = env.getProperty("path.file.cer.olab");		
-			pasword = env.getProperty("password.cer.olab");	
-			rfcMarca = env.getProperty("rfc.marca.olab");	
-			razonSocialMarca = env.getProperty("razon.social.olab");
-			numeroCertificado = env.getProperty("numero.certificado.olab");
-			break;
-		case 4:
-			log.info("**** AZTECA *****");
-			rutaKey = env.getProperty("path.file.key.azteca");
-			rutaCer = env.getProperty("path.file.cer.azteca");		
-			pasword = env.getProperty("password.cer.azteca");	
-			rfcMarca = env.getProperty("rfc.marca.azteca");	
-			razonSocialMarca = env.getProperty("razon.social.azteca");
-			numeroCertificado = env.getProperty("numero.certificado.azteca");
-			break;
-		case 7:
-			log.info("**** JENNER *****");
-			if(bandAzteca){
-				log.info("**** JENNER Timbrado con Azteca *****");
-				rutaKey = env.getProperty("path.file.key.azteca");
-				rutaCer = env.getProperty("path.file.cer.azteca");		
-				pasword = env.getProperty("password.cer.azteca");	
-				rfcMarca = env.getProperty("rfc.marca.azteca");	
-				razonSocialMarca = env.getProperty("razon.social.azteca");
-				numeroCertificado = env.getProperty("numero.certificado.azteca");			
-			}else{				
-				if(listPrado.contains(csucursal.toString())){
-					log.info("**** PRADO *****");
-					rutaKey = env.getProperty("path.file.key.prado");
-					rutaCer = env.getProperty("path.file.cer.prado");		
-					pasword = env.getProperty("password.cer.prado");	
-					rfcMarca = env.getProperty("rfc.marca.prado");	
-					razonSocialMarca = env.getProperty("razon.social.prado");
-					numeroCertificado = env.getProperty("numero.certificado.prado");	
-				}else if(listLean.contains(csucursal.toString())){
-					log.info("**** LEAN *****");
-					rutaKey = env.getProperty("path.file.key.lean");
-					rutaCer = env.getProperty("path.file.cer.lean");		
-					pasword = env.getProperty("password.cer.lean");	
-					rfcMarca = env.getProperty("rfc.marca.lean");	
-					razonSocialMarca = env.getProperty("razon.social.lean");
-					numeroCertificado = env.getProperty("numero.certificado.lean");
-				}
-			}
-			break;
-		case 5:
-			log.info("**** SWISSLAB *****");
-			rutaKey = env.getProperty("path.file.key.swisslab");
-			rutaCer = env.getProperty("path.file.cer.swisslab");		
-			pasword = env.getProperty("password.cer.swisslab");	
-			rfcMarca = env.getProperty("rfc.marca.swisslab");	
-			razonSocialMarca = env.getProperty("razon.social.swisslab");
-			numeroCertificado = env.getProperty("numero.certificado.swisslab");
-			break;			
-		case 15:
-			log.info("**** LIACSA *****");
-			rutaKey = env.getProperty("path.file.key.swisslab");
-			rutaCer = env.getProperty("path.file.cer.swisslab");		
-			pasword = env.getProperty("password.cer.swisslab");	
-			rfcMarca = env.getProperty("rfc.marca.swisslab");	
-			razonSocialMarca = env.getProperty("razon.social.swisslab");
-			numeroCertificado = env.getProperty("numero.certificado.swisslab");
-			break;		
-		default:
-			break;
-		}
-		
-		DatosMarcaDto datosMarcaDto= new DatosMarcaDto(rutaCadenaOriginal, pasword, rfcMarca, 
-				razonSocialMarca, numeroCertificado, rutaKey, rutaCer);
-		return datosMarcaDto;
-	}
+	
 	
 	public String obtenerCertificadocer(DatosMarcaDto datosMarcaDto) throws Exception{
 		log.info("Obtener certificado*******");

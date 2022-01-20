@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gda.cfdi.dto.TFacturaEntityDto;
 import com.gda.cfdi.exception.ResponseErrorDto;
 import com.gda.cfdi.service.Cfdi4Service;
 import com.gda.cfdi.service.CfdiService;
@@ -29,15 +29,16 @@ public class CfdiController {
 	
 	@GetMapping("/generar-cfdi")
 	public ResponseEntity<?> getXmlOrden(@RequestParam("kordensucursal") Integer kordensucursal,
-			@RequestParam("version") Integer version){
+			@RequestParam("version") Integer version, @RequestParam("cusocfdi") Integer cusocfdi, 
+			@RequestParam("kdatofiscal") Integer kdatofiscal){
 		try {
-			String cfdi = "";
+			TFacturaEntityDto cfdiDto = null;
 			if(version.equals(3)) {
-				cfdi = cfdiService.generarCfdi(kordensucursal);	
-				return new ResponseEntity<String>(cfdi, HttpStatus.OK);
+				cfdiDto = cfdiService.generarCfdi(kordensucursal, cusocfdi, kdatofiscal);	
+				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else if(version.equals(4)){
-				cfdi = cfdi4Service.generarCfdi(kordensucursal);
-				return new ResponseEntity<String>(cfdi, HttpStatus.OK);
+				cfdiDto = cfdi4Service.generarCfdi(kordensucursal);
+				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else {
 				ResponseErrorDto dto = new ResponseErrorDto();
 				dto.setCodigo("error");
@@ -53,6 +54,4 @@ public class CfdiController {
 		}
 	}
 	
-	
-
 }

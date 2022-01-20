@@ -50,9 +50,11 @@ import com.gda.cfdi.dto.CClaveProductoServicioSatDto;
 import com.gda.cfdi.dto.CControlFolioDto;
 import com.gda.cfdi.dto.CFormaPagoCfdiDto;
 import com.gda.cfdi.dto.CTipoPagoDto;
+import com.gda.cfdi.dto.CfdiDto;
 import com.gda.cfdi.dto.DatosMarcaDto;
 import com.gda.cfdi.dto.SelloDto;
 import com.gda.cfdi.dto.TFacturaCanceladaDto;
+import com.gda.cfdi.dto.TFacturaEntityDto;
 import com.gda.cfdi.dto.TOrdenExamenSucursalDto;
 import com.gda.cfdi.dto.TOrdenSucursalDto;
 import com.gda.cfdi.dto.TPagoPacienteDto;
@@ -64,14 +66,12 @@ import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados.CfdiRelacionado;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.ACuentaTerceros;
-import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.ComplementoConcepto;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados.Traslado;
 import mx.gob.sat.cfd._4.Comprobante.Emisor;
 import mx.gob.sat.cfd._4.Comprobante.Receptor;
 import mx.gob.sat.cfd._4.ObjectFactory;
-
 import mx.gob.sat.sitio_internet.cfd.catalogos.CMetodoPago;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CMoneda;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CRegimenFiscal;
@@ -91,7 +91,7 @@ public class Cfdi4Service {
 	@Autowired
 	private IConsultaDao consultaDao;
 	
-	public String generarCfdi(Integer kordensucursal) throws Exception {	
+	public TFacturaEntityDto generarCfdi(Integer kordensucursal) throws Exception {	
 		try {
 			Integer cusoCfdi = 3;
 			Boolean bandAzteca;
@@ -443,7 +443,8 @@ public class Cfdi4Service {
 			cfdi.setSello(selloDto.getSelloCFDI());
 			
 			String xmlOriginalSello = createXmlFromComprobante(cfdi);
-			return xmlOriginalSello;
+			TFacturaEntityDto cfdiDto = new TFacturaEntityDto();
+			return cfdiDto;
 		} catch (Exception e) {
 			throw e;
 		}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://cancelacfd.sat.gob.mx">
+  <xs:element name="Cancelacion">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Folios">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Folio">
+                <xs:complexType>
+                  <xs:attribute name="UUID" type="xs:string" use="required" />
+                  <xs:attribute name="Motivo" type="xs:unsignedByte" use="required" />
+                  <xs:attribute name="FolioSustitucion" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="Fecha" type="xs:dateTime" use="required" />
+      <xs:attribute name="RfcEmisor" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xsd:schema>
