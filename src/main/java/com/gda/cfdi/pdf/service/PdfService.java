@@ -1,9 +1,12 @@
 package com.gda.cfdi.pdf.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -134,7 +137,19 @@ public class PdfService {
 				} 
 			}
 		}
-		return ruta;		
+		
+		String b64 = null;
+		try {
+	      File file = new File(ruta);
+	      byte [] bytes = Files.readAllBytes(file.toPath());
+
+	      b64 = Base64.getEncoder().encodeToString(bytes);
+	      file.delete();
+	    } catch (Exception e) {
+	      e.printStackTrace();
+	    }
+		
+		return b64;		
 	}
 	
 	
