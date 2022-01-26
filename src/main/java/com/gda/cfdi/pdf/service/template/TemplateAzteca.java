@@ -152,7 +152,7 @@ public class TemplateAzteca extends PdfPageEventHelper{
 			Font fuenteTimbradoImpor = new Font(Font.FontFamily.HELVETICA,4,Font.BOLD,BaseColor.BLACK);
 			
 			/*rutapruebas*/// imagenLogo = Image.getInstance("C:/Users/Desarrollo_GDA/documentos Timbrado/imgs/AZTECA.png");
-			/*rutaproduccion*/ imagenLogo = Image.getInstance("/mnt/gda/DesarrolloGDA/documentosTimbrao/imgs/AZTECA.png");
+			/*rutaproduccion*/ imagenLogo = Image.getInstance("/home/orubio/DesarrolloGDA/documentosTimbrao/imgs/AZTECA.png");
 			imagenLogo.setAbsolutePosition(400,730f);           
             imagenLogo.scaleAbsoluteWidth(160f);
             imagenLogo.scaleAbsoluteHeight(75f);             
@@ -388,14 +388,14 @@ public class TemplateAzteca extends PdfPageEventHelper{
 			///////////////////////////////////////////////////////////////////////////////////////////////
 			////////////////// Pie de Pagina 
 			///////////////////////////////////////////////////////////////////////////////////////////////
-//            imagenQr = Image.getInstance("/mnt/gda/Desarrollo GDA/documentos Timbrado/pdf/imgs/qr.png");
+//            imagenQr = Image.getInstance("/home/orubio/Desarrollo GDA/documentos Timbrado/pdf/imgs/qr.png");
             String imgCrearQr = "?re="+strRFCEmisor+"&rr="+strRFCReceptor+"&tt="+comprobante.getTotal().toString()+"&id="+uuid;
-            /*rutaproduccion*/ File f = new File("/mnt/gda/DesarrolloGDA/documentosTimbrao/imgs/qr.png");
+            /*rutaproduccion*/ File f = new File("/home/orubio/DesarrolloGDA/documentosTimbrao/imgs/qr.png");
             /*rutapruebas*/// File f = new File("C:/Users/Desarrollo_GDA/documentos Timbrado/imgs/qr.png");
             GenerarQRCode qrCode = new GenerarQRCode();
             qrCode.generateQR(f, imgCrearQr, 600, 600);
             
-            /*rutaproduccion*/ imagenQr = Image.getInstance("/mnt/gda/DesarrolloGDA/documentosTimbrao/imgs/qr.png");
+            /*rutaproduccion*/ imagenQr = Image.getInstance("/home/orubio/DesarrolloGDA/documentosTimbrao/imgs/qr.png");
             /*rutapruebas*/// imagenQr = Image.getInstance("C:/Users/Desarrollo_GDA/documentos Timbrado/imgs/qr.png");
             imagenQr.setAbsolutePosition(32, 60f);         
 			imagenQr.scaleAbsoluteWidth(97.06f);

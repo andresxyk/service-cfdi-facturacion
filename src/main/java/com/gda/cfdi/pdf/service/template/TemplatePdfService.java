@@ -62,7 +62,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 		
 		FileOutputStream ficheroPdf = null;
 		try {
-			/*rutaproduccion*/ ruta = "/mnt/gda/DesarrolloGDA/documentosTimbrao/pdf/Olab/pdf/OLFA_"+infoPDF.getKfactura()+".pdf";
+			/*rutaproduccion*/ ruta = "/home/orubio/DesarrolloGDA/documentosTimbrao/pdf/Olab/pdf/OLFA_"+infoPDF.getKfactura()+".pdf";
 			/*rutapruebas*/// ruta = "C:/Users/Desarrollo_GDA/documentos Timbrado/pdf/Olab/pdf/OLFA_"+kfactura+".pdf";
 			ficheroPdf = new FileOutputStream(ruta);
 		} catch (FileNotFoundException e) {
@@ -530,7 +530,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 		Document reporteAzteca = new Document(PageSize.A4, 36, 36, 260,150);
 		FileOutputStream ficheroPdf = null;
 		try {
-	/*rutaproduccion*/ ruta = "/mnt/gda/DesarrolloGDA/documentosTimbrao/pdf/Azteca/pdf/AZFA_"+infoPDF.getKfactura()+".pdf";
+	/*rutaproduccion*/ ruta = "/home/orubio/DesarrolloGDA/documentosTimbrao/pdf/Azteca/pdf/AZFA_"+infoPDF.getKfactura()+".pdf";
 	/*rutapruebas*///	ruta = "C:/Users/Desarrollo_GDA/documentos Timbrado/pdf/Azteca/pdf/AZFA_"+kfactura+".pdf";
 			ficheroPdf = new FileOutputStream(ruta);
 		} catch (FileNotFoundException e) {
@@ -1000,7 +1000,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 		Document reporteAzteca = new Document(PageSize.A4, 36, 36, 260,136);
 		FileOutputStream ficheroPdf = null;
 		try {
-			/*rutaproduccion*/ ruta = "/mnt/gda/DesarrolloGDA/documentosTimbrao/pdf/Swisslab/pdf/SWFA_"+infoPDF.getKfactura()+".pdf";
+			/*rutaproduccion*/ ruta = "/home/orubio/DesarrolloGDA/documentosTimbrao/pdf/Swisslab/pdf/SWFA_"+infoPDF.getKfactura()+".pdf";
 			/*rutapruebas*/// ruta = "C:/Users/Desarrollo_GDA/documentos Timbrado/pdf/Olab/pdf/OLFA_"+kfactura+".pdf";
 			ficheroPdf = new FileOutputStream(ruta);
 		} catch (FileNotFoundException e) {
@@ -1474,7 +1474,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 		Document reporteAzteca = new Document(PageSize.A4, 36, 36, 260,136);
 		FileOutputStream ficheroPdf = null;
 		try {
-			/*rutaproduccion*/ ruta = "/mnt/gda/DesarrolloGDA/documentosTimbrao/pdf/Liacsa/pdf/LIFA_"+infoPDF.getKfactura()+".pdf";
+			/*rutaproduccion*/ ruta = "/home/orubio/DesarrolloGDA/documentosTimbrao/pdf/Liacsa/pdf/LIFA_"+infoPDF.getKfactura()+".pdf";
 			/*rutapruebas*/// ruta = "C:/Users/Desarrollo_GDA/documentos Timbrado/pdf/Olab/pdf/OLFA_"+kfactura+".pdf";
 			ficheroPdf = new FileOutputStream(ruta);
 		} catch (FileNotFoundException e) {
@@ -1948,7 +1948,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 		Document reporteAzteca = new Document(PageSize.A4, 36, 36, 260,136);
 		FileOutputStream ficheroPdf = null;
 		try {
-			/*rutaproduccion*/ ruta = "/mnt/gda/DesarrolloGDA/documentosTimbrao/pdf/Jenner/pdf/JEFA_"+infoPDF.getKfactura()+".pdf";
+			/*rutaproduccion*/ ruta = "/home/orubio/DesarrolloGDA/documentosTimbrao/pdf/Jenner/pdf/JEFA_"+infoPDF.getKfactura()+".pdf";
 			/*rutapruebas*///ruta = "C:/Users/Desarrollo_GDA/documentos Timbrado/pdf/Jenner/pdf/JEFA_"+kfactura+".pdf";
 			ficheroPdf = new FileOutputStream(ruta);
 		} catch (FileNotFoundException e) {

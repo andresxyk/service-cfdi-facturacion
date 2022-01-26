@@ -151,7 +151,7 @@ public class TemplateSwiss extends PdfPageEventHelper{
 			
 			
 			
-			/*rutaproduccion*/ imagenLogo = Image.getInstance("/mnt/gda/DesarrolloGDA/documentosTimbrao/imgs/SWISSLAB.png");
+			/*rutaproduccion*/ imagenLogo = Image.getInstance("/home/orubio/DesarrolloGDA/documentosTimbrao/imgs/SWISSLAB.png");
 			/*rutapruebas*/// imagenLogo = Image.getInstance("C:\\Users\\Desarrollo_GDA\\documentos Timbrado\\imgs\\SWISSLAB.png");
 			imagenLogo.setAbsolutePosition(370, 730f);           
             imagenLogo.scaleAbsoluteWidth(200f);
@@ -393,12 +393,12 @@ public class TemplateSwiss extends PdfPageEventHelper{
 			////////////////// Pie de Pagina 
 			///////////////////////////////////////////////////////////////////////////////////////////////
             String imgCrearQr = "?re="+strRFCEmisor+"&rr="+strRFCReceptor+"&tt="+comprobante.getTotal().toString()+"&id="+uuid;
-            /*rutaproduccion*/ File f = new File("/mnt/gda/DesarrolloGDA/documentosTimbrao/imgs/qr.png");
+            /*rutaproduccion*/ File f = new File("/home/orubio/DesarrolloGDA/documentosTimbrao/imgs/qr.png");
             /*rutapruebas*/// File f = new File("C:/Users/Desarrollo_GDA/documentos Timbrado/imgs/qr.png");
       	GenerarQRCode qrCode = new GenerarQRCode();
       	qrCode.generateQR(f, imgCrearQr, 600, 600);
           
-      		/*rutaproduccion*/ imagenQr = Image.getInstance("/mnt/gda/DesarrolloGDA/documentosTimbrao/imgs/qr.png");
+      		/*rutaproduccion*/ imagenQr = Image.getInstance("/home/orubio/DesarrolloGDA/documentosTimbrao/imgs/qr.png");
       		/*rutapruebas*/// imagenQr = Image.getInstance("C:/Users/Desarrollo_GDA/documentos Timbrado/imgs/qr.png");
       		imagenQr.setAbsolutePosition(32, 60f);         
 			imagenQr.scaleAbsoluteWidth(97.06f);
