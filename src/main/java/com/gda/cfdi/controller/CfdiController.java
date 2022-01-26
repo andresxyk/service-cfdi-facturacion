@@ -54,4 +54,31 @@ public class CfdiController {
 		}
 	}
 	
+	
+	@GetMapping("/cfdi-orden-credito")
+	public ResponseEntity<?> getXmlOrdenCredito(@RequestParam("kordensucursal") Integer kordensucursal,
+			@RequestParam("version") Integer version){
+		try {
+			TFacturaEntityDto cfdiDto = null;
+			if(version.equals(3)) {
+//				cfdiDto = cfdiService.generarCfdi(kordensucursal, cusocfdi, kdatofiscal);	
+				return new ResponseEntity<String>("version 3", HttpStatus.OK);
+			}else if(version.equals(4)){
+//				cfdiDto = cfdi4Service.generarCfdi(kordensucursal);
+				return new ResponseEntity<String>("version 4", HttpStatus.OK);
+			}else {
+				ResponseErrorDto dto = new ResponseErrorDto();
+				dto.setCodigo("error");
+				dto.setDescripcion("La versión es incorrecta.");
+				return new ResponseEntity<ResponseErrorDto>(dto, HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			ResponseErrorDto dto = new ResponseErrorDto();
+			dto.setCodigo("error");
+			dto.setDescripcion(e.getMessage());
+			return new ResponseEntity<ResponseErrorDto>(dto, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 }
