@@ -11,11 +11,14 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.gda.cfdi.dto.CControlFolioDto;
 import com.gda.cfdi.dto.CConvenioDto;
 import com.gda.cfdi.dto.CFormaPagoCfdiDto;
 import com.gda.cfdi.dto.CTipoPagoDto;
+import com.gda.cfdi.dto.CUsoCfdiDto;
+import com.gda.cfdi.dto.DatosFiscales;
 import com.gda.cfdi.dto.DatosFiscalesDto;
 import com.gda.cfdi.dto.EstudioDto;
 import com.gda.cfdi.dto.TDatoFiscalDto;
@@ -32,6 +35,32 @@ public class ConsultaService {
 	
 	@Autowired
 	private Environment env;
+	
+	public List<CUsoCfdiDto> getListUsoCFDI(Integer num){
+		RestTemplate template = new RestTemplate();
+		String url = env.getProperty("url.service.database")+"getListUsoCFDI-by-num";
+		String urlParam = UriComponentsBuilder.fromUriString(url)
+				.queryParam("num", num)
+					.build().toString();
+		CUsoCfdiDto[] array = template.getForObject(urlParam, CUsoCfdiDto[].class);
+		return Arrays.asList(array);
+	}
+	
+	public DatosFiscales obtenerDatosFiscalesByCConvenio(Integer cconvenio) {
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"datosFiscales-by-cconvenio";			
+			String urlParam = UriComponentsBuilder.fromUriString(url)
+					.queryParam("cconvenio", cconvenio)
+						.build().toString();
+			DatosFiscales response = template.getForObject(urlParam, DatosFiscales.class);
+			return response;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			throw e;
+		}
+	}
 	
 	public Integer updateMontosFactura(BigDecimal total, BigDecimal subtotal, BigDecimal iva, BigDecimal descuento, Integer kfactura){
 		try {

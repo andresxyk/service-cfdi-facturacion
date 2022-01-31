@@ -62,6 +62,22 @@ public class UtilsService {
 	private Environment env;
 	
 	
+	public boolean validarRFC(String rfc) throws Exception {
+		log.info("Validar Fisica/moral " + rfc);
+		boolean correcto = false;
+		if (rfc.length() == 13) {
+			log.info("Validar persona fisica:::  " + rfc);
+			correcto = rfc.toUpperCase()
+					.matches("[ÑA-Z|&]{4}[0-9]{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])[A-Z0-9]{2}[0-9A]");
+		} else if (rfc.length() == 12) {
+			log.info("Validar persona moral:::  " + rfc);
+			correcto = rfc.toUpperCase()
+					.matches("[ÑA-Z|&]{3}[0-9]{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])[A-Z0-9]{2}[0-9A]");
+		}
+		log.info("RFC valido-->><  " + correcto);
+		return correcto;
+	}
+	
 	public String createXmlFromComprobante(Comprobante comprobante) throws JAXBException {
 		String xml;
 		JAXBContext jaxbContext;
