@@ -1,5 +1,6 @@
 package com.gda.cfdi.service;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,8 +16,11 @@ import com.gda.cfdi.dto.CControlFolioDto;
 import com.gda.cfdi.dto.CConvenioDto;
 import com.gda.cfdi.dto.CFormaPagoCfdiDto;
 import com.gda.cfdi.dto.CTipoPagoDto;
+import com.gda.cfdi.dto.DatosFiscalesDto;
+import com.gda.cfdi.dto.EstudioDto;
 import com.gda.cfdi.dto.TDatoFiscalDto;
 import com.gda.cfdi.dto.TFacturaCanceladaDto;
+import com.gda.cfdi.dto.TFacturaCreditoDto;
 import com.gda.cfdi.dto.TFacturaDto;
 import com.gda.cfdi.dto.TOrdenSucursalDto;
 import com.gda.cfdi.dto.TPagoPacienteDto;
@@ -28,6 +32,50 @@ public class ConsultaService {
 	
 	@Autowired
 	private Environment env;
+	
+	public Integer updateMontosFactura(BigDecimal total, BigDecimal subtotal, BigDecimal iva, BigDecimal descuento, Integer kfactura){
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"updateMontosFactura-credito?total={total}&subtotal={subtotal}"
+					+ "&iva={iva}&descuento={descuento}&kfactura={kfactura}";
+			String urlParam = url.replace("{total}", total.toString()).replace("{subtotal}", subtotal.toString())
+					.replace("{iva}", iva.toString()).replace("{descuento}", descuento.toString()).replace("{kfactura}", kfactura.toString());
+			Integer id = template.postForObject(urlParam, null, Integer.class);
+			return id;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			throw e;
+		}
+	}
+	
+	public List<EstudioDto> getListEstudiosByKfactura(Integer kfactura){
+		RestTemplate template = new RestTemplate();
+		String url = env.getProperty("url.service.database")+"getListEstudios-by-kfactura?kfactura="+kfactura;
+		EstudioDto[] array = template.getForObject(url, EstudioDto[].class);
+		return Arrays.asList(array);
+	}
+	
+	public List<TDatoFiscalDto> getListDatosFiscalesByRfc(String rfc){
+		RestTemplate template = new RestTemplate();
+		String url = env.getProperty("url.service.database")+"getListDatosFiscales-by-rfc?rfc="+rfc;
+		TDatoFiscalDto[] array = template.getForObject(url, TDatoFiscalDto[].class);
+		return Arrays.asList(array);
+	}
+	
+	public DatosFiscalesDto getDatosFiscalesByConvenio(Integer cconvenio) {
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"datosFiscales-by-cconvenio?cconvenio={cconvenio}";
+			String urlParam = url.replace("{cconvenio}", cconvenio.toString());
+			DatosFiscalesDto response = template.getForObject(urlParam, DatosFiscalesDto.class);
+			return response;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			throw e;
+		}
+	}
 	
 	public TFacturaDto getTFacturaDto(Integer kfactura) {
 		try {
@@ -146,6 +194,50 @@ public class ConsultaService {
 			log.error(e.getMessage());
 			log.error(e.getResponseBodyAsString());
 			return null;
+		}
+	}
+	
+	public TFacturaCreditoDto getTFacturaCreditoDtoBySerieAndFolio(String sserie, Integer folio) {
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"tfacturaCredito-by-csucursal-and-folio?sserie="+sserie+"&folio="+folio;
+			TFacturaCreditoDto dto = template.getForObject(url, TFacturaCreditoDto.class);
+			return dto;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			return null;
+		}
+	}
+	
+	public Integer updateAjusteFactura(Integer kfactura, Integer user_id_change, BigDecimal msubtotal, BigDecimal miva, BigDecimal mtotal){
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"updateAjusteFactura-credito?kfactura={kfactura}&useridchange={useridchange}"
+					+ "&msubtotal={msubtotal}&miva={miva}&mtotal={mtotal}";
+			String urlParam = url.replace("{kfactura}", kfactura.toString()).replace("{useridchange}", user_id_change.toString())
+					.replace("{msubtotal}", msubtotal.toString()).replace("{miva}", miva.toString()).replace("{mtotal}", mtotal.toString());
+			Integer id = template.postForObject(urlParam, null, Integer.class);
+			return id;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			throw e;
+		}
+	}
+	
+	public Integer updateMetodoPago(String strNoCuenta,String strMetodoPago,Integer cconvenio){
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"updateMetodoPago-credito?strNoCuenta={strNoCuenta}&strMetodoPago={strMetodoPago}"
+					+ "&cconvenio={cconvenio}";
+			String urlParam = url.replace("{strNoCuenta}", strNoCuenta).replace("{strMetodoPago}", strMetodoPago).replace("{cconvenio}", cconvenio.toString());
+			Integer id = template.postForObject(urlParam, null, Integer.class);
+			return id;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			throw e;
 		}
 	}
 	
