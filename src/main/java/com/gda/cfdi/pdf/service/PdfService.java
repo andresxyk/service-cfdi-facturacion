@@ -114,23 +114,23 @@ public class PdfService {
 				switch (cmarca) {
 					case 1:
 						log.info("OLAB*****");
-						ruta = iTemplatePdfService.CrearPdfMarcaOlab(comprobante, infoPDF);
+						ruta = iTemplatePdfService.CrearPdfMarcaOlab(comprobante, infoPDF,env);
 						break;
 					case 4:
 						log.info("*******************AZTECA*****");
-						ruta = iTemplatePdfService.CrearPdfMarcaAzteca(comprobante, infoPDF);
+						ruta = iTemplatePdfService.CrearPdfMarcaAzteca(comprobante, infoPDF,env);
 						break;
 					case 5:
 						log.info("SWISSLAB*****");
-						ruta = iTemplatePdfService.CrearPdfMarcaSwiss(comprobante, infoPDF);
+						ruta = iTemplatePdfService.CrearPdfMarcaSwiss(comprobante, infoPDF,env);
 						break;
 					case 15:
 						log.info("LIACSA*****");
-						ruta = iTemplatePdfService.CrearPdfMarcaLiacsa(comprobante, infoPDF);
+						ruta = iTemplatePdfService.CrearPdfMarcaLiacsa(comprobante, infoPDF,env);
 						break;
 					case 7:
 						log.info("JENNER*****");
-						ruta = iTemplatePdfService.CrearPdfMarcaJenner(comprobante, infoPDF);
+						ruta = iTemplatePdfService.CrearPdfMarcaJenner(comprobante, infoPDF,env);
 						break;
 					default:
 						break;

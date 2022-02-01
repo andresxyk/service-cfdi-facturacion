@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 
 import com.gda.cfdi.pdf.dto.PdfInfoDto;
 import com.gda.cfdi.pdf.utils.GenerarQRCode;
@@ -45,7 +46,7 @@ public class TemplateSwiss extends PdfPageEventHelper{
 	PdfPTable tabPieCFDI = new PdfPTable(2);
 	private Image imagenQr;
 	
-	public TemplateSwiss(Comprobante comprobante, PdfInfoDto infoPDF) throws Exception{
+	public TemplateSwiss(Comprobante comprobante, PdfInfoDto infoPDF, Environment env) throws Exception{
 		try {
 			String strDirSucursal = infoPDF.getDirSucursal();
 			CTipoDeComprobante tipoComprobante = comprobante.getTipoDeComprobante();
@@ -151,8 +152,7 @@ public class TemplateSwiss extends PdfPageEventHelper{
 			
 			
 			
-			/*rutaproduccion*/ imagenLogo = Image.getInstance("/home/orubio/DesarrolloGDA/documentosTimbrao/imgs/SWISSLAB.png");
-			/*rutapruebas*/// imagenLogo = Image.getInstance("C:\\Users\\Desarrollo_GDA\\documentos Timbrado\\imgs\\SWISSLAB.png");
+			/*rutaproduccion*/ imagenLogo = Image.getInstance(env.getProperty("path.file.logo.swisslab"));
 			imagenLogo.setAbsolutePosition(370, 730f);           
             imagenLogo.scaleAbsoluteWidth(200f);
             imagenLogo.scaleAbsoluteHeight(90f);             
@@ -393,13 +393,11 @@ public class TemplateSwiss extends PdfPageEventHelper{
 			////////////////// Pie de Pagina 
 			///////////////////////////////////////////////////////////////////////////////////////////////
             String imgCrearQr = "?re="+strRFCEmisor+"&rr="+strRFCReceptor+"&tt="+comprobante.getTotal().toString()+"&id="+uuid;
-            /*rutaproduccion*/ File f = new File("/home/orubio/DesarrolloGDA/documentosTimbrao/imgs/qr.png");
-            /*rutapruebas*/// File f = new File("C:/Users/Desarrollo_GDA/documentos Timbrado/imgs/qr.png");
+            /*rutaproduccion*/ File f = new File(env.getProperty("path.file.qr")); 
       	GenerarQRCode qrCode = new GenerarQRCode();
       	qrCode.generateQR(f, imgCrearQr, 600, 600);
           
-      		/*rutaproduccion*/ imagenQr = Image.getInstance("/home/orubio/DesarrolloGDA/documentosTimbrao/imgs/qr.png");
-      		/*rutapruebas*/// imagenQr = Image.getInstance("C:/Users/Desarrollo_GDA/documentos Timbrado/imgs/qr.png");
+      		/*rutaproduccion*/ imagenQr = Image.getInstance(env.getProperty("path.file.qr"));
       		imagenQr.setAbsolutePosition(32, 60f);         
 			imagenQr.scaleAbsoluteWidth(97.06f);
 			imagenQr.scaleAbsoluteHeight(97.06f);

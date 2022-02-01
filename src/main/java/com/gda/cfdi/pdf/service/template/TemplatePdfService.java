@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.gda.cfdi.pdf.dto.PdfInfoDto;
@@ -33,7 +34,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 	private static final Logger log = LoggerFactory.getLogger(TemplatePdfService.class);
 	
 	@Override
-	public String CrearPdfMarcaOlab(Comprobante comprobante, PdfInfoDto infoPDF) throws DocumentException, IOException, Exception{
+	public String CrearPdfMarcaOlab(Comprobante comprobante, PdfInfoDto infoPDF, Environment env) throws DocumentException, IOException, Exception{
 		String ruta = "";
 		PdfPTable tabDetalleMontos = new PdfPTable(6);
 		PdfPTable tabDatosFactura = new PdfPTable(7);
@@ -62,15 +63,14 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 		
 		FileOutputStream ficheroPdf = null;
 		try {
-			/*rutaproduccion*/ ruta = "/home/orubio/DesarrolloGDA/documentosTimbrao/pdf/Olab/pdf/OLFA_"+infoPDF.getKfactura()+".pdf";
-			/*rutapruebas*/// ruta = "C:/Users/Desarrollo_GDA/documentos Timbrado/pdf/Olab/pdf/OLFA_"+kfactura+".pdf";
+			ruta = env.getProperty("path.files.pdf.olab")+"OLFA_"+infoPDF.getKfactura()+".pdf";
 			ficheroPdf = new FileOutputStream(ruta);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 		try {
 			writerOlab = PdfWriter.getInstance(reporteAzteca, ficheroPdf);
-			writerOlab.setPageEvent(new TemplateOlab(comprobante, infoPDF));
+			writerOlab.setPageEvent(new TemplateOlab(comprobante, infoPDF, env));
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		}
@@ -506,7 +506,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 	}
 	
 	@Override
-	public String CrearPdfMarcaAzteca(Comprobante comprobante, PdfInfoDto infoPDF) throws Exception{
+	public String CrearPdfMarcaAzteca(Comprobante comprobante, PdfInfoDto infoPDF, Environment env) throws Exception{
 		String ruta = "";
 		PdfPTable tabDetalleMontos = new PdfPTable(6);
 		PdfPTable tabDatosFactura = new PdfPTable(7);
@@ -530,7 +530,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 		Document reporteAzteca = new Document(PageSize.A4, 36, 36, 260,150);
 		FileOutputStream ficheroPdf = null;
 		try {
-	/*rutaproduccion*/ ruta = "/home/orubio/DesarrolloGDA/documentosTimbrao/pdf/Azteca/pdf/AZFA_"+infoPDF.getKfactura()+".pdf";
+	/*rutaproduccion*/ ruta = env.getProperty("path.files.pdf.azteca")+"AZFA_"+infoPDF.getKfactura()+".pdf";
 	/*rutapruebas*///	ruta = "C:/Users/Desarrollo_GDA/documentos Timbrado/pdf/Azteca/pdf/AZFA_"+kfactura+".pdf";
 			ficheroPdf = new FileOutputStream(ruta);
 		} catch (FileNotFoundException e) {
@@ -538,7 +538,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 		}
 		try {
 			writerAzteca = PdfWriter.getInstance(reporteAzteca, ficheroPdf);
-			writerAzteca.setPageEvent(new TemplateAzteca(comprobante, infoPDF));
+			writerAzteca.setPageEvent(new TemplateAzteca(comprobante, infoPDF, env));
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		}
@@ -975,7 +975,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 	
 	
 	@Override
-	public String CrearPdfMarcaSwiss(Comprobante comprobante, PdfInfoDto infoPDF) throws DocumentException, IOException{
+	public String CrearPdfMarcaSwiss(Comprobante comprobante, PdfInfoDto infoPDF, Environment env) throws DocumentException, IOException{
 		String ruta = "";
 		PdfPTable tabDetalleMontos = new PdfPTable(6);
 		PdfPTable tabDatosFactura = new PdfPTable(7);
@@ -1000,7 +1000,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 		Document reporteAzteca = new Document(PageSize.A4, 36, 36, 260,136);
 		FileOutputStream ficheroPdf = null;
 		try {
-			/*rutaproduccion*/ ruta = "/home/orubio/DesarrolloGDA/documentosTimbrao/pdf/Swisslab/pdf/SWFA_"+infoPDF.getKfactura()+".pdf";
+			/*rutaproduccion*/ ruta = env.getProperty("path.files.pdf.swisslab")+"SWFA_"+infoPDF.getKfactura()+".pdf";
 			/*rutapruebas*/// ruta = "C:/Users/Desarrollo_GDA/documentos Timbrado/pdf/Olab/pdf/OLFA_"+kfactura+".pdf";
 			ficheroPdf = new FileOutputStream(ruta);
 		} catch (FileNotFoundException e) {
@@ -1008,7 +1008,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 		}
 		try {
 			writerSwiss = PdfWriter.getInstance(reporteAzteca, ficheroPdf);
-			writerSwiss.setPageEvent(new TemplateSwiss(comprobante, infoPDF));
+			writerSwiss.setPageEvent(new TemplateSwiss(comprobante, infoPDF, env));
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -1448,7 +1448,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 	}
 	
 	@Override
-	public String CrearPdfMarcaLiacsa(Comprobante comprobante, PdfInfoDto infoPDF) throws DocumentException, IOException{
+	public String CrearPdfMarcaLiacsa(Comprobante comprobante, PdfInfoDto infoPDF, Environment env) throws DocumentException, IOException{
 
 		String ruta = "";
 		PdfPTable tabDetalleMontos = new PdfPTable(6);
@@ -1474,15 +1474,14 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 		Document reporteAzteca = new Document(PageSize.A4, 36, 36, 260,136);
 		FileOutputStream ficheroPdf = null;
 		try {
-			/*rutaproduccion*/ ruta = "/home/orubio/DesarrolloGDA/documentosTimbrao/pdf/Liacsa/pdf/LIFA_"+infoPDF.getKfactura()+".pdf";
-			/*rutapruebas*/// ruta = "C:/Users/Desarrollo_GDA/documentos Timbrado/pdf/Olab/pdf/OLFA_"+kfactura+".pdf";
+			ruta = env.getProperty("path.files.pdf.liacsa")+"LIFA_"+infoPDF.getKfactura()+".pdf";
 			ficheroPdf = new FileOutputStream(ruta);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 		try {
 			writerSwiss = PdfWriter.getInstance(reporteAzteca, ficheroPdf);
-			writerSwiss.setPageEvent(new TemplateLiacsa(comprobante, infoPDF));
+			writerSwiss.setPageEvent(new TemplateLiacsa(comprobante, infoPDF, env));
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -1923,7 +1922,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 	}
 	
 	@Override
-	public String CrearPdfMarcaJenner(Comprobante comprobante, PdfInfoDto infoPDF) throws DocumentException, IOException, Exception  {
+	public String CrearPdfMarcaJenner(Comprobante comprobante, PdfInfoDto infoPDF, Environment env) throws DocumentException, IOException, Exception  {
 
 		String ruta = "";
 		PdfPTable tabDetalleMontos = new PdfPTable(6);
@@ -1948,7 +1947,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 		Document reporteAzteca = new Document(PageSize.A4, 36, 36, 260,136);
 		FileOutputStream ficheroPdf = null;
 		try {
-			/*rutaproduccion*/ ruta = "/home/orubio/DesarrolloGDA/documentosTimbrao/pdf/Jenner/pdf/JEFA_"+infoPDF.getKfactura()+".pdf";
+			/*rutaproduccion*/ ruta = env.getProperty("path.files.pdf.jenner")+"JEFA_"+infoPDF.getKfactura()+".pdf";
 			/*rutapruebas*///ruta = "C:/Users/Desarrollo_GDA/documentos Timbrado/pdf/Jenner/pdf/JEFA_"+kfactura+".pdf";
 			ficheroPdf = new FileOutputStream(ruta);
 		} catch (FileNotFoundException e) {
@@ -1957,7 +1956,7 @@ public class TemplatePdfService implements ITemplatePdfServiceImpl {
 		try {
 			writerJenner = PdfWriter.getInstance(reporteAzteca, ficheroPdf);
 			try {
-				writerJenner.setPageEvent(new TemplateJenner(comprobante,infoPDF));
+				writerJenner.setPageEvent(new TemplateJenner(comprobante,infoPDF, env));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
