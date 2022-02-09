@@ -11,7 +11,26 @@ public class PdfInfoDto {
 	private Integer kfactura;
 	private String descripcionMetodoPago;
 	private String descripcionUsoCfdi;
+	private String adendaDireccion;
+	private String smetodoPago;
 	
+	
+	public String getSmetodoPago() {
+		return smetodoPago;
+	}
+
+	public void setSmetodoPago(String smetodoPago) {
+		this.smetodoPago = smetodoPago;
+	}
+
+	public String getAdendaDireccion() {
+		return adendaDireccion;
+	}
+
+	public void setAdendaDireccion(String adendaDireccion) {
+		this.adendaDireccion = adendaDireccion;
+	}
+
 	public String getDescripcionUsoCfdi() {
 		return descripcionUsoCfdi;
 	}

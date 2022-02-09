@@ -2,16 +2,11 @@ package com.gda.cfdi.pdf.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +21,6 @@ import com.gda.cfdi.pdf.service.template.ITemplatePdfServiceImpl;
 import com.itextpdf.text.DocumentException;
 
 import mx.gob.sat.cfd._3.Comprobante;
-import mx.gob.sat.cfd.pagos.Pagos;
-import mx.gob.sat.timbrefiscaldigital.TimbreFiscalDigital;
 
 @Service
 public class PdfService {
@@ -39,6 +32,9 @@ public class PdfService {
 	
 	@Autowired
 	private ConsultaService consultaService;
+	
+	@Autowired
+	private UtilsService utilsService;
 	
 	@Autowired
 	private ITemplatePdfServiceImpl iTemplatePdfService;
@@ -54,7 +50,7 @@ public class PdfService {
 		System.out.println(xml);
 		if(facturaDto!=null) {
 			if(!xml.isEmpty() && xml.trim().length()>5) {
-				Comprobante comprobante = this.createComplementoFromXml(xml);
+				Comprobante comprobante = utilsService.createComplementoFromXml(xml);
 				PdfInfoDto infoPDF = new PdfInfoDto();
 				infoPDF.setKfactura(kfactura);
 				infoPDF.setComplementoConcepto(false);
@@ -153,30 +149,7 @@ public class PdfService {
 	}
 	
 	
-	private Comprobante createComplementoFromXml(String xml) throws JAXBException {
-		Comprobante comprobante = null;
-		JAXBContext jaxbContext;
-		List<Class<?>> classesMarshall = new ArrayList<Class<?>>();
-
-		if (xml.toLowerCase().contains("<tfd:TimbreFiscalDigital".toLowerCase())) {
-			classesMarshall.add(TimbreFiscalDigital.class);
-		}
-		classesMarshall.add(Comprobante.class);
-		classesMarshall.add(Pagos.class);
-		jaxbContext = JAXBContext.newInstance(classesMarshall.toArray(new Class<?>[classesMarshall.size()]));
-		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-		StringReader reader = new StringReader(this.fixXml(xml));
-		comprobante = (Comprobante) unmarshaller.unmarshal(reader);
-
-		return comprobante;
-	}
 	
-	private static String fixXml(String xml) {
-		xml = xml.replace("/cfd/3\"xmlns", "/cfd/3\" xmlns");
-		xml = xml.replace("instance\"xsi", "instance\" xsi");
-		xml = xml.replace("cfd/3 http", "cfd/3 http");
-		return xml;
-	}
 	
 
 }
