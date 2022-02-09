@@ -13,7 +13,9 @@ import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.Timestamp;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.text.DateFormat;
 import java.text.Normalizer;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Properties;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -47,6 +50,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.gda.cfdi.dto.DatosMarcaDto;
+import com.gda.cfdi.dto.FacturaSelloDto;
 import com.gda.cfdi.dto.cancelacion.Cancelacion;
 
 import mx.gob.sat.cfd._3.Comprobante;
@@ -60,6 +64,49 @@ public class UtilsService {
 	
 	@Autowired
 	private Environment env;
+	
+	public Integer getCEntidadLegalByRFC(String rfc) throws IOException {
+		log.info("ejecutando getCEntidadLegalByRFC[rfc: " + rfc + "]");
+
+		Integer centidadlegal = 0;
+
+		String rfcOlab = env.getProperty("rfc.marca.olab");
+		String rfcAzteca = env.getProperty("rfc.marca.azteca");
+		String rfcSwisslab = env.getProperty("rfc.marca.swisslab");
+		String rfcJennerPrado = env.getProperty("rfc.marca.prado");
+		String rfcJennerLean = env.getProperty("password.cer.lean");
+		
+		if (rfc.equals(rfcOlab)) {
+			centidadlegal = 1;
+		}
+		if (rfc.equals(rfcAzteca)) {
+			centidadlegal = 5;
+		}
+		if (rfc.equals(rfcSwisslab)) {
+			centidadlegal = 6;
+		}
+		if (rfc.equals(rfcJennerPrado)) {
+			centidadlegal =  7; 
+		}
+		if (rfc.equals(rfcJennerLean)) {
+			centidadlegal =  8; 
+		}
+		return centidadlegal;
+	}
+	
+	public static Date parseDateTime(String s) {
+	    try {
+	      DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	      return formatter.parse(s);
+	    } catch (ParseException e) {
+	      throw new RuntimeException(e);
+	    }
+	}
+	  
+	public static String printDateTime(Date dt) {
+	    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	    return formatter.format(dt);
+	}
 	
 	
 	public boolean validarRFC(String rfc) throws Exception {
@@ -99,6 +146,35 @@ public class UtilsService {
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
 				"http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd");
+
+		StringWriter sw = new StringWriter();
+		marshaller.marshal(comprobante, sw);
+		xml = sw.toString();
+
+		return xml;
+	}
+	
+	public String createXmlFromComplementoPago(Comprobante comprobante) throws JAXBException {
+		String xml;
+		JAXBContext jaxbContext;
+		List<Class<?>> classesMarshall = new ArrayList<Class<?>>();
+
+		comprobante.getComplemento().forEach(complemento -> {
+			complemento.getAny().forEach(object -> {
+				if (object instanceof TimbreFiscalDigital) {
+					classesMarshall.add(TimbreFiscalDigital.class);
+				}
+			});
+		});
+
+		classesMarshall.add(Comprobante.class);
+		classesMarshall.add(Pagos.class);
+		jaxbContext = JAXBContext.newInstance(classesMarshall.toArray(new Class<?>[classesMarshall.size()]));
+		Marshaller marshaller = jaxbContext.createMarshaller();
+
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
+				"http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd http://www.sat.gob.mx/Pagos http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos10.xsd");
 
 		StringWriter sw = new StringWriter();
 		marshaller.marshal(comprobante, sw);
@@ -325,6 +401,95 @@ public class UtilsService {
 		return datosMarcaDto;
 	}
 	
+	public DatosMarcaDto obtenerDatosMarcaAnticipada(Integer marca, Integer razonSocialJen) {
+		String rutaCadenaOriginal = env.getProperty("path.file.cadena.original");
+		String pasword = "";
+		String rfcMarca = "";
+		String razonSocialMarca = "";
+		String numeroCertificado = "";
+		String rutaKey = "";
+		String rutaCer = "";
+		
+		switch (marca) {
+		case 1:
+			log.info("**** OLAB *****");
+			rutaKey = env.getProperty("path.file.key.olab");
+			rutaCer = env.getProperty("path.file.cer.olab");		
+			pasword = env.getProperty("password.cer.olab");	
+			rfcMarca = env.getProperty("rfc.marca.olab");	
+			razonSocialMarca = env.getProperty("razon.social.olab");
+			numeroCertificado = env.getProperty("numero.certificado.olab");
+			break;
+		case 4:
+			log.info("**** AZTECA *****");
+			rutaKey = env.getProperty("path.file.key.azteca");
+			rutaCer = env.getProperty("path.file.cer.azteca");		
+			pasword = env.getProperty("password.cer.azteca");	
+			rfcMarca = env.getProperty("rfc.marca.azteca");	
+			razonSocialMarca = env.getProperty("razon.social.azteca");
+			numeroCertificado = env.getProperty("numero.certificado.azteca");
+			break;
+		case 7:			
+			if(razonSocialJen==7){
+				log.info("**** PRADO *****");
+				rutaKey = env.getProperty("path.file.key.prado");
+				rutaCer = env.getProperty("path.file.cer.prado");		
+				pasword = env.getProperty("password.cer.prado");	
+				rfcMarca = env.getProperty("rfc.marca.prado");	
+				razonSocialMarca = env.getProperty("razon.social.prado");
+				numeroCertificado = env.getProperty("numero.certificado.prado");
+			}else if(razonSocialJen==8){
+				log.info("**** LEAN *****");
+				rutaKey = env.getProperty("path.file.key.lean");
+				rutaCer = env.getProperty("path.file.cer.lean");		
+				pasword = env.getProperty("password.cer.lean");	
+				rfcMarca = env.getProperty("rfc.marca.lean");	
+				razonSocialMarca = env.getProperty("razon.social.lean");
+				numeroCertificado = env.getProperty("numero.certificado.lean");
+			}else if(razonSocialJen==9){
+				log.info("**** AZTECA *****");
+				rutaKey = env.getProperty("path.file.key.azteca");
+				rutaCer = env.getProperty("path.file.cer.azteca");		
+				pasword = env.getProperty("password.cer.azteca");	
+				rfcMarca = env.getProperty("rfc.marca.azteca");	
+				razonSocialMarca = env.getProperty("razon.social.azteca");
+				numeroCertificado = env.getProperty("numero.certificado.azteca");
+			}else if(razonSocialJen==5){
+				log.info("**** AZTECA *****");
+				rutaKey = env.getProperty("path.file.key.azteca");
+				rutaCer = env.getProperty("path.file.cer.azteca");		
+				pasword = env.getProperty("password.cer.azteca");	
+				rfcMarca = env.getProperty("rfc.marca.azteca");	
+				razonSocialMarca = env.getProperty("razon.social.azteca");
+				numeroCertificado = env.getProperty("numero.certificado.azteca");
+			}
+			break;
+		case 5:
+			log.info("**** SWISSLAB *****");
+			rutaKey = env.getProperty("path.file.key.swisslab");
+			rutaCer = env.getProperty("path.file.cer.swisslab");		
+			pasword = env.getProperty("password.cer.swisslab");	
+			rfcMarca = env.getProperty("rfc.marca.swisslab");	
+			razonSocialMarca = env.getProperty("razon.social.swisslab");
+			numeroCertificado = env.getProperty("numero.certificado.swisslab");
+			break;	
+		case 15:
+			log.info("**** LIACSA *****");
+			rutaKey = env.getProperty("path.file.key.swisslab");
+			rutaCer = env.getProperty("path.file.cer.swisslab");		
+			pasword = env.getProperty("password.cer.swisslab");	
+			rfcMarca = env.getProperty("rfc.marca.swisslab");	
+			razonSocialMarca = env.getProperty("razon.social.swisslab");
+			numeroCertificado = env.getProperty("numero.certificado.swisslab");
+			break;	
+		default:
+			break;
+		}
+		DatosMarcaDto datosMarcaDto= new DatosMarcaDto(rutaCadenaOriginal, pasword, rfcMarca, 
+				razonSocialMarca, numeroCertificado, rutaKey, rutaCer);
+		return datosMarcaDto;
+	}
+	
 	public static String toStringFormat(Date date, String format) {
 		try {
 			SimpleDateFormat formatter = new SimpleDateFormat(format);
@@ -414,6 +579,174 @@ public class UtilsService {
 		String cadenaSinAcentos = cadenaNormalize.replaceAll("[^\\p{ASCII}]", "");
 //		System.out.println("Resultado: " + cadenaSinAcentos);
 		return cadenaSinAcentos;
+	}
+	
+	
+	public String getRutaXMLByIdSucursal(Integer idSucursal) throws IOException {
+		String url;
+//		Properties env = loadProperties();
+		url = env.getProperty("facturas.documentos.servidor");
+		
+		switch (idSucursal) {
+		case 1013:
+			url += env.getProperty("facturas.dowload.folder.swisslab");
+			break;
+		case 1003:
+			url += env.getProperty("facturas.dowload.folder.olab");
+			break;
+		case 1012:
+			url += env.getProperty("facturas.dowload.folder.azteca");
+			break;
+		case 1014:
+			url += env.getProperty("facturas.dowload.folder.prado");
+			break;
+		case 1015:
+			url += env.getProperty("facturas.dowload.folder.lean");
+			break;
+		default:
+			break;
+		}
+		
+		url += env.getProperty("facturas.download.url.xml");
+		
+		return url;
+	}
+	
+	/**
+	 * Devuelve el nombre de los archivos 
+	 * para la factura de acuerdo al rfc
+	 * y al folio especificados
+	 * 
+	 * @param rfc
+	 * @param folio
+	 * @return
+	 * @throws IOException 
+	 */
+	public String getNombreFacturasByIdSucursal(Integer idSucursal, Integer folio) throws IOException {
+		String prefijo = null;
+		String sufijo = null;
+//		Properties env = loadProperties();
+		
+		switch (idSucursal) {
+		case 1013:
+			prefijo = env.getProperty("facturas.dowload.prefijo.swisslab");
+			sufijo = formatFolio(folio, 7);
+			break;
+		case 1003:
+			prefijo = env.getProperty("facturas.dowload.prefijo.olab");
+			sufijo = formatFolio(folio, 8);
+			break;
+		case 1012:
+			prefijo = env.getProperty("facturas.dowload.prefijo.azteca");
+			sufijo = formatFolio(folio, 7);
+			break;
+		case 1014:
+			prefijo = env.getProperty("facturas.dowload.prefijo.prado");
+			sufijo = formatFolio(folio, 6);
+			break;
+		case 1015:
+			prefijo = env.getProperty("facturas.dowload.prefijo.lean");
+			sufijo = formatFolio(folio, 6);
+			break;
+		default:
+			break;
+		}
+
+		return prefijo + sufijo;
+	}
+
+	/**
+	 * Agrega ceros
+	 * 
+	 * @param ufolio
+	 * @param longCadena
+	 * @return
+	 */
+	public static String formatFolio(int ufolio, int longCadena) {
+		String folio = String.valueOf(ufolio);
+		int value = longCadena - folio.length();
+		for (int i = 1; i <= value; i++) {
+			folio = "0" + folio;
+		}
+		return folio;
+	}
+	
+	public Comprobante createComplementoPagoFromXml(String xml) throws JAXBException {
+		Comprobante comprobante = null;
+		JAXBContext jaxbContext;
+		List<Class<?>> classesMarshall = new ArrayList<Class<?>>();
+
+		if (xml.toLowerCase().contains("<tfd:TimbreFiscalDigital".toLowerCase())) {
+			classesMarshall.add(TimbreFiscalDigital.class);
+		}
+		classesMarshall.add(Comprobante.class);
+		classesMarshall.add(Pagos.class);
+		jaxbContext = JAXBContext.newInstance(classesMarshall.toArray(new Class<?>[classesMarshall.size()]));
+		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+		StringReader reader = new StringReader(this.fixXml(xml));
+		comprobante = (Comprobante) unmarshaller.unmarshal(reader);
+
+		return comprobante;
+	}
+	
+	public FacturaSelloDto buildSelloFactura(String rfc, String xml, boolean procJenner)
+			throws IOException, GeneralSecurityException, TransformerException, JAXBException {
+		log.info("ejecutando sellarComprobanteFromRfc[rfc: " + rfc + "]");
+		FacturaSelloDto facturaSello;
+		String dynamicKeyProperty = null;
+		String urlKey, urlCer;
+		String password;
+		String pathXslt = env.getProperty("path.file.cadena.original");
+
+		String rfcOlab = env.getProperty("rfc.marca.olab");
+		String rfcAzteca = env.getProperty("rfc.marca.azteca");
+		String rfcSwisslab = env.getProperty("rfc.marca.swisslab");
+		String rfcJennerPrado = env.getProperty("rfc.marca.prado");
+		String rfcJennerLean = env.getProperty("rfc.marca.lean");
+		
+		facturaSello = new FacturaSelloDto();
+		
+		if (rfc.equals(rfcOlab)) {
+			facturaSello.setMarca(1);
+			dynamicKeyProperty = "olab";
+		}
+		if (rfc.equals(rfcAzteca)) {
+			facturaSello.setMarca(4);
+			dynamicKeyProperty = "azteca";
+		}
+		if (rfc.equals(rfcSwisslab)) {
+			facturaSello.setMarca(5);
+			dynamicKeyProperty = "swisslab";
+		}
+		if (rfc.equals("LCP061017PA9")) {
+			facturaSello.setMarca(7);
+			dynamicKeyProperty =  "prado";	
+//			if(procJenner){
+//				dynamicKeyProperty =  "prado";				
+//			}else{
+//				dynamicKeyProperty = "azteca";
+//			}
+		}
+		if (rfc.equals("LCL050622DD9")) {
+			facturaSello.setMarca(8);
+			dynamicKeyProperty =  "lean"; 
+//			if(procJenner){
+//				dynamicKeyProperty =  "lean"; 				
+//			}else{
+//				dynamicKeyProperty = "azteca";				
+//			}
+		}
+
+		urlKey = env.getProperty("path.file.key." + dynamicKeyProperty );
+		urlCer = env.getProperty("path.file.cer." + dynamicKeyProperty );
+		password = env.getProperty("password.cer." + dynamicKeyProperty );
+
+		
+		facturaSello.setCertificadoB64(getCertificadoB64(urlCer));
+		facturaSello.setCadenaOriginal(createCadenaOriginal(xml, pathXslt));
+		facturaSello.setSello(createSello(facturaSello.getCadenaOriginal(), urlKey, password));
+
+		return facturaSello;
 	}
 	
 }

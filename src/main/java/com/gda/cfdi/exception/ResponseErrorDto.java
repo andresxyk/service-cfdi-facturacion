@@ -4,9 +4,18 @@ public class ResponseErrorDto {
 
 	private String codigo;
 	private String descripcion;
+	private String detalle;
 	
 	public ResponseErrorDto() {
 		super();
+	}
+
+	public String getDetalle() {
+		return detalle;
+	}
+
+	public void setDetalle(String detalle) {
+		this.detalle = detalle;
 	}
 
 	public ResponseErrorDto(String codigo, String descripcion) {

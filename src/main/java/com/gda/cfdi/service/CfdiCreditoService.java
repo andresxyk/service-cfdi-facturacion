@@ -427,8 +427,7 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 		trasladosTotales.setTipoFactor(CTipoFactor.TASA);
 //		lstTrasladosTotales.add(trasladosTotales);
 		traslados.getTraslado().add(trasladosTotales);
-		impuestos.setTraslados(traslados);
-		
+		impuestos.setTraslados(traslados);		
 		impuestos.setTotalImpuestosTrasladados(importeTotal.setScale(2, BigDecimal.ROUND_DOWN));
 		
 		if(isRetencion){

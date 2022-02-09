@@ -9,22 +9,29 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.gda.cfdi.dto.CClaveProductoServicioSatDto;
 import com.gda.cfdi.dto.CControlFolioDto;
 import com.gda.cfdi.dto.CConvenioDto;
 import com.gda.cfdi.dto.CFormaPagoCfdiDto;
 import com.gda.cfdi.dto.CTipoPagoDto;
 import com.gda.cfdi.dto.CUsoCfdiDto;
+import com.gda.cfdi.dto.ControlFolioDto;
 import com.gda.cfdi.dto.DatosFiscales;
 import com.gda.cfdi.dto.DatosFiscalesDto;
 import com.gda.cfdi.dto.EstudioDto;
+import com.gda.cfdi.dto.PagoDto;
 import com.gda.cfdi.dto.TDatoFiscalDto;
 import com.gda.cfdi.dto.TFacturaCanceladaDto;
 import com.gda.cfdi.dto.TFacturaCreditoDto;
 import com.gda.cfdi.dto.TFacturaDto;
+import com.gda.cfdi.dto.TFacturaEntity;
+import com.gda.cfdi.dto.TNotaCreditoEntityDto;
 import com.gda.cfdi.dto.TOrdenSucursalDto;
 import com.gda.cfdi.dto.TPagoPacienteDto;
 
@@ -35,6 +42,148 @@ public class ConsultaService {
 	
 	@Autowired
 	private Environment env;
+	
+	
+	
+	public Integer updateCControlFolio(Integer ufolioactual,Integer ccontrolfolio) {
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"updateCControlFolio";
+			String urlParam = UriComponentsBuilder.fromUriString(url)
+					.queryParam("ccontrolfolio", ccontrolfolio)
+					.queryParam("ufolioactual", ufolioactual)
+						.build().toString();
+			Integer response = template.postForObject(urlParam, null,Integer.class);
+			return response;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			throw e;
+		}
+	}
+	
+	public Integer saveComplementoPago(TFacturaDto dto) {
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"saveComplementoPago";
+			Integer response = template.postForObject(url, dto,Integer.class);
+			return response;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			throw e;
+		}
+	}
+	
+	public ControlFolioDto findControlFolioById(Integer idControlFolio) {
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"findControlFolio-by-id";			
+			String urlParam = UriComponentsBuilder.fromUriString(url)
+					.queryParam("idControlFolio", idControlFolio)
+						.build().toString();
+			ControlFolioDto response = template.getForObject(urlParam, ControlFolioDto.class);
+			return response;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			throw e;
+		}
+	}
+	
+	public PagoDto findPagoById(Integer idPago) {
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"findPago-by-id";			
+			String urlParam = UriComponentsBuilder.fromUriString(url)
+					.queryParam("idPago", idPago)
+						.build().toString();
+			PagoDto response = template.getForObject(urlParam, PagoDto.class);
+			return response;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			throw e;
+		}
+	}
+	
+	public CClaveProductoServicioSatDto findCClaveProductoServicioSatById(Integer cexamen) {
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"cClaveProductoServicioSat-by-id";			
+			String urlParam = UriComponentsBuilder.fromUriString(url)
+					.queryParam("cexamen", cexamen)
+						.build().toString();
+			CClaveProductoServicioSatDto response = template.getForObject(urlParam, CClaveProductoServicioSatDto.class);
+			return response;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			throw e;
+		}
+	}
+	
+	public TNotaCreditoEntityDto obtenerNotaCredito(Integer ufoliofactura) {
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"tnotacredito-by-ufoliofactura";			
+			String urlParam = UriComponentsBuilder.fromUriString(url)
+					.queryParam("ufoliofactura", ufoliofactura)
+						.build().toString();
+			TNotaCreditoEntityDto response = template.getForObject(urlParam, TNotaCreditoEntityDto.class);
+			return response;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			throw e;
+		}
+	}
+	
+	public DatosFiscales obtenerDatosFiscalesByCConvenioAndBconvenio(Integer cconvenio, boolean bconvenio) {
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"datosFiscales-fac-by-cconvenio-and-bconvenio";			
+			String urlParam = UriComponentsBuilder.fromUriString(url)
+					.queryParam("cconvenio", cconvenio)
+					.queryParam("bconvenio", bconvenio)
+						.build().toString();
+			DatosFiscales response = template.getForObject(urlParam, DatosFiscales.class);
+			return response;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			throw e;
+		}
+	}
+	
+	public TFacturaEntity getTFacturaEntityQuery(String query) {
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"getTFacturaEntityQuery-by-query";			
+			TFacturaEntity response = template.postForObject(url, query, TFacturaEntity.class);
+			return response;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			throw e;
+		}
+	}
+	
+	public Integer obtenerMarcaConvenio(Integer cconvenio) {
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"getMarca-by-cconvenio";
+			String urlParam = UriComponentsBuilder.fromUriString(url)
+					.queryParam("cconvenio", cconvenio)
+						.build().toString();
+			Integer entidad = template.getForObject(urlParam, Integer.class);
+			return entidad;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			return null;
+		}
+	}
 	
 	public List<CUsoCfdiDto> getListUsoCFDI(Integer num){
 		RestTemplate template = new RestTemplate();
@@ -49,7 +198,7 @@ public class ConsultaService {
 	public DatosFiscales obtenerDatosFiscalesByCConvenio(Integer cconvenio) {
 		try {
 			RestTemplate template = new RestTemplate();
-			String url = env.getProperty("url.service.database")+"datosFiscales-by-cconvenio";			
+			String url = env.getProperty("url.service.database")+"datosFiscales-fac-by-cconvenio";			
 			String urlParam = UriComponentsBuilder.fromUriString(url)
 					.queryParam("cconvenio", cconvenio)
 						.build().toString();
