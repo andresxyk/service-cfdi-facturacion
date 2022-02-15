@@ -25,9 +25,9 @@ public class PdfComplementoPagoController {
 	private PdfComplementoPagoService pdfComplementoPagoService;
 	
 	@GetMapping("/pdf-complemento-pago")
-	public ResponseEntity<?> getXmlOrden(@RequestParam("kfactura") Integer kfactura){
+	public ResponseEntity<?> getXmlOrden(@RequestParam("kfactura") Integer kfactura, @RequestParam("bReturnBase64") Boolean bReturnBase64){
 		try {			
-			return new ResponseEntity<String>(pdfComplementoPagoService.generarPdfOrden(kfactura), HttpStatus.OK);
+			return new ResponseEntity<String>(pdfComplementoPagoService.generarPdfOrden(kfactura, bReturnBase64), HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			ResponseErrorDto dto = new ResponseErrorDto();

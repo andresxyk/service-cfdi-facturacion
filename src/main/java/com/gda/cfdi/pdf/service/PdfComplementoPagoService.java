@@ -36,7 +36,7 @@ public class PdfComplementoPagoService {
 	@Autowired
 	private ComplementoPdfService complementoPdfBo;
 	
-	public String generarPdfOrden(Integer kfactura) throws Exception {
+	public String generarPdfOrden(Integer kfactura, Boolean bReturnBase64) throws Exception {
 		try {
 			TFacturaDto facturaDto = consultaService.getTFacturaById(kfactura);
 			String ruta = "";
@@ -123,18 +123,22 @@ public class PdfComplementoPagoService {
 					}					
 				}
 			}
-			String b64 = null;
-			try {
-		      File file = new File(ruta);
-		      byte [] bytes = Files.readAllBytes(file.toPath());
-
-		      b64 = Base64.getEncoder().encodeToString(bytes);
+			if(bReturnBase64) {
+				String b64 = null;
+				try {
+					File file = new File(ruta);
+					byte [] bytes = Files.readAllBytes(file.toPath());
+					
+					b64 = Base64.getEncoder().encodeToString(bytes);
 //		      file.delete();
-		    } catch (Exception e) {
-		      e.printStackTrace();
-		    }
-			
-			return b64;		
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				return b64;						
+			}else {
+				return ruta;
+			}
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw e;
