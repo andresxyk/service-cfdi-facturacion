@@ -153,6 +153,8 @@ public class CfdiSerieBConvenioService {
 			String xmlOriginalSello =  utilsService.createXmlFromComprobante(comprobante);
 			
 			TFacturaEntityDto tfactura = new TFacturaEntityDto();
+			tfactura.setUfoliofactura(tFacturaEntity.getUfoliofactura());
+			tfactura.setSserie(tFacturaEntity.getSserie());
 			tfactura.setKfactura(tFacturaEntity.getKfactura());
 			tfactura.setMsubtotal(comprobante.getSubTotal());
 			tfactura.setMiva(comprobante.getImpuestos().getTotalImpuestosTrasladados());
