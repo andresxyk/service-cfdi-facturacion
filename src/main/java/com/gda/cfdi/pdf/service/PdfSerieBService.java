@@ -168,7 +168,7 @@ private static final Logger log = LoggerFactory.getLogger(PdfSerieBService.class
 				e.printStackTrace();
 			}
 			
-			return ruta;	
+			return b64;	
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			e.printStackTrace();
