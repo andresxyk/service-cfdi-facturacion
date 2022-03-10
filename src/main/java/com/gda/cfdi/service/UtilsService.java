@@ -55,6 +55,7 @@ import com.gda.cfdi.dto.cancelacion.Cancelacion;
 
 import mx.gob.sat.cfd._3.Comprobante;
 import mx.gob.sat.cfd.pagos.Pagos;
+import mx.gob.sat.pagos20.Pagos.Pago;
 import mx.gob.sat.timbrefiscaldigital.TimbreFiscalDigital;
 
 @Service
@@ -257,6 +258,22 @@ public class UtilsService {
 		StringReader reader = new StringReader(this.fixXml(xml));
 		comprobante = (Comprobante) unmarshaller.unmarshal(reader);
 
+		return comprobante;
+	}
+	
+	public mx.gob.sat.cfd._4.Comprobante createComprabanteFromXml4(String xml) throws JAXBException{
+		mx.gob.sat.cfd._4.Comprobante comprobante = null;
+		JAXBContext jaxbContext;
+		List<Class<?>> classesMarshall = new ArrayList<Class<?>>();
+		if (xml.toLowerCase().contains("<tfd:TimbreFiscalDigital".toLowerCase())) {
+			classesMarshall.add(TimbreFiscalDigital.class);
+		}
+		classesMarshall.add(mx.gob.sat.cfd._4.Comprobante.class);
+		classesMarshall.add(mx.gob.sat.pagos20.Pagos.Pago.class);
+		jaxbContext = JAXBContext.newInstance(classesMarshall.toArray(new Class<?>[classesMarshall.size()]));
+		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+		StringReader reader = new StringReader(this.fixXml(xml));
+		comprobante = (mx.gob.sat.cfd._4.Comprobante) unmarshaller.unmarshal(reader);
 		return comprobante;
 	}
 	

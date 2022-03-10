@@ -313,11 +313,19 @@ public class TFacturaDto {
 		return "TFacturaDto [idFactura=" + idFactura + ", idDatoFiscal=" + idDatoFiscal + ", cveSucursal=" + cveSucursal
 				+ ", folio=" + folio + ", idCliente=" + idCliente + ", idSucursal=" + idSucursal + ", idFormaPago="
 				+ idFormaPago + ", subtotal=" + subtotal + ", total=" + total + ", idConvenio=" + idConvenio
-				+ ", cadenaOriginal=" + cadenaOriginal + ", sello=" + sello + ", xml=" + xml + ", xmlTimbrado="
-				+ xmlTimbrado + ", serie=" + serie + ", uuid=" + uuid + ", idMetodoPago=" + idMetodoPago
-				+ ", idUsoCfdi=" + idUsoCfdi + ", centidadlegal=" + centidadlegal + "]";
+				+ ", cadenaOriginal=" + cadenaOriginal + ", sello=" + sello + ", centidadlegal=" + centidadlegal
+				+ ", xml=" + xml + ", xmlTimbrado=" + xmlTimbrado + ", serie=" + serie + ", uuid=" + uuid
+				+ ", idMetodoPago=" + idMetodoPago + ", idUsoCfdi=" + idUsoCfdi + ", userId=" + userId + ", dregistro="
+				+ dregistro + ", kdatofiscal=" + kdatofiscal + ", ssucursal=" + ssucursal + ", ccliente=" + ccliente
+				+ ", csucursal=" + csucursal + ", cformapago=" + cformapago + ", msubtotal=" + msubtotal
+				+ ", mdescuento=" + mdescuento + ", mcopago=" + mcopago + ", miva=" + miva + ", mtotal=" + mtotal
+				+ ", ctipoimpuesto=" + ctipoimpuesto + ", cconvenio=" + cconvenio + ", scadenaoriginal="
+				+ scadenaoriginal + ", cestadoregistro=" + cestadoregistro + ", useridchange=" + useridchange
+				+ ", sxml=" + sxml + ", sxmlsello=" + sxmlsello + ", sserie=" + sserie + ", surl=" + surl + ", suddi="
+				+ suddi + ", ssellodigital=" + ssellodigital + ", sobservacion=" + sobservacion + "]";
 	}
 
+	
 
 	
 	

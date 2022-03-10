@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -32,8 +30,10 @@ import com.gda.cfdi.dto.TFacturaCreditoDto;
 import com.gda.cfdi.dto.TFacturaDto;
 import com.gda.cfdi.dto.TFacturaEntity;
 import com.gda.cfdi.dto.TNotaCreditoEntityDto;
+import com.gda.cfdi.dto.TOrdenExamenSucursalDto;
 import com.gda.cfdi.dto.TOrdenSucursalDto;
 import com.gda.cfdi.dto.TPagoPacienteDto;
+import com.gda.cfdi.dto.TSociedadCivilDto;
 
 @Service
 public class ConsultaService {
@@ -44,6 +44,41 @@ public class ConsultaService {
 	private Environment env;
 	
 	
+	public Integer getCTipoConvenioByConvenio(Integer cconvenio) {
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"getCTipoConvenio-by-Convenio";			
+			String urlParam = UriComponentsBuilder.fromUriString(url)
+					.queryParam("cconvenio", cconvenio)
+						.build().toString();
+			Integer response = template.getForObject(urlParam, Integer.class);
+			return response;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			throw e;
+		}
+	}
+	
+	public List<TSociedadCivilDto> getTSociedadCivilByKOrdenSucursal(Integer kordensucursal){
+		RestTemplate template = new RestTemplate();
+		String url = env.getProperty("url.service.database")+"getTSociedadCivil-by-KOrdenSucursal";
+		String urlParam = UriComponentsBuilder.fromUriString(url)
+				.queryParam("kordensucursal", kordensucursal)
+					.build().toString();
+		TSociedadCivilDto[] array = template.getForObject(urlParam, TSociedadCivilDto[].class);
+		return Arrays.asList(array);
+	}
+	
+	public List<TOrdenExamenSucursalDto> getTOrdenExamenSucursalByKOrdenSucursal(Integer kordensucursal){
+		RestTemplate template = new RestTemplate();
+		String url = env.getProperty("url.service.database")+"tordenexamensucursal-by-kordensucursal";
+		String urlParam = UriComponentsBuilder.fromUriString(url)
+				.queryParam("kordensucursal", kordensucursal)
+					.build().toString();
+		TOrdenExamenSucursalDto[] array = template.getForObject(urlParam, TOrdenExamenSucursalDto[].class);
+		return Arrays.asList(array);
+	}
 	
 	public Integer updateCControlFolio(Integer ufolioactual,Integer ccontrolfolio) {
 		try {

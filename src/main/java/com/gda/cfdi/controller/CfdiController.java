@@ -69,7 +69,8 @@ public class CfdiController {
 				cfdiDto = cfdiService.generarCfdi(kordensucursal, cusocfdi, kdatofiscal);	
 				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else if(version.equals(4)){
-				cfdiDto = cfdi4Service.generarCfdi(kordensucursal);
+//				cfdiDto = cfdi4Service.generarCfdi(kordensucursal);
+				cfdiDto = null;
 				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else {
 				ResponseErrorDto dto = new ResponseErrorDto();
@@ -250,7 +251,7 @@ public class CfdiController {
 		}
 	}
 	
-	@GetMapping("/cfdi-complemento-pago-multi-pago")
+	@PostMapping("/cfdi-complemento-pago-multi-pago")
 	public ResponseEntity<?> getXmlComplementoPagoMultiPago(@RequestBody MultiPagoDto multiPagoDto, @RequestParam("version") Integer version){
 		try {
 			TFacturaEntityDto cfdiDto = null;
