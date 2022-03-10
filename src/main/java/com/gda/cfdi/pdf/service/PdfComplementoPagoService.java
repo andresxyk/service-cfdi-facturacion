@@ -14,10 +14,11 @@ import org.springframework.stereotype.Service;
 
 import com.gda.cfdi.pdf.dto.ComplementoDatosDto;
 import com.gda.cfdi.pdf.dto.TFacturaDto;
-import com.gda.cfdi.pdf.service.serieaorden.CfdiPdfService;
 import com.itextpdf.text.DocumentException;
 
 import mx.gob.sat.cfd._3.Comprobante;
+import mx.gob.sat.cfd.pagos.Pagos;
+import mx.gob.sat.cfd.pagos.Pagos.Pago.DoctoRelacionado;
 
 @Service
 public class PdfComplementoPagoService {
@@ -62,11 +63,13 @@ public class PdfComplementoPagoService {
 					if (comprobante.getEmisor().getRfc().equals("LCL050622DD9")) {
 						cmarca = 8;
 					}
-					sserie = comprobante.getSerie();
+					
+					
+					sserie = this.getSerieFacturaRelacionada(comprobante);
 					String inicioNom = "";
 					String folioFactura = "";
 					try {
-						List<ComplementoDatosDto> complementoDatos = consultaService.findComplementoDatosById(comprobante.getEmisor().getRfc(), sserie, comprobante.getFolio());
+						List<ComplementoDatosDto> complementoDatos = consultaService.findComplementoDatosById(comprobante.getEmisor().getRfc(), comprobante.getSerie(), comprobante.getFolio());
 						if (complementoDatos.size() > 0 && complementoDatos != null) {
 							ComplementoDatosDto complementoDato = complementoDatos.get(0);
 							switch (comprobante.getEmisor().getRfc()) {
@@ -119,10 +122,11 @@ public class PdfComplementoPagoService {
 						}
 
 					} catch (DocumentException | IOException | NullPointerException e) {
-						log.error("Error al generar el pdf" + e.getMessage());
+						log.error("Error al generar el pdf " + e.getMessage());
 					}					
 				}
 			}
+			log.info("ruta:"+ruta);
 			if(bReturnBase64) {
 				String b64 = null;
 				try {
@@ -143,6 +147,25 @@ public class PdfComplementoPagoService {
 			log.error(e.getMessage());
 			throw e;
 		}
+	}
+	
+	public String getSerieFacturaRelacionada(Comprobante comprobante) {
+		String sserie = "";
+		for (Comprobante.Complemento com : comprobante.getComplemento()) {
+			log.info("Comprobante.Complemento.com.getAny:::" + com.getAny().size());
+			for (Object obj : com.getAny()) {
+				log.info("Pago.DoctoRelacionado:::" + (obj instanceof Pagos ? "si" : "no"));
+				if (obj instanceof Pagos) {
+					Pagos pagos = (Pagos) obj;
+					for (Pagos.Pago pago : pagos.getPago()) {
+						DoctoRelacionado dr = pago.getDoctoRelacionado().get(0);
+						sserie = dr.getSerie();
+						break;
+					}
+				}
+			}
+		}
+		return sserie;
 	}
 
 }
