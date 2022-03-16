@@ -271,6 +271,11 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 		BigDecimal importeRetencion = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		
 		if(tipofactura.equals(1) || tipofactura.equals(3)){
+			BigDecimal msubtotalGlobal = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			List<EstudioDto> listEstudios = consultaService.getListEstudiosByKfactura(dto.getIdFactura());
+			for (EstudioDto estudioDto : listEstudios) {
+				msubtotalGlobal = msubtotalGlobal.add(estudioDto.getImporte());
+			}
 			Concepto concepto = new ObjectFactory().createComprobanteConceptosConcepto();
 			concepto.setDescuento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 			concepto.setCantidad(new BigDecimal("1").setScale(0, BigDecimal.ROUND_HALF_UP));
@@ -279,8 +284,8 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 			concepto.setClaveUnidad("E48");
 			concepto.setUnidad("Unidad de Servicio");
 			concepto.setDescripcion(descripcionFactura);
-			concepto.setValorUnitario(dto.getSubtotal());
-			concepto.setImporte(dto.getSubtotal());
+			concepto.setValorUnitario(msubtotalGlobal);
+			concepto.setImporte(msubtotalGlobal);
 			
 			importePadre = importePadre.add(concepto.getImporte().setScale(4));
 			

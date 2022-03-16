@@ -79,9 +79,17 @@ public class CfdiCancenlacionService {
 		cancelacion.setFolios(folios);
 		
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		String xml =  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><Cancelacion xmlns=\"http://cancelacfd.sat.gob.mx\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Fecha=\""
-		+ dateFormat.format(new Date()) + "\" RfcEmisor=\"" + rfcEmisor + "\">" + "<Folios>" + "<Folio UUID=\""+uuid+"\" Motivo=\""+motivo+"\" FolioSustitucion=\""+uuidSustitucion+"\">"  
-		+ "</Folio >" + "</Folios>" + "</Cancelacion>";
+		String xml = "";
+		if(motivo.equals("01")) {
+			xml =  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><Cancelacion xmlns=\"http://cancelacfd.sat.gob.mx\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Fecha=\""
+					+ dateFormat.format(new Date()) + "\" RfcEmisor=\"" + rfcEmisor + "\">" + "<Folios>" + "<Folio UUID=\""+uuid+"\" Motivo=\""+motivo+"\" FolioSustitucion=\""+uuidSustitucion+"\">"  
+					+ "</Folio >" + "</Folios>" + "</Cancelacion>";			
+		}else {
+			xml =  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><Cancelacion xmlns=\"http://cancelacfd.sat.gob.mx\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Fecha=\""
+					+ dateFormat.format(new Date()) + "\" RfcEmisor=\"" + rfcEmisor + "\">" + "<Folios>" + "<Folio UUID=\""+uuid+"\" Motivo=\""+motivo+"\">"  
+					+ "</Folio >" + "</Folios>" + "</Cancelacion>";	
+		}
+		
 		log.info("requestCancelacionOriginal==="+xml);
 		
 		String xml1 = utilsService.createXmlFromCancelacion(cancelacion).replace("xmlns=\"http://cancelacfd.sat.gob.mx\"", "xmlns=\"http://cancelacfd.sat.gob.mx\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");

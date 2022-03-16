@@ -117,25 +117,7 @@ public class CfdiService {
 				Integer cconvenio = listTos.get(0).getCconvenio();
 				CConvenioDto convenioDto = consultaService.getCcovenioDtoById(cconvenio);
 				TPagoPacienteDto pacienteDto = this.obtenerPago(list);	
-				Integer centidadlegal = null;
-				if(cmarca.equals(7)){
-					if(arrPrado.contains(csucursal)){
-						centidadlegal = 7;
-					}else if(arrLean.contains(csucursal)){
-						centidadlegal = 8;
-					}				
-				}else if(cmarca.equals(1)){
-					centidadlegal = 1;
-				}else if(cmarca.equals(4)){
-					centidadlegal = 5;
-				}else if(cmarca.equals(5)){
-					centidadlegal = 6;
-				}else if(cmarca.equals(15)){
-					centidadlegal = 16;
-				}else if(cmarca.equals(17)){
-					centidadlegal = 18;
-				}
-				
+				Integer centidadlegal = list.get(0).getCentidadlegal();
 				
 				
 				SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");			
