@@ -22,6 +22,20 @@ public class CfdiCancelacionController {
 	@Autowired
 	private CfdiCancenlacionService cancelacionService;
 	
+	@GetMapping("/request-cancelacion-cfdi")
+	public ResponseEntity<?> cfdiCancelacion(@RequestParam("uuid") String uuid, @RequestParam("rfcEmisor") String rfcEmisor, 
+			@RequestParam("uuidSustitucion") String uuidSustitucion, @RequestParam("motivo") Integer motivo){
+		try {
+			return new ResponseEntity<String>(cancelacionService.requestCancelacionCfdi(uuid, rfcEmisor, uuidSustitucion, motivo), HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			ResponseErrorDto dto = new ResponseErrorDto();
+			dto.setCodigo("error");
+			dto.setDescripcion(e.getMessage());
+			return new ResponseEntity<ResponseErrorDto>(dto, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@GetMapping("/cfdi-cancelacion")
 	public ResponseEntity<?> cfdiCancelacion(@RequestParam("uuid") String uuid, @RequestParam("rfcEmisor") String rfcEmisor, 
 			@RequestParam("uuidSustitucion") String uuidSustitucion, @RequestParam("motivo") String motivo,

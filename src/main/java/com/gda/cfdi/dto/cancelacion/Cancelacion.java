@@ -237,7 +237,7 @@ public class Cancelacion {
             protected String uuid;
             @XmlAttribute(name = "Motivo", required = true)
             protected String motivo;
-            @XmlAttribute(name = "FolioSustitucion", required = true)
+            @XmlAttribute(name = "FolioSustitucion")
             protected String folioSustitucion;
 
             /**
