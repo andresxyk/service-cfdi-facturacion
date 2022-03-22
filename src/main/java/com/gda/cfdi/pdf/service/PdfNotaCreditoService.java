@@ -75,6 +75,7 @@ public class PdfNotaCreditoService {
 					
 					String strMetodoPago = consultaService.getConceptoMetodoPago(comprobante.getMetodoPago().value());
 					infoPDF.setDescripcionMetodoPago(strMetodoPago);
+					log.info("UsoCfdi:"+comprobante.getReceptor().getUsoCFDI().value());
 					String descripcionusocfdi = consultaService.getUsoCfdi(comprobante.getReceptor().getUsoCFDI().value());
 					infoPDF.setDescripcionUsoCfdi(descripcionusocfdi);
 					

@@ -75,7 +75,7 @@ public class CfdiPdfService {
 		Document reporteAzteca = new Document(PageSize.A4, 36, 36, 260,156);
 		FileOutputStream ficheroPdf = null;
 		try {
-			ruta = env.getProperty(strMontoTotal)+nobreArchivo+".pdf";
+			ruta = env.getProperty("path.file.ordenes.pdf.olab")+nobreArchivo+".pdf";
 			log.info("ruta--->>>   "+ruta);		
 			
 			ficheroPdf = new FileOutputStream(ruta);
