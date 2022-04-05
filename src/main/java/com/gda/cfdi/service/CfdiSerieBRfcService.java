@@ -162,6 +162,8 @@ public class CfdiSerieBRfcService {
 			TFacturaEntityDto tfactura = new TFacturaEntityDto();
 			tfactura.setKfactura(tFacturaEntity.getKfactura());
 			tfactura.setMsubtotal(comprobante.getSubTotal());
+			tfactura.setUfoliofactura(tFacturaEntity.getUfoliofactura());
+			tfactura.setSserie(tFacturaEntity.getSserie());
 			tfactura.setMiva(comprobante.getImpuestos().getTotalImpuestosTrasladados());
 			tfactura.setMtotal(comprobante.getTotal());
 			tfactura.setUser_id_change(tFacturaEntity.getUser_id().intValue());
