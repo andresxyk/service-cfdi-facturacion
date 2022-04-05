@@ -423,16 +423,14 @@ public class TemplateJenner extends PdfPageEventHelper{
 			////////////////// Pie de Pagina 
 			///////////////////////////////////////////////////////////////////////////////////////////////
             String imgCrearQr = "?re="+strRFCEmisor+"&rr="+strRFCReceptor+"&tt="+comprobante.getTotal().toString()+"&id="+uuid;
-            File f=null;
-            f = new File(env.getProperty("path.file.qr"));
-            
-	      	GenerarQRCode qrCode = new GenerarQRCode();
-	      	qrCode.generateQR(f, imgCrearQr, 600, 600);
-	      	imagenQr = Image.getInstance(env.getProperty("path.file.qr"));
-          	
-			imagenQr.setAbsolutePosition(35, 60f);           
-			imagenQr.scaleAbsoluteWidth(90f);
-			imagenQr.scaleAbsoluteHeight(90f); 
+            File f = new File(env.getProperty("path.file.qr"));
+          	GenerarQRCode qrCode = new GenerarQRCode();
+          	qrCode.generateQR(f, imgCrearQr, 600, 600);
+              
+          		imagenQr = Image.getInstance(env.getProperty("path.file.qr"));
+    			imagenQr.setAbsolutePosition(35, 60f);           
+    			imagenQr.scaleAbsoluteWidth(90f);
+    			imagenQr.scaleAbsoluteHeight(90f);
 			
 //			 PdfPCell pcTituloCFDI = new PdfPCell(new Paragraph(" ",fuenteImportPie));
 //            pcTituloCFDI.setHorizontalAlignment(Element.ALIGN_CENTER);

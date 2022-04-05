@@ -74,7 +74,7 @@ private static final Logger log = LoggerFactory.getLogger(PdfSerieBService.class
 					infoPDF.setCadenaOriginal(facturaDto.getCadenaOriginal());
 					
 					Boolean bDirFiscal = consultaService.getDespliegueFiscalConvenio(facturaDto.getIdConvenio());
-					
+					log.info("centidadlegal:"+centidadlegal);
 					String carpeta = "";
 					String inicioNom = "";
 					String folioFactura = "";
@@ -96,15 +96,15 @@ private static final Logger log = LoggerFactory.getLogger(PdfSerieBService.class
 						inicioNom = "FacturacionElectronica_B";
 						folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 8);
 					} else if (cmarca == 7) {
-						if (centidadlegal == 7) {
+						if (centidadlegal == 7 || comprobante.getEmisor().getRfc().equals("LCP061017PA9")) {
 							carpeta = "Jenner/Prado";
 							inicioNom = "FacturacionElectronica_B";
 							folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 8);
-						} else if (centidadlegal == 8) {
+						} else if (centidadlegal == 8 || comprobante.getEmisor().getRfc().equals("LCL050622DD9")) {
 							carpeta = "Jenner/Lean";
 							inicioNom = "FacturacionElectronica_B";
 							folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 8);
-						}else if (centidadlegal == 5){
+						}else if (centidadlegal == 5 || comprobante.getEmisor().getRfc().equals("LQC920131M20")){
 							carpeta = "Azteca";
 							inicioNom = "FacturacionElectronica_B";
 							folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 8);
@@ -138,13 +138,13 @@ private static final Logger log = LoggerFactory.getLogger(PdfSerieBService.class
 						break;
 					case 7:
 						log.info("JENNER*****");
-						if (centidadlegal == 7) {
+						if (centidadlegal == 7 || comprobante.getEmisor().getRfc().equals("LCP061017PA9")) {
 							ruta = creacionPdf.CrearPdfMarcaJenner(infoPDF, facturaDto.getFolio(),
 									nobreArchivo, true, bRetencion, comprobante, bDirFiscal, env);	
-						} else if (centidadlegal == 8) {
+						} else if (centidadlegal == 8 || comprobante.getEmisor().getRfc().equals("LCL050622DD9")) {
 							ruta = creacionPdf.CrearPdfMarcaJenner(infoPDF, facturaDto.getFolio(),
 									nobreArchivo, false, bRetencion, comprobante, bDirFiscal, env);
-						} else if (centidadlegal == 5) {
+						} else if (centidadlegal == 5 || comprobante.getEmisor().getRfc().equals("LQC920131M20")) {
 							log.info("**************JENNER****AZTECA*****");
 							ruta = creacionPdf.CrearPdfMarcaAzteca(infoPDF,
 									facturaDto.getFolio(),
