@@ -56,6 +56,7 @@ import com.gda.cfdi.dto.DatosMarcaDto;
 import com.gda.cfdi.dto.SelloDto;
 import com.gda.cfdi.dto.TDatoFiscalDto;
 import com.gda.cfdi.dto.TFacturaCanceladaDto;
+import com.gda.cfdi.dto.TFacturaDto;
 import com.gda.cfdi.dto.TFacturaEntityDto;
 import com.gda.cfdi.dto.TOrdenExamenSucursalDto;
 import com.gda.cfdi.dto.TOrdenSucursalDto;
@@ -96,6 +97,17 @@ public class CfdiService {
 	
 	@Autowired
 	private UtilsService utilsService;
+	
+	
+	public String getXmlFactura(Integer kfactura) throws Exception {
+		TFacturaDto tf = consultaService.getTFacturaDto(kfactura);
+		if(tf.getXmlTimbrado()!=null && tf.getXmlTimbrado().length() > 0) {
+			return tf.getXmlTimbrado();
+		}else{
+			throw new Exception("No contiene XML");
+		}
+	}
+	
 	
 	public TFacturaEntityDto generarCfdi(Integer kordensucursal, Integer cusocfdi, Integer kdatofiscal) throws Exception {	
 		ArrayList<Integer> arrPrado = new ArrayList<Integer>(Arrays.asList(117,118,126,127,128,129,130,132,134,138,139,140,141,142,143,196,198,199,200));
