@@ -6,4 +6,17 @@
 //
 
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://cancelacfd.sat.gob.mx", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+//@javax.xml.bind.annotation.XmlSchema(
+//        xmlns = {
+//            @javax.xml.bind.annotation.XmlNs(
+//                    prefix = "",
+//                    namespaceURI = "http://cancelacfd.sat.gob.mx"),
+//            @javax.xml.bind.annotation.XmlNs(
+//                    prefix = "xsd",
+//                    namespaceURI = javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI),
+//            @javax.xml.bind.annotation.XmlNs(
+//                    prefix = "xsi",
+//                    namespaceURI = javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI) },
+//        namespace = "http://cancelacfd.sat.gob.mx",
+//        elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package com.gda.cfdi.dto.cancelacion;

@@ -29,6 +29,7 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.keyinfo.X509IssuerSerial;
+import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -53,12 +54,33 @@ import com.gda.cfdi.dto.cancelacion.Cancelacion.Folios.Folio;
 public class CfdiCancenlacionService {
 
 	private static final Logger log = LoggerFactory.getLogger(CfdiCancenlacionService.class);
-	
-	@Autowired
-	private ConsultaService consultaService;
-	
+		
 	@Autowired
 	private UtilsService utilsService;
+	
+	@Autowired
+	private DomainService domainService;
+	
+	public String requestCancelacionCfdi(String uuid, String rfcEmisor, String uuidSustitucion, Integer motivo) throws Exception {
+		Cancelacion cancelacion = new Cancelacion();		
+		cancelacion.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+		cancelacion.setRfcEmisor(rfcEmisor);
+		Folios folios = new Folios();
+		Folio folio = new Folio();
+		folio.setUUID(uuid);
+		folio.setMotivo(motivo.equals(1)?"01":motivo.equals(2)?"02":motivo.equals(3)?"03":motivo.equals(4)?"04":"");
+		if(motivo.equals(1)) {
+			folio.setFolioSustitucion(uuidSustitucion);			
+		}
+		folios.setFolio(folio);
+		cancelacion.setFolios(folios);
+		String request = utilsService.createXmlFromCancelacion(cancelacion).replace("xmlns=\"http://cancelacfd.sat.gob.mx\"", "xmlns=\"http://cancelacfd.sat.gob.mx\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");;
+		log.info("requestCancelacionOriginal==="+request);
+		DatosMarcaDto datosMarcaDto = domainService.obtenerDatosRfcEmisor(rfcEmisor);
+		String requestCancelacion = domainService.getXMLCancelacionConFirmaDigital(request, datosMarcaDto);
+		return requestCancelacion;
+		
+	}
 	
 	public String generarCfdiCancelacion(String uuid, String rfcEmisor, String uuidSustitucion, String motivo, Integer marca, Integer csucursal) throws Exception {
 		
@@ -79,9 +101,17 @@ public class CfdiCancenlacionService {
 		cancelacion.setFolios(folios);
 		
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		String xml =  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><Cancelacion xmlns=\"http://cancelacfd.sat.gob.mx\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Fecha=\""
-		+ dateFormat.format(new Date()) + "\" RfcEmisor=\"" + rfcEmisor + "\">" + "<Folios>" + "<Folio UUID=\""+uuid+"\" Motivo=\""+motivo+"\" FolioSustitucion=\""+uuidSustitucion+"\">"  
-		+ "</Folio >" + "</Folios>" + "</Cancelacion>";
+		String xml = "";
+		if(motivo.equals("01")) {
+			xml =  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><Cancelacion xmlns=\"http://cancelacfd.sat.gob.mx\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Fecha=\""
+					+ dateFormat.format(new Date()) + "\" RfcEmisor=\"" + rfcEmisor + "\">" + "<Folios>" + "<Folio UUID=\""+uuid+"\" Motivo=\""+motivo+"\" FolioSustitucion=\""+uuidSustitucion+"\">"  
+					+ "</Folio >" + "</Folios>" + "</Cancelacion>";			
+		}else {
+			xml =  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><Cancelacion xmlns=\"http://cancelacfd.sat.gob.mx\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Fecha=\""
+					+ dateFormat.format(new Date()) + "\" RfcEmisor=\"" + rfcEmisor + "\">" + "<Folios>" + "<Folio UUID=\""+uuid+"\" Motivo=\""+motivo+"\">"  
+					+ "</Folio >" + "</Folios>" + "</Cancelacion>";	
+		}
+		
 		log.info("requestCancelacionOriginal==="+xml);
 		
 		String xml1 = utilsService.createXmlFromCancelacion(cancelacion).replace("xmlns=\"http://cancelacfd.sat.gob.mx\"", "xmlns=\"http://cancelacfd.sat.gob.mx\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");

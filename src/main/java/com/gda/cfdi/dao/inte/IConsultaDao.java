@@ -14,30 +14,30 @@ import com.gda.cfdi.dto.TSociedadCivilDto;
 
 public interface IConsultaDao {
 
-	CControlFolioDto getControlFolioDto(Integer csucursal);
-
-	List<TPagoPacienteDto> getTPagoPacienteDto(Integer kordensucursal);
-
-	List<TOrdenSucursalDto> getListTOrdenSucursalByKordensucursal(Integer kordensucursal);
-
-	Integer updateCControlFolio(Integer ccontrolfolio, Integer ufolioactual);
-
-	String getCPostalByCsucursal(Integer csucursal);
-
-	CTipoPagoDto getCTipoPagoById(Integer id);
-
-	CFormaPagoCfdiDto getCFormaPagoCfdiById(Integer id);
-
-	List<TFacturaCanceladaDto> getFacturasCanceladasByKorden(Integer kordensucursal);
-
-	List<TOrdenExamenSucursalDto> getTOrdenExamenSucursalByKOrdenSucursal(Integer kordensucursal);
-
-	List<TSociedadCivilDto> getTSociedadCivilByKOrdenSucursal(Integer kordensucursal);
-
-	CClaveProductoServicioSatDto findCClaveProductoServicioSatById(Integer cexamen);
-
-	Integer getCTipoConvenioByConvenio(Integer cconvenio);
-
-	
+//	CControlFolioDto getControlFolioDto(Integer csucursal);
+//
+//	List<TPagoPacienteDto> getTPagoPacienteDto(Integer kordensucursal);
+//
+//	List<TOrdenSucursalDto> getListTOrdenSucursalByKordensucursal(Integer kordensucursal);
+//
+//	Integer updateCControlFolio(Integer ccontrolfolio, Integer ufolioactual);
+//
+//	String getCPostalByCsucursal(Integer csucursal);
+//
+//	CTipoPagoDto getCTipoPagoById(Integer id);
+//
+//	CFormaPagoCfdiDto getCFormaPagoCfdiById(Integer id);
+//
+//	List<TFacturaCanceladaDto> getFacturasCanceladasByKorden(Integer kordensucursal);
+//
+//	List<TOrdenExamenSucursalDto> getTOrdenExamenSucursalByKOrdenSucursal(Integer kordensucursal);
+//
+//	List<TSociedadCivilDto> getTSociedadCivilByKOrdenSucursal(Integer kordensucursal);
+//
+//	CClaveProductoServicioSatDto findCClaveProductoServicioSatById(Integer cexamen);
+//
+//	Integer getCTipoConvenioByConvenio(Integer cconvenio);
+//
+//	
 
 }

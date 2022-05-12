@@ -17,8 +17,29 @@ public class TPagoPacienteDto {
 	private Integer cestadoregistro;
 	private Integer user_id;
 	private Integer ctipopago;
+	private String stipopago;
+	private Integer cmarca;
+	private Integer centidadlegal;
 	
 	
+	public String getStipopago() {
+		return stipopago;
+	}
+	public void setStipopago(String stipopago) {
+		this.stipopago = stipopago;
+	}
+	public Integer getCmarca() {
+		return cmarca;
+	}
+	public void setCmarca(Integer cmarca) {
+		this.cmarca = cmarca;
+	}
+	public Integer getCentidadlegal() {
+		return centidadlegal;
+	}
+	public void setCentidadlegal(Integer centidadlegal) {
+		this.centidadlegal = centidadlegal;
+	}
 	public Integer getCtipopago() {
 		return ctipopago;
 	}
