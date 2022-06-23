@@ -22,12 +22,16 @@ import com.gda.cfdi.dto.TNotaCreditoEntityDto;
 import com.gda.cfdi.exception.ResponseErrorDto;
 import com.gda.cfdi.service.Cfdi4Service;
 import com.gda.cfdi.service.CfdiComplementoPagoService;
+import com.gda.cfdi.service.CfdiComprobanteService;
 import com.gda.cfdi.service.CfdiCreditoService;
 import com.gda.cfdi.service.CfdiNotaCreditoService;
 import com.gda.cfdi.service.CfdiSerieAService;
 import com.gda.cfdi.service.CfdiSerieBConvenioService;
 import com.gda.cfdi.service.CfdiSerieBRfcService;
 import com.gda.cfdi.service.CfdiService;
+import com.google.gson.Gson;
+
+import facturacion.domain.dto.FacturacionComprobanteDto;
 
 @RestController
 @RequestMapping(value = "/gda/service-cfdi")
@@ -58,6 +62,39 @@ public class CfdiController {
 	
 	@Autowired
 	private CfdiComplementoPagoService cfdiComplementoPagoService;
+	
+	@Autowired
+	private CfdiComprobanteService cfdiComprobanteService;
+	
+	private Gson gson = new Gson();
+	
+	@PostMapping("/request-cfdi-comprobante")
+	public ResponseEntity<?> getRequestXmlComprobante(@RequestParam("version") Integer version,
+			@RequestBody FacturacionComprobanteDto facturacionComprobanteDto){
+		try {
+			log.info(gson.toJson(facturacionComprobanteDto));
+			FacturacionComprobanteDto cfdiDto = null;
+			if(version.equals(3)) {
+				cfdiDto = cfdiComprobanteService.requestCfdiComprobante(facturacionComprobanteDto);	
+				return new ResponseEntity<FacturacionComprobanteDto>(cfdiDto, HttpStatus.OK);
+			}else if(version.equals(4)){
+//				cfdiDto = cfdi4Service.generarCfdi(kordensucursal);
+				cfdiDto = null;
+				return new ResponseEntity<FacturacionComprobanteDto>(cfdiDto, HttpStatus.OK);
+			}else {
+				ResponseErrorDto dto = new ResponseErrorDto();
+				dto.setCodigo("error");
+				dto.setDescripcion("La versión es incorrecta.");
+				return new ResponseEntity<ResponseErrorDto>(dto, HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			ResponseErrorDto dto = new ResponseErrorDto();
+			dto.setCodigo("error");
+			dto.setDescripcion(e.getMessage());
+			return new ResponseEntity<ResponseErrorDto>(dto, HttpStatus.BAD_REQUEST);
+		}
+	}
 	
 	@GetMapping("/generar-cfdi")
 	public ResponseEntity<?> getXmlOrden(@RequestParam("kordensucursal") Integer kordensucursal,

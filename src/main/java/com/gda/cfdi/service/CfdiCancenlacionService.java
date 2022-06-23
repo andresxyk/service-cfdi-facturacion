@@ -82,13 +82,13 @@ public class CfdiCancenlacionService {
 		
 	}
 	
-	public String generarCfdiCancelacion(String uuid, String rfcEmisor, String uuidSustitucion, String motivo, Integer marca, Integer csucursal) throws Exception {
+	public String generarCfdiCancelacion(String uuid, String rfcEmisor, String uuidSustitucion, String motivo) throws Exception {
 		
-		String requestCancelacion = this.requestCancelacion(uuid, rfcEmisor, uuidSustitucion != "" ? uuidSustitucion : null, motivo,marca,csucursal);
+		String requestCancelacion = this.requestCancelacion(uuid, rfcEmisor, uuidSustitucion != "" ? uuidSustitucion : null, motivo);
 		return requestCancelacion;
 	}
 	
-	private String requestCancelacion(String uuid, String rfcEmisor, String uuidSustitucion, String motivo, Integer marca, Integer csucursal) throws Exception {
+	private String requestCancelacion(String uuid, String rfcEmisor, String uuidSustitucion, String motivo) throws Exception {
 		Cancelacion cancelacion = new Cancelacion();		
 		cancelacion.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
 		cancelacion.setRfcEmisor(rfcEmisor);
@@ -116,13 +116,13 @@ public class CfdiCancenlacionService {
 		
 		String xml1 = utilsService.createXmlFromCancelacion(cancelacion).replace("xmlns=\"http://cancelacfd.sat.gob.mx\"", "xmlns=\"http://cancelacfd.sat.gob.mx\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
 		log.info("requestCancelacionOriginal==="+xml1);
-		String requestCancelacion = this.getXMLCancelacionConFirmaDigital(xml, marca, csucursal);
+		String requestCancelacion = this.getXMLCancelacionConFirmaDigital(xml,rfcEmisor);
 		return requestCancelacion;
 	}
 	
-	public String getXMLCancelacionConFirmaDigital(String xmlCancelacion,Integer marca, Integer csucursal) throws Exception {
+	public String getXMLCancelacionConFirmaDigital(String xmlCancelacion, String rfcEmisor) throws Exception {
 		System.out.println("ObtenerFirmaDigial*****");
-		DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosMarca(marca, csucursal, true);
+		DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosRfcEmisor(rfcEmisor);
 		X509Certificate x509 = null;
 		x509 = getX509Certificate(new File(datosMarcaDto.getRutaCer()));
 		System.out.println("x509--->>>   " + x509);

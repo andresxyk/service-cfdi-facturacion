@@ -3,6 +3,7 @@ package com.gda.cfdi.service;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -11,6 +12,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.Signature;
+import java.security.SignatureException;
 import java.security.Timestamp;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.text.DateFormat;
@@ -23,7 +25,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Properties;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -51,11 +52,12 @@ import org.springframework.stereotype.Service;
 
 import com.gda.cfdi.dto.DatosMarcaDto;
 import com.gda.cfdi.dto.FacturaSelloDto;
+import com.gda.cfdi.dto.SelloDto;
 import com.gda.cfdi.dto.cancelacion.Cancelacion;
 
 import mx.gob.sat.cfd._3.Comprobante;
+import mx.gob.sat.cfd._3.terceros.PorCuentadeTerceros;
 import mx.gob.sat.cfd.pagos.Pagos;
-import mx.gob.sat.pagos20.Pagos.Pago;
 import mx.gob.sat.timbrefiscaldigital.TimbreFiscalDigital;
 
 @Service
@@ -124,6 +126,31 @@ public class UtilsService {
 		}
 		log.info("RFC valido-->><  " + correcto);
 		return correcto;
+	}
+	
+	public String getXmlFromComprobante(mx.gob.sat.cfd._3.Comprobante comprobante) throws JAXBException {
+		String xml;
+		JAXBContext jaxbContext;
+		List<Class<?>> classesMarshall = new ArrayList<Class<?>>();
+		comprobante.getComplemento().forEach(complemento -> {
+			complemento.getAny().forEach(object -> {
+				if (object instanceof TimbreFiscalDigital) {
+					classesMarshall.add(TimbreFiscalDigital.class);
+				}
+			});
+		});
+		classesMarshall.add(mx.gob.sat.cfd._3.Comprobante.class);
+		classesMarshall.add(PorCuentadeTerceros.class);
+//		classesMarshall.add(Pagos.class);
+		jaxbContext = JAXBContext.newInstance(classesMarshall.toArray(new Class<?>[classesMarshall.size()]));
+		Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
+				"http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd http://www.sat.gob.mx/terceros http://www.sat.gob.mx/sitio_internet/cfd/terceros/terceros11.xsd");
+		StringWriter sw = new StringWriter();
+		marshaller.marshal(comprobante, sw);
+		xml = sw.toString();
+		return xml;
 	}
 	
 	public String createXmlFromComprobante(Comprobante comprobante) throws JAXBException {
@@ -329,6 +356,76 @@ public class UtilsService {
 				razonSocialMarca, numeroCertificado, rutaKey, rutaCer);
 		return datosMarcaDto;
 	}
+	
+	
+	public DatosMarcaDto obtenerDatosRfcEmisor(String rfcEmisor){
+		String sucursalesPrado = env.getProperty("list.sucursal.jenner.prado");
+		String sucursalesLean = env.getProperty("list.sucursal.jenner.lean");
+		List<String> listPrado = new ArrayList<String>(Arrays.asList(sucursalesPrado.split(",")));
+		List<String> listLean = new ArrayList<String>(Arrays.asList(sucursalesLean.split(",")));
+		
+		String rutaCadenaOriginal = env.getProperty("path.file.cadena.original");
+		String pasword = "";
+		String rfcMarca = "";
+		String razonSocialMarca = "";
+		String numeroCertificado = "";
+		String rutaKey = "";
+		String rutaCer = "";
+		switch (rfcEmisor) {
+		case "ECD741021QA5":
+			log.info("**** OLAB *****");
+			rutaKey = env.getProperty("path.file.key.olab");
+			rutaCer = env.getProperty("path.file.cer.olab");		
+			pasword = env.getProperty("password.cer.olab");	
+			rfcMarca = env.getProperty("rfc.marca.olab");	
+			razonSocialMarca = env.getProperty("razon.social.olab");
+			numeroCertificado = env.getProperty("numero.certificado.olab");
+			break;
+		case "LQC920131M20":
+			log.info("**** AZTECA *****");
+			rutaKey = env.getProperty("path.file.key.azteca");
+			rutaCer = env.getProperty("path.file.cer.azteca");		
+			pasword = env.getProperty("password.cer.azteca");	
+			rfcMarca = env.getProperty("rfc.marca.azteca");	
+			razonSocialMarca = env.getProperty("razon.social.azteca");
+			numeroCertificado = env.getProperty("numero.certificado.azteca");
+			break;
+		case "LCP061017PA9":
+			log.info("**** PRADO *****");
+			rutaKey = env.getProperty("path.file.key.prado");
+			rutaCer = env.getProperty("path.file.cer.prado");		
+			pasword = env.getProperty("password.cer.prado");	
+			rfcMarca = env.getProperty("rfc.marca.prado");	
+			razonSocialMarca = env.getProperty("razon.social.prado");
+			numeroCertificado = env.getProperty("numero.certificado.prado");
+			break;
+		case "LCL050622DD9":
+			log.info("**** LEAN *****");
+			rutaKey = env.getProperty("path.file.key.lean");
+			rutaCer = env.getProperty("path.file.cer.lean");		
+			pasword = env.getProperty("password.cer.lean");	
+			rfcMarca = env.getProperty("rfc.marca.lean");	
+			razonSocialMarca = env.getProperty("razon.social.lean");
+			numeroCertificado = env.getProperty("numero.certificado.lean");
+			break;
+		case "SWI1201268J8":
+			log.info("**** SWISSLAB *****");
+			rutaKey = env.getProperty("path.file.key.swisslab");
+			rutaCer = env.getProperty("path.file.cer.swisslab");		
+			pasword = env.getProperty("password.cer.swisslab");	
+			rfcMarca = env.getProperty("rfc.marca.swisslab");	
+			razonSocialMarca = env.getProperty("razon.social.swisslab");
+			numeroCertificado = env.getProperty("numero.certificado.swisslab");
+			break;	
+		default:
+			break;
+		}
+		
+		DatosMarcaDto datosMarcaDto= new DatosMarcaDto(rutaCadenaOriginal, pasword, rfcMarca, 
+				razonSocialMarca, numeroCertificado, rutaKey, rutaCer);
+		return datosMarcaDto;
+	}
+	
 	
 	public DatosMarcaDto obtenerDatosMarca(Integer marca, Integer csucursal, boolean bandAzteca){
 		String sucursalesPrado = env.getProperty("list.sucursal.jenner.prado");
@@ -766,5 +863,67 @@ public class UtilsService {
 
 		return facturaSello;
 	}
+	
+	public SelloDto obtenerSello(DatosMarcaDto datosMarcaDto, String xml) {
+		String selloCFDI = "";
+		String cadenaOriginal = "";
+		log.info("rutaCadenaOriginal--->>>   "+datosMarcaDto.getRutaCadenaOriginal());
+		File xslt = new File(datosMarcaDto.getRutaCadenaOriginal());
+		StreamSource sourceXSL = new StreamSource(xslt);		
+		StreamSource sourceXML = new StreamSource(new StringReader(xml));
+		System.out.println("cargo xml::  " + sourceXML);
+		byte[] output1 = null;
+		try {
+			TransformerFactory tFactory = TransformerFactory.newInstance();
+			Transformer transformer = tFactory.newTransformer(sourceXSL);
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			transformer.transform(sourceXML, new StreamResult(output));
+			output1 = output.toString().getBytes("UTF-8");
+			cadenaOriginal = new String(output1);
+		} catch (Exception e) {
+			System.out.println("Error de codificacion: " + e.getMessage());
+			e.printStackTrace();
+		}
+		log.info("Obtener sellos ");
+		selloCFDI = generarSello(datosMarcaDto, new String(output1));
+//		selloCFDI = generarSello("12345678a", new String(output1));
+		
+		SelloDto selloDto = new SelloDto(selloCFDI, cadenaOriginal);
+		return selloDto;
+	}
+	
+	public String generarSello(DatosMarcaDto datosMarcaDto, String cadenaOriginal) {
+		FileInputStream fileInputStream;
+		String firma = "";
+		try {
+			fileInputStream = new FileInputStream(datosMarcaDto.getRutaKey());
+			byte[] fileBytes = new byte[fileInputStream.available()];
+			fileInputStream.read(fileBytes);
+			System.out.println("fileBytes-->>>    " + fileBytes);
+			PKCS8Key pkcs8 = new PKCS8Key(fileBytes, datosMarcaDto.getPasword().toCharArray());
+			KeyFactory privateKeyFactory = KeyFactory.getInstance("RSA");
+			PKCS8EncodedKeySpec pkcs8Encoded = new PKCS8EncodedKeySpec(pkcs8.getDecryptedBytes());
+			PrivateKey privateKey = privateKeyFactory.generatePrivate(pkcs8Encoded);
+			Signature signature = Signature.getInstance("SHA256withRSA");
+			signature.initSign(privateKey);
+			byte[] cadenaOriginalByte = cadenaOriginal.getBytes();
+			signature.update(cadenaOriginalByte);
+			// fileInputStream.close();
+			firma = new String(Base64.encode(signature.sign()));
+			System.out.println("firma::::    " + firma);
+		} catch (SignatureException e) {
+			System.out.println("SignatureException-->> " + e);
+			e.printStackTrace();
+		} catch (GeneralSecurityException e) {
+			System.out.println("GeneralSecurityException-->> " + e);
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		log.info("Firma digital del CFDI:" + firma);
+		return firma;
+	}	
 	
 }
