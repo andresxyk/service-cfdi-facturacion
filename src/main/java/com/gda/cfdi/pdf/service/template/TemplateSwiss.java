@@ -323,7 +323,7 @@ public class TemplateSwiss extends PdfPageEventHelper{
             tabDetalleFact.addCell(pcRegimenEmisor);
 //            tabDetalleFact.addCell(pcDomicilioReceptor);
 //            tabDetalleFact.addCell(pcDomicilioEmisor);
-            //tabDetalleFact.addCell(pcNumOrdenPaciente);
+            tabDetalleFact.addCell(pcNumOrdenPaciente);
             tabDetalleFact.addCell(pcLineas);
             tabDetalleFact.addCell(pcLineasII);
             tabDetalleFact.setTotalWidth(530);
