@@ -168,7 +168,7 @@ public class TemplateOlab extends PdfPageEventHelper{
 			///////////////////////////////////////////////////////////////////////////////////////////////
 			//////////////////	Direccion del PDF
 			///////////////////////////////////////////////////////////////////////////////////////////////            
-            PdfPCell direccionSucursal = new PdfPCell(new Paragraph("Campos Elíseos 345, Polanco, Polanco III Secc, 11560 Ciudad de México, CDMX",fuenteDirSucur));
+            PdfPCell direccionSucursal = new PdfPCell(new Paragraph("Aviación Civil 35, Industrial Puerto Aéreo, Venustiano Carranza C.P. 15710 Ciudad de México",fuenteDirSucur));
             direccionSucursal.setBorder(Rectangle.UNDEFINED);
             tabDirSuc.addCell(direccionSucursal);
             tabDirSuc.setTotalWidth(350);            
