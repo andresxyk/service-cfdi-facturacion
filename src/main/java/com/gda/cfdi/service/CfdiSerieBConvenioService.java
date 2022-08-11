@@ -217,7 +217,7 @@ public class CfdiSerieBConvenioService {
 				cfdi33.setLugarExpedicion("57708");
 
 			} else {
-				cfdi33.setLugarExpedicion("11560");
+				cfdi33.setLugarExpedicion("15710");
 			}
 
 //			cfdi33.setLugarExpedicion("11560");// siempre es el mismo CP ya que siempre se expide en OMEGA

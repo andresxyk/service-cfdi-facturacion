@@ -137,14 +137,14 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 				comprobante.setLugarExpedicion("57708");
 				
 			}else{				
-				comprobante.setLugarExpedicion("11560");
+				comprobante.setLugarExpedicion("15710");
 			}
 		}else if(marca.equals(5)){
 			comprobante.setLugarExpedicion("64040");
 		}else if(marca.equals(15)){
 			comprobante.setLugarExpedicion("31203");
 		}else if(marca.equals(4) || marca.equals(7) || marca.equals(8)){
-			comprobante.setLugarExpedicion("11560");
+			comprobante.setLugarExpedicion("15710");
 		}
 		
 		
