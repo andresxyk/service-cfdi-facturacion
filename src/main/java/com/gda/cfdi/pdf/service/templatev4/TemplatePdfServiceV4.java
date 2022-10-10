@@ -1,4 +1,4 @@
-package com.gda.cfdi.pdf.service.template;
+package com.gda.cfdi.pdf.service.templatev4;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -25,13 +25,13 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import mx.gob.sat.cfd._3.Comprobante;
+import mx.gob.sat.cfd._4.Comprobante;
 
 
 @Service
-public class TemplatePdfService implements ITemplatePdfServiceImpl {
+public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	
-	private static final Logger log = LoggerFactory.getLogger(TemplatePdfService.class);
+	private static final Logger log = LoggerFactory.getLogger(TemplatePdfServiceV4.class);
 	
 	@Override
 	public String CrearPdfMarcaOlab(Comprobante comprobante, PdfInfoDto infoPDF, Environment env) throws DocumentException, IOException, Exception{

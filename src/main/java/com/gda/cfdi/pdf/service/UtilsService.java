@@ -67,10 +67,33 @@ private static final Logger log = LoggerFactory.getLogger(UtilsService.class);
 		return comprobante;
 	}
 	
+	public mx.gob.sat.cfd._4.Comprobante createComprobanteFromXml(String xml) throws JAXBException {
+		mx.gob.sat.cfd._4.Comprobante comprobante = null;
+		JAXBContext jaxbContext;
+		List<Class<?>> classesMarshall = new ArrayList<Class<?>>();
+		if (xml.toLowerCase().contains("<tfd:TimbreFiscalDigital".toLowerCase())) {
+			classesMarshall.add(TimbreFiscalDigital.class);
+		}
+		classesMarshall.add(mx.gob.sat.cfd._4.Comprobante.class);
+		classesMarshall.add(mx.gob.sat.pagos20.Pagos.class);
+		jaxbContext = JAXBContext.newInstance(classesMarshall.toArray(new Class<?>[classesMarshall.size()]));
+		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+		StringReader reader = new StringReader(this.fixXmlV4(xml));
+		comprobante = (mx.gob.sat.cfd._4.Comprobante) unmarshaller.unmarshal(reader);
+		return comprobante;
+	}
+	
 	public static String fixXml(String xml) {
 		xml = xml.replace("/cfd/3\"xmlns", "/cfd/3\" xmlns");
 		xml = xml.replace("instance\"xsi", "instance\" xsi");
 		xml = xml.replace("cfd/3 http", "cfd/3 http");
+		return xml;
+	}
+	
+	public static String fixXmlV4(String xml) {
+		xml = xml.replace("/cfd/4\"xmlns", "/cfd/4\" xmlns");
+		xml = xml.replace("instance\"xsi", "instance\" xsi");
+		xml = xml.replace("cfd/4 http", "cfd/4 http");
 		return xml;
 	}
 	

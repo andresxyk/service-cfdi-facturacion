@@ -1,4 +1,4 @@
-package com.gda.cfdi.pdf.service.template;
+package com.gda.cfdi.pdf.service.templatev4;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,16 +27,17 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import mx.gob.sat.cfd._3.Comprobante;
-import mx.gob.sat.cfd._3.Comprobante.Emisor;
-import mx.gob.sat.cfd._3.Comprobante.Receptor;
-import mx.gob.sat.cfd._3.Comprobante.CfdiRelacionados.CfdiRelacionado;
+import mx.gob.sat.cfd._4.Comprobante;
+import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados;
+import mx.gob.sat.cfd._4.Comprobante.Emisor;
+import mx.gob.sat.cfd._4.Comprobante.Receptor;
+import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados.CfdiRelacionado;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CRegimenFiscal;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CTipoDeComprobante;
 import mx.gob.sat.timbrefiscaldigital.TimbreFiscalDigital;
 
-public class TemplateLiacsa extends PdfPageEventHelper{
-	private static final Logger log = LoggerFactory.getLogger(TemplateLiacsa.class);
+public class TemplateJenner extends PdfPageEventHelper{
+	private static final Logger log = LoggerFactory.getLogger(TemplateJenner.class);
 	
 	private Image imagenLogo;
 	PdfPTable tabDirSuc = new PdfPTable(1);
@@ -46,7 +47,7 @@ public class TemplateLiacsa extends PdfPageEventHelper{
 	PdfPTable tabPieCFDI = new PdfPTable(2);
 	private Image imagenQr;
 	
-	public TemplateLiacsa(Comprobante comprobante, PdfInfoDto infoPDF, Environment env) throws Exception{
+	public TemplateJenner(Comprobante comprobante, PdfInfoDto infoPDF, Environment env)throws Exception{
 		try {
 			String strDirSucursal = infoPDF.getDirSucursal();
 			CTipoDeComprobante tipoComprobante = comprobante.getTipoDeComprobante();
@@ -65,16 +66,15 @@ public class TemplateLiacsa extends PdfPageEventHelper{
 			}
 			
 			TimbreFiscalDigital timbreFiscalDigital = null;
-			for(Comprobante.Complemento compTimbre:comprobante.getComplemento()) {
-				for(Object obj : compTimbre.getAny()) {
-					log.info("TimbreFiscalDigital.DoctoRelacionado:::" + (obj instanceof TimbreFiscalDigital ? "si" : "no"));
-					if(obj instanceof TimbreFiscalDigital) {
-						timbreFiscalDigital = (TimbreFiscalDigital) obj;
-						break;
-					}
+			for(Object obj : comprobante.getComplemento().getAny()) {
+				log.info("TimbreFiscalDigital.DoctoRelacionado:::" + (obj instanceof TimbreFiscalDigital ? "si" : "no"));
+				if(obj instanceof TimbreFiscalDigital) {
+					timbreFiscalDigital = (TimbreFiscalDigital) obj;
+					break;
 				}
 			}
 			
+			char[] caracteres;
 			SimpleDateFormat parseador = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 			String strFechaExped = comprobante.getLugarExpedicion() +" "+parseador.format(comprobante.getFecha().toGregorianCalendar().getTime());
 			String strFechaCertificacion = parseador.format(timbreFiscalDigital.getFechaTimbrado().toGregorianCalendar().getTime());
@@ -87,59 +87,62 @@ public class TemplateLiacsa extends PdfPageEventHelper{
 			String strConcep = infoPDF.getDescripcionUsoCfdi();
 			String strRFCReceptor = receptor.getRfc();
 			String strRegFiscal = emisor.getRegimenFiscal();
-			//String strDomicFiscalRecep = "FALTA DATO";
-			System.out.println("direccion:::   "+infoPDF.getDirFiscalEmisor());
+			String strDomicFiscalRecep = "";
+			
+			
+			
 			String strDomicFiscalEmis = infoPDF.getDirFiscalEmisor();
 			String strNomOrdPac = infoPDF.getConsecutivo()+" "+infoPDF.getNombrePaciente();
 			String strCadenaTimbre = "CADENA ORIGINAL DEL COMPLEMENTO DE CERTIFICACION DIGITAL SAT:"+infoPDF.getCadenaOriginal()+" "
 					+ "Sello Digital del SAT: "+timbreFiscalDigital.getSelloSAT()+" CERTIFICADO SAT: "+ timbreFiscalDigital.getNoCertificadoSAT();
 			String uuid = timbreFiscalDigital.getUUID();
+			
 			String sello = comprobante.getSello();
-
-
+			
 			String uuidRelacionado="";
 			String codeTipoRelacionado=null;
-			if(comprobante.getCfdiRelacionados()!=null) {
-				codeTipoRelacionado = comprobante.getCfdiRelacionados().getTipoRelacion();
-				List<CfdiRelacionado> listRelacionados = comprobante.getCfdiRelacionados().getCfdiRelacionado();
+			if(comprobante.getCfdiRelacionados()!=null && comprobante.getCfdiRelacionados().size()>0) {
+				CfdiRelacionados cfdiRelacionado = comprobante.getCfdiRelacionados().get(0);				
+				codeTipoRelacionado = cfdiRelacionado.getTipoRelacion();
+				List<CfdiRelacionado> listRelacionados = cfdiRelacionado.getCfdiRelacionado();
 				if(listRelacionados.size()>0) {
 					uuidRelacionado = listRelacionados.get(0).getUUID();
 				}
 			}
 			
+			
 			String tipoRelacionado = "";
 			if(codeTipoRelacionado != null){
 				switch (codeTipoRelacionado) {
 				case "01":
-					tipoRelacionado = codeTipoRelacionado+" - Nota de crédito de los documentos relacionados";
+					tipoRelacionado = "Nota de crédito de los documentos relacionados";
 					break;
 				case "02":
-					tipoRelacionado = codeTipoRelacionado+" - Nota de débito de los documentos relacionados";
+					tipoRelacionado = "Nota de débito de los documentos relacionados";
 					break;
 				case "03":
-					tipoRelacionado = codeTipoRelacionado+" - Devolución de mercancía sobre facturas o traslados previos";
+					tipoRelacionado = "Devolución de mercancía sobre facturas o traslados previos";
 					break;
 				case "04":
-					tipoRelacionado = codeTipoRelacionado+" - Sustitución de los CFDI previos";
+					tipoRelacionado = "Sustitución de los CFDI previos";
 					break;
 				case "05":
-					tipoRelacionado = codeTipoRelacionado+" - Traslados de mercancías facturados previamente";
+					tipoRelacionado = "Traslados de mercancías facturados previamente";
 					break;
 				case "06":
-					tipoRelacionado = codeTipoRelacionado+" - Factura generada por los traslados previos";
+					tipoRelacionado = "Factura generada por los traslados previos";
 					break;
 				case "07":
-					tipoRelacionado = codeTipoRelacionado+" - CFDI por aplicación de anticipo";
+					tipoRelacionado = "CFDI por aplicación de anticipo";
 					break;
 				default:
 					break;
 				}
 			}
 			
-			//BaseColor colorLetraEncabezadoImagen = WebColors.getRGBColor("#1F49B6");
 			BaseColor colorLetraEncabezados = WebColors.getRGBColor("#FFFFFF");
-			BaseColor colorFondoTituloFact = WebColors.getRGBColor("#1F49B6");
-			BaseColor colorFondoContenidoFact = WebColors.getRGBColor("#F4F4F9");			
+			BaseColor colorFondoTituloFact = WebColors.getRGBColor("#0971CE");
+			BaseColor colorFondoContenidoFact = WebColors.getRGBColor("#E6ECF8");			
 			Font fuenteDirSucur = new Font(Font.FontFamily.HELVETICA,7,Font.NORMAL,BaseColor.BLACK);
 			Font fuenteImport = new Font(Font.FontFamily.HELVETICA,7,Font.BOLD,BaseColor.BLACK);
 			Font fuenteImportPie = new Font(Font.FontFamily.HELVETICA,5,Font.BOLD,BaseColor.BLACK);
@@ -150,22 +153,22 @@ public class TemplateLiacsa extends PdfPageEventHelper{
 			Font fuenteTimbrado = new Font(Font.FontFamily.HELVETICA,4,Font.NORMAL,BaseColor.BLACK);
 			Font fuenteTimbradoImpor = new Font(Font.FontFamily.HELVETICA,4,Font.BOLD,BaseColor.BLACK);
 			
-			
-			/*rutaproduccion*/ imagenLogo = Image.getInstance(env.getProperty("path.file.logo.liacsa"));
-			imagenLogo.setAbsolutePosition(370, 730f);           
-            imagenLogo.scaleAbsoluteWidth(200f);
-            imagenLogo.scaleAbsoluteHeight(90f);             
+			/*rutaproduccion*/ imagenLogo = Image.getInstance(env.getProperty("path.file.logo.jenner"));
+			/*rutapruebas*/// imagenLogo = Image.getInstance("C:/Users/Desarrollo_GDA/documentos Timbrado/imgs/JENNER.png");
+			imagenLogo.setAbsolutePosition(400,730f);           
+            imagenLogo.scaleAbsoluteWidth(160f);
+            imagenLogo.scaleAbsoluteHeight(75f);             
 			///////////////////////////////////////////////////////////////////////////////////////////////
 			//////////////////	Direccion del PDF
 			///////////////////////////////////////////////////////////////////////////////////////////////            
             PdfPCell direccionSucursal = new PdfPCell(new Paragraph(strDirSucursal,fuenteDirSucur));
             direccionSucursal.setBorder(Rectangle.UNDEFINED);
             tabDirSuc.addCell(direccionSucursal);
-            tabDirSuc.setTotalWidth(350);                   
+            tabDirSuc.setTotalWidth(350);            
 			///////////////////////////////////////////////////////////////////////////////////////////////
 			//////////////////	Detalle Encabezado Version / CFDI
 			///////////////////////////////////////////////////////////////////////////////////////////////            
-            PdfPCell pcVersion = new PdfPCell(new Paragraph("Versión 3.3", fuenteImport));
+            PdfPCell pcVersion = new PdfPCell(new Paragraph("Versión "+comprobante.getVersion(), fuenteImport));
             Chunk folioSer = new Chunk("Folio y serie: ",fuenteDirSucur);
             Chunk datoFolioSer = new Chunk(strFolioSerie,fuenteImport);
             Paragraph datosFolioSer = new Paragraph();
@@ -187,7 +190,6 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             parrafoLeyndaTim.add(paraFechaTimbrado);
             parrafoLeyndaTim.add(paraFechaTimbradoII);
             PdfPCell pcLeyendaTimb = new PdfPCell(parrafoLeyndaTim);
-            //PdfPCell pcCFDI = new PdfPCell(new Paragraph(strConcep,fuenteImport));
             PdfPCell pcCFDI = new PdfPCell(new Paragraph(strConcep,fuenteImport));
             pcVersion.setBorder(Rectangle.RIGHT);
             pcVersion.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -255,26 +257,25 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             PdfPCell pcRFCReceptor = new PdfPCell(datosRFCReceptor);
             
             Chunk RegimenEmisor = new Chunk("Régimen fiscal: ",fuenteContenidoTab);
-            Chunk datoRegimenEmisor = new Chunk(strRegFiscal+" RÉGIMEN GENERAL DE LEY",fuenteContenidoImporTab);
+            Chunk datoRegimenEmisor = new Chunk(strRegFiscal+" Régimen General de Ley",fuenteContenidoImporTab);
             Paragraph datosRegimenEmisor = new Paragraph();
             datosRegimenEmisor.add(RegimenEmisor);
             datosRegimenEmisor.add(datoRegimenEmisor);
             PdfPCell pcRegimenEmisor = new PdfPCell(datosRegimenEmisor);
             
-//            System.out.println("Direccion::::---->>>>>>   "+comprobante.getAdendaDireccion());
-//            Chunk DomicilioReceptor = new Chunk("Domicilio fiscal: ",fuenteContenidoTab);
-//            Chunk datoDomicilioReceptor = new Chunk(comprobante.getAdendaDireccion(),fuenteContenidoImporTab);
-//            Paragraph datosDomicilioReceptor = new Paragraph();
-//            datosDomicilioReceptor.add(DomicilioReceptor);
-//            datosDomicilioReceptor.add(datoDomicilioReceptor);
-//            PdfPCell pcDomicilioReceptor = new PdfPCell(datosDomicilioReceptor);
-//            
-//            Chunk DomicilioEmisor = new Chunk("Domicilio fiscal: ",fuenteContenidoTab);
-//            Chunk datoDomicilioEmisor = new Chunk(strDomicFiscalEmis.toUpperCase(),fuenteContenidoImporTab);
-//            Paragraph datosDomicilioEmisor = new Paragraph();
-//            datosDomicilioEmisor.add(DomicilioEmisor);
-//            datosDomicilioEmisor.add(datoDomicilioEmisor);            
-//            PdfPCell pcDomicilioEmisor = new PdfPCell(datosDomicilioEmisor);
+          //DESCOMENTAR Chunk DomicilioReceptor = new Chunk("\t Domicilio fiscal: ",fuenteContenidoTab);
+          //DESCOMENTAR Chunk datoDomicilioReceptor = new Chunk(strDomicFiscalRecep,fuenteContenidoImporTab);
+          //DESCOMENTAR Paragraph datosDomicilioReceptor = new Paragraph();
+          //DESCOMENTAR datosDomicilioReceptor.add(DomicilioReceptor);
+          //DESCOMENTAR datosDomicilioReceptor.add(datoDomicilioReceptor);
+          //DESCOMENTAR PdfPCell pcDomicilioReceptor = new PdfPCell(datosDomicilioReceptor);
+            
+          //DESCOMENTAR Chunk DomicilioEmisor = new Chunk("\t Domicilio fiscal: ",fuenteContenidoTab);
+          //DESCOMENTAR Chunk datoDomicilioEmisor = new Chunk(strDomicFiscalEmis,fuenteContenidoImporTab);
+          //DESCOMENTAR Paragraph datosDomicilioEmisor = new Paragraph();
+          //DESCOMENTAR datosDomicilioEmisor.add(DomicilioEmisor);
+          //DESCOMENTAR datosDomicilioEmisor.add(datoDomicilioEmisor);            
+          //DESCOMENTAR PdfPCell pcDomicilioEmisor = new PdfPCell(datosDomicilioEmisor);
 
             PdfPCell pcNumOrdenPaciente = new PdfPCell(new Paragraph(strNomOrdPac,fuenteContenidoImporTab));
             
@@ -283,8 +284,8 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             pcRFCEmisor.setPaddingLeft(7);
             pcRFCReceptor.setPaddingLeft(7);
             pcRegimenEmisor.setPaddingLeft(7);
-//            pcDomicilioReceptor.setPaddingLeft(7);
-//            pcDomicilioEmisor.setPaddingLeft(7);
+          //DESCOMENTAR pcDomicilioReceptor.setPaddingLeft(7);
+          //DESCOMENTAR  pcDomicilioEmisor.setPaddingLeft(7);
             pcNumOrdenPaciente.setPaddingLeft(7);
             
             pcDatosReceptor.setBackgroundColor(colorFondoTituloFact);
@@ -296,8 +297,8 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             pcRFCEmisor.setBackgroundColor(colorFondoContenidoFact);
             pcRFCReceptor.setBackgroundColor(colorFondoContenidoFact);
             pcRegimenEmisor.setBackgroundColor(colorFondoContenidoFact);
-//            pcDomicilioReceptor.setBackgroundColor(colorFondoContenidoFact);
-//            pcDomicilioEmisor.setBackgroundColor(colorFondoContenidoFact);
+          //DESCOMENTAR pcDomicilioReceptor.setBackgroundColor(colorFondoContenidoFact);
+          //DESCOMENTAR pcDomicilioEmisor.setBackgroundColor(colorFondoContenidoFact);
             pcNumOrdenPaciente.setBackgroundColor(colorFondoContenidoFact);
             pcDatosReceptor.setBorder(Rectangle.UNDEFINED);
             pcDatosEmisor.setBorder(Rectangle.UNDEFINED);
@@ -308,8 +309,8 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             pcRFCEmisor.setBorder(Rectangle.UNDEFINED);
             pcRFCReceptor.setBorder(Rectangle.UNDEFINED);
             pcRegimenEmisor.setBorder(Rectangle.UNDEFINED);
-//            pcDomicilioReceptor.setBorder(Rectangle.UNDEFINED);
-//            pcDomicilioEmisor.setBorder(Rectangle.UNDEFINED);
+          //DESCOMENTAR pcDomicilioReceptor.setBorder(Rectangle.UNDEFINED);
+          //DESCOMENTAR pcDomicilioEmisor.setBorder(Rectangle.UNDEFINED);
             pcNumOrdenPaciente.setBorder(Rectangle.UNDEFINED);
             tabDetalleFact.addCell(pcDatosEmisor);
             tabDetalleFact.addCell(pcDatosReceptor);
@@ -320,8 +321,8 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             tabDetalleFact.addCell(pcRFCEmisor);
             tabDetalleFact.addCell(pcRFCReceptor);
             tabDetalleFact.addCell(pcRegimenEmisor);
-//            tabDetalleFact.addCell(pcDomicilioReceptor);
-//            tabDetalleFact.addCell(pcDomicilioEmisor);
+          //DESCOMENTAR tabDetalleFact.addCell(pcDomicilioReceptor);
+          //DESCOMENTAR tabDetalleFact.addCell(pcDomicilioEmisor);
             tabDetalleFact.addCell(pcNumOrdenPaciente);
             tabDetalleFact.addCell(pcLineas);
             tabDetalleFact.addCell(pcLineasII);
@@ -393,44 +394,44 @@ public class TemplateLiacsa extends PdfPageEventHelper{
 			///////////////////////////////////////////////////////////////////////////////////////////////
             String imgCrearQr = "?re="+strRFCEmisor+"&rr="+strRFCReceptor+"&tt="+comprobante.getTotal().toString()+"&id="+uuid;
             /*rutaproduccion*/ File f = new File(env.getProperty("path.file.qr")); 
-      	GenerarQRCode qrCode = new GenerarQRCode();
-      	qrCode.generateQR(f, imgCrearQr, 600, 600);
+          	GenerarQRCode qrCode = new GenerarQRCode();
+          	qrCode.generateQR(f, imgCrearQr, 600, 600);
           
-      		/*rutaproduccion*/ imagenQr = Image.getInstance(env.getProperty("path.file.qr"));
-      		imagenQr.setAbsolutePosition(32, 60f);         
+          	/*rutaproduccion*/ imagenQr = Image.getInstance(env.getProperty("path.file.qr"));
+          	imagenQr.setAbsolutePosition(32, 60f);         
 			imagenQr.scaleAbsoluteWidth(97.06f);
 			imagenQr.scaleAbsoluteHeight(97.06f);
 			
-			 PdfPCell pcTituloCFDI = new PdfPCell(new Paragraph("CFDI RELACIONADO",fuenteImportPie));
-            pcTituloCFDI.setHorizontalAlignment(Element.ALIGN_CENTER);
-            pcTituloCFDI.setColspan(2);
-            PdfPCell pcTituloRelacionCFDI = new PdfPCell(new Paragraph(" ",fuenteImportPie));
-            pcTituloRelacionCFDI.setHorizontalAlignment(Element.ALIGN_LEFT);
-            PdfPCell pcTituloCFDIRelacionado = new PdfPCell(new Paragraph("  ",fuenteImportPie));
-            pcTituloCFDIRelacionado.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            PdfPCell pcTimbre = new PdfPCell(new Paragraph(strCadenaTimbre,fuenteTimbrado));
-            pcTimbre.setMinimumHeight(35);
-            pcTimbre.setHorizontalAlignment(Element.ALIGN_LEFT);
-            pcTimbre.setColspan(2);        
-         
-            PdfPCell uuidRelacionados = null;
-            if(comprobante.getCfdiRelacionados() != null) {
-            	List<CfdiRelacionado> listRelacionados = comprobante.getCfdiRelacionados().getCfdiRelacionado();
+			PdfPCell pcTituloCFDI = new PdfPCell(new Paragraph("CFDI RELACIONADO",fuenteImportPie));
+			pcTituloCFDI.setHorizontalAlignment(Element.ALIGN_CENTER);
+			pcTituloCFDI.setColspan(2);
+			PdfPCell pcTituloRelacionCFDI = new PdfPCell(new Paragraph(" ",fuenteImportPie));
+			pcTituloRelacionCFDI.setHorizontalAlignment(Element.ALIGN_LEFT);
+			PdfPCell pcTituloCFDIRelacionado = new PdfPCell(new Paragraph(" ",fuenteImportPie));
+			pcTituloCFDIRelacionado.setHorizontalAlignment(Element.ALIGN_RIGHT);
+			PdfPCell pcTimbre = new PdfPCell(new Paragraph(strCadenaTimbre,fuenteTimbrado));
+			pcTimbre.setMinimumHeight(35);
+			pcTimbre.setHorizontalAlignment(Element.ALIGN_LEFT);
+			pcTimbre.setColspan(2);
+			
+			PdfPCell uuidRelacionados = null;
+            if(comprobante.getCfdiRelacionados() != null && comprobante.getCfdiRelacionados().size()>0) {
+            	List<CfdiRelacionado> listRelacionados = comprobante.getCfdiRelacionados().get(0).getCfdiRelacionado();
 				if(listRelacionados.size()>0) {
 					uuidRelacionados = new PdfPCell(new Paragraph("CFDI Relacionado: "+uuidRelacionado+" Tipo de Relación: "+tipoRelacionado,fuenteTimbradoImpor));
 		            uuidRelacionados.setHorizontalAlignment(Element.ALIGN_LEFT);
 		            uuidRelacionados.setColspan(2);
 				}
             }
-            
+			
             PdfPCell pcFolioFiscal = new PdfPCell(new Paragraph("UUID: "+uuid+" Fecha y Hora de Certificación: "+strFechaCertificacion,fuenteTimbradoImpor));
             pcFolioFiscal.setHorizontalAlignment(Element.ALIGN_LEFT);
-            pcFolioFiscal.setColspan(2); 
+            pcFolioFiscal.setColspan(2);   
             
             PdfPCell pcNoSerieSAT = new PdfPCell(new Paragraph("Certificado del Sello digital del emisor: "+sello,fuenteTimbradoImpor));
             pcNoSerieSAT.setHorizontalAlignment(Element.ALIGN_LEFT);
             pcNoSerieSAT.setColspan(2);
-            
+			
             PdfPCell pcCertEmisor = new PdfPCell(new Paragraph("Certificado del emisor: "+comprobante.getNoCertificado()+
             		"\t RFC del Proveedor de Certificación: "+timbreFiscalDigital.getRfcProvCertif(),fuenteTimbradoImpor));
             pcCertEmisor.setHorizontalAlignment(Element.ALIGN_LEFT);
@@ -451,8 +452,8 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             pcLeyendaDoc.setBorder(Rectangle.UNDEFINED);
             pcCertEmisor.setBorder(Rectangle.UNDEFINED);
             pcLeyendaDoc.setHorizontalAlignment(Element.ALIGN_RIGHT);
-			
-			tabPieCFDI.setTotalWidth(445);
+            
+            tabPieCFDI.setTotalWidth(445);
             tabPieCFDI.addCell(pcTituloCFDI);
             tabPieCFDI.addCell(pcTituloRelacionCFDI);
             tabPieCFDI.addCell(pcTituloCFDIRelacionado);

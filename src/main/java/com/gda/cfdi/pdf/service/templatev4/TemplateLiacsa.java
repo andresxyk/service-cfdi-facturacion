@@ -1,4 +1,4 @@
-package com.gda.cfdi.pdf.service.template;
+package com.gda.cfdi.pdf.service.templatev4;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,16 +27,17 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import mx.gob.sat.cfd._3.Comprobante;
-import mx.gob.sat.cfd._3.Comprobante.Emisor;
-import mx.gob.sat.cfd._3.Comprobante.Receptor;
-import mx.gob.sat.cfd._3.Comprobante.CfdiRelacionados.CfdiRelacionado;
+import mx.gob.sat.cfd._4.Comprobante;
+import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados;
+import mx.gob.sat.cfd._4.Comprobante.Emisor;
+import mx.gob.sat.cfd._4.Comprobante.Receptor;
+import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados.CfdiRelacionado;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CRegimenFiscal;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CTipoDeComprobante;
 import mx.gob.sat.timbrefiscaldigital.TimbreFiscalDigital;
 
-public class TemplateSwiss extends PdfPageEventHelper{
-	private static final Logger log = LoggerFactory.getLogger(TemplateSwiss.class);
+public class TemplateLiacsa extends PdfPageEventHelper{
+	private static final Logger log = LoggerFactory.getLogger(TemplateLiacsa.class);
 	
 	private Image imagenLogo;
 	PdfPTable tabDirSuc = new PdfPTable(1);
@@ -46,7 +47,7 @@ public class TemplateSwiss extends PdfPageEventHelper{
 	PdfPTable tabPieCFDI = new PdfPTable(2);
 	private Image imagenQr;
 	
-	public TemplateSwiss(Comprobante comprobante, PdfInfoDto infoPDF, Environment env) throws Exception{
+	public TemplateLiacsa(Comprobante comprobante, PdfInfoDto infoPDF, Environment env) throws Exception{
 		try {
 			String strDirSucursal = infoPDF.getDirSucursal();
 			CTipoDeComprobante tipoComprobante = comprobante.getTipoDeComprobante();
@@ -65,13 +66,11 @@ public class TemplateSwiss extends PdfPageEventHelper{
 			}
 			
 			TimbreFiscalDigital timbreFiscalDigital = null;
-			for(Comprobante.Complemento compTimbre:comprobante.getComplemento()) {
-				for(Object obj : compTimbre.getAny()) {
-					log.info("TimbreFiscalDigital.DoctoRelacionado:::" + (obj instanceof TimbreFiscalDigital ? "si" : "no"));
-					if(obj instanceof TimbreFiscalDigital) {
-						timbreFiscalDigital = (TimbreFiscalDigital) obj;
-						break;
-					}
+			for(Object obj : comprobante.getComplemento().getAny()) {
+				log.info("TimbreFiscalDigital.DoctoRelacionado:::" + (obj instanceof TimbreFiscalDigital ? "si" : "no"));
+				if(obj instanceof TimbreFiscalDigital) {
+					timbreFiscalDigital = (TimbreFiscalDigital) obj;
+					break;
 				}
 			}
 			
@@ -99,9 +98,10 @@ public class TemplateSwiss extends PdfPageEventHelper{
 
 			String uuidRelacionado="";
 			String codeTipoRelacionado=null;
-			if(comprobante.getCfdiRelacionados()!=null) {
-				codeTipoRelacionado = comprobante.getCfdiRelacionados().getTipoRelacion();
-				List<CfdiRelacionado> listRelacionados = comprobante.getCfdiRelacionados().getCfdiRelacionado();
+			if(comprobante.getCfdiRelacionados()!=null && comprobante.getCfdiRelacionados().size()>0) {
+				CfdiRelacionados cfdiRelacionado = comprobante.getCfdiRelacionados().get(0);				
+				codeTipoRelacionado = cfdiRelacionado.getTipoRelacion();
+				List<CfdiRelacionado> listRelacionados = cfdiRelacionado.getCfdiRelacionado();
 				if(listRelacionados.size()>0) {
 					uuidRelacionado = listRelacionados.get(0).getUUID();
 				}
@@ -151,22 +151,21 @@ public class TemplateSwiss extends PdfPageEventHelper{
 			Font fuenteTimbradoImpor = new Font(Font.FontFamily.HELVETICA,4,Font.BOLD,BaseColor.BLACK);
 			
 			
-			
-			/*rutaproduccion*/ imagenLogo = Image.getInstance(env.getProperty("path.file.logo.swisslab"));
+			/*rutaproduccion*/ imagenLogo = Image.getInstance(env.getProperty("path.file.logo.liacsa"));
 			imagenLogo.setAbsolutePosition(370, 730f);           
             imagenLogo.scaleAbsoluteWidth(200f);
             imagenLogo.scaleAbsoluteHeight(90f);             
 			///////////////////////////////////////////////////////////////////////////////////////////////
 			//////////////////	Direccion del PDF
 			///////////////////////////////////////////////////////////////////////////////////////////////            
-            PdfPCell direccionSucursal = new PdfPCell(new Paragraph("Av Eloy Cavazos 2401, Las Villas, 67170 Guadalupe, Nuevo León",fuenteDirSucur));
+            PdfPCell direccionSucursal = new PdfPCell(new Paragraph(strDirSucursal,fuenteDirSucur));
             direccionSucursal.setBorder(Rectangle.UNDEFINED);
             tabDirSuc.addCell(direccionSucursal);
             tabDirSuc.setTotalWidth(350);                   
 			///////////////////////////////////////////////////////////////////////////////////////////////
 			//////////////////	Detalle Encabezado Version / CFDI
 			///////////////////////////////////////////////////////////////////////////////////////////////            
-            PdfPCell pcVersion = new PdfPCell(new Paragraph("Versión 3.3", fuenteImport));
+            PdfPCell pcVersion = new PdfPCell(new Paragraph("Versión "+comprobante.getVersion(), fuenteImport));
             Chunk folioSer = new Chunk("Folio y serie: ",fuenteDirSucur);
             Chunk datoFolioSer = new Chunk(strFolioSerie,fuenteImport);
             Paragraph datosFolioSer = new Paragraph();
@@ -337,7 +336,7 @@ public class TemplateSwiss extends PdfPageEventHelper{
             PdfPCell pcCantidad = new PdfPCell(new Paragraph("\r\n \r\nCANTIDAD",fuenteTituloTabDetalle));
             PdfPCell pcClaveUnidad = new PdfPCell(new Paragraph("\r\n CLAVE \r\n UNIDAD",fuenteTituloTabDetalle));
             PdfPCell pcValorUni = new PdfPCell(new Paragraph("\r\n VALOR \r\n UNTARIO",fuenteTituloTabDetalle));
-            PdfPCell pcDescuento = new PdfPCell(new Paragraph("\r\n \r\n IVA",fuenteTituloTabDetalle));
+            PdfPCell pcDescuento = new PdfPCell(new Paragraph("\r\n \r\n DESCUENTO",fuenteTituloTabDetalle));
             PdfPCell pcImporte = new PdfPCell(new Paragraph("\r\n \r\n IMPORTE",fuenteTituloTabDetalle));
             pcClavePro.setBackgroundColor(colorFondoTituloFact);
             pcCodigo.setBackgroundColor(colorFondoTituloFact);
@@ -415,8 +414,8 @@ public class TemplateSwiss extends PdfPageEventHelper{
             pcTimbre.setColspan(2);        
          
             PdfPCell uuidRelacionados = null;
-            if(comprobante.getCfdiRelacionados() != null) {
-            	List<CfdiRelacionado> listRelacionados = comprobante.getCfdiRelacionados().getCfdiRelacionado();
+            if(comprobante.getCfdiRelacionados() != null && comprobante.getCfdiRelacionados().size()>0) {
+            	List<CfdiRelacionado> listRelacionados = comprobante.getCfdiRelacionados().get(0).getCfdiRelacionado();
 				if(listRelacionados.size()>0) {
 					uuidRelacionados = new PdfPCell(new Paragraph("CFDI Relacionado: "+uuidRelacionado+" Tipo de Relación: "+tipoRelacionado,fuenteTimbradoImpor));
 		            uuidRelacionados.setHorizontalAlignment(Element.ALIGN_LEFT);

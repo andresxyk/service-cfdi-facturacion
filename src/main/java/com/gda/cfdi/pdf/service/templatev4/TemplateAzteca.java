@@ -1,4 +1,4 @@
-package com.gda.cfdi.pdf.service.template;
+package com.gda.cfdi.pdf.service.templatev4;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,10 +27,11 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import mx.gob.sat.cfd._3.Comprobante;
-import mx.gob.sat.cfd._3.Comprobante.Emisor;
-import mx.gob.sat.cfd._3.Comprobante.Receptor;
-import mx.gob.sat.cfd._3.Comprobante.CfdiRelacionados.CfdiRelacionado;
+import mx.gob.sat.cfd._4.Comprobante;
+import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados;
+import mx.gob.sat.cfd._4.Comprobante.Emisor;
+import mx.gob.sat.cfd._4.Comprobante.Receptor;
+import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados.CfdiRelacionado;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CTipoDeComprobante;
 import mx.gob.sat.timbrefiscaldigital.TimbreFiscalDigital;
 
@@ -64,13 +65,11 @@ public class TemplateAzteca extends PdfPageEventHelper{
 			}
 			
 			TimbreFiscalDigital timbreFiscalDigital = null;
-			for(Comprobante.Complemento compTimbre:comprobante.getComplemento()) {
-				for(Object obj : compTimbre.getAny()) {
-					log.info("TimbreFiscalDigital.DoctoRelacionado:::" + (obj instanceof TimbreFiscalDigital ? "si" : "no"));
-					if(obj instanceof TimbreFiscalDigital) {
-						timbreFiscalDigital = (TimbreFiscalDigital) obj;
-						break;
-					}
+			for(Object obj : comprobante.getComplemento().getAny()) {
+				log.info("TimbreFiscalDigital.DoctoRelacionado:::" + (obj instanceof TimbreFiscalDigital ? "si" : "no"));
+				if(obj instanceof TimbreFiscalDigital) {
+					timbreFiscalDigital = (TimbreFiscalDigital) obj;
+					break;
 				}
 			}
 			
@@ -100,9 +99,10 @@ public class TemplateAzteca extends PdfPageEventHelper{
 			
 			String uuidRelacionado="";
 			String codeTipoRelacionado=null;
-			if(comprobante.getCfdiRelacionados()!=null) {
-				codeTipoRelacionado = comprobante.getCfdiRelacionados().getTipoRelacion();
-				List<CfdiRelacionado> listRelacionados = comprobante.getCfdiRelacionados().getCfdiRelacionado();
+			if(comprobante.getCfdiRelacionados()!=null && comprobante.getCfdiRelacionados().size()>0) {
+				CfdiRelacionados cfdiRelacionado = comprobante.getCfdiRelacionados().get(0);				
+				codeTipoRelacionado = cfdiRelacionado.getTipoRelacion();
+				List<CfdiRelacionado> listRelacionados = cfdiRelacionado.getCfdiRelacionado();
 				if(listRelacionados.size()>0) {
 					uuidRelacionado = listRelacionados.get(0).getUUID();
 				}
@@ -167,7 +167,7 @@ public class TemplateAzteca extends PdfPageEventHelper{
 			///////////////////////////////////////////////////////////////////////////////////////////////
 			//////////////////	Detalle Encabezado Version / CFDI
 			///////////////////////////////////////////////////////////////////////////////////////////////            
-            PdfPCell pcVersion = new PdfPCell(new Paragraph("Versión 3.3", fuenteImport));
+            PdfPCell pcVersion = new PdfPCell(new Paragraph("Versión "+comprobante.getVersion(), fuenteImport));
             Chunk folioSer = new Chunk("Folio y serie: ",fuenteDirSucur);
             Chunk datoFolioSer = new Chunk(strFolioSerie,fuenteImport);
             Paragraph datosFolioSer = new Paragraph();
@@ -412,8 +412,8 @@ public class TemplateAzteca extends PdfPageEventHelper{
             pcTimbre.setColspan(2);   
             
             PdfPCell uuidRelacionados = null;
-            if(comprobante.getCfdiRelacionados() != null) {
-            	List<CfdiRelacionado> listRelacionados = comprobante.getCfdiRelacionados().getCfdiRelacionado();
+            if(comprobante.getCfdiRelacionados() != null && comprobante.getCfdiRelacionados().size()>0) {
+            	List<CfdiRelacionado> listRelacionados = comprobante.getCfdiRelacionados().get(0).getCfdiRelacionado();
 				if(listRelacionados.size()>0) {
 					uuidRelacionados = new PdfPCell(new Paragraph("CFDI Relacionado: "+uuidRelacionado+" Tipo de Relación: "+tipoRelacionado,fuenteTimbradoImpor));
 		            uuidRelacionados.setHorizontalAlignment(Element.ALIGN_LEFT);

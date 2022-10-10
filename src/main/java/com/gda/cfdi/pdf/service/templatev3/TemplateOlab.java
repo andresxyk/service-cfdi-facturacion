@@ -1,4 +1,4 @@
-package com.gda.cfdi.pdf.service.template;
+package com.gda.cfdi.pdf.service.templatev3;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,10 +28,10 @@ import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import mx.gob.sat.cfd._3.Comprobante;
+import mx.gob.sat.cfd._3.Comprobante.CfdiRelacionados;
 import mx.gob.sat.cfd._3.Comprobante.CfdiRelacionados.CfdiRelacionado;
 import mx.gob.sat.cfd._3.Comprobante.Emisor;
 import mx.gob.sat.cfd._3.Comprobante.Receptor;
-import mx.gob.sat.sitio_internet.cfd.catalogos.CRegimenFiscal;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CTipoDeComprobante;
 import mx.gob.sat.timbrefiscaldigital.TimbreFiscalDigital;
 
@@ -165,7 +165,7 @@ public class TemplateOlab extends PdfPageEventHelper{
 			///////////////////////////////////////////////////////////////////////////////////////////////
 			//////////////////	Detalle Encabezado Version / CFDI
 			///////////////////////////////////////////////////////////////////////////////////////////////            
-            PdfPCell pcVersion = new PdfPCell(new Paragraph("Versión 3.3", fuenteImport));
+            PdfPCell pcVersion = new PdfPCell(new Paragraph("Versión "+comprobante.getVersion(), fuenteImport));
             Chunk folioSer = new Chunk("Folio y serie: ",fuenteDirSucur);
             Chunk datoFolioSer = new Chunk(strFolioSerie,fuenteImport);
             Paragraph datosFolioSer = new Paragraph();

@@ -1,4 +1,4 @@
-package com.gda.cfdi.pdf.service.template;
+package com.gda.cfdi.pdf.service.templatev3;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +28,7 @@ import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import mx.gob.sat.cfd._3.Comprobante;
+import mx.gob.sat.cfd._3.Comprobante.CfdiRelacionados;
 import mx.gob.sat.cfd._3.Comprobante.Emisor;
 import mx.gob.sat.cfd._3.Comprobante.Receptor;
 import mx.gob.sat.cfd._3.Comprobante.CfdiRelacionados.CfdiRelacionado;
@@ -168,7 +169,7 @@ public class TemplateJenner extends PdfPageEventHelper{
 			///////////////////////////////////////////////////////////////////////////////////////////////
 			//////////////////	Detalle Encabezado Version / CFDI
 			///////////////////////////////////////////////////////////////////////////////////////////////            
-            PdfPCell pcVersion = new PdfPCell(new Paragraph("Versión 3.3", fuenteImport));
+            PdfPCell pcVersion = new PdfPCell(new Paragraph("Versión "+comprobante.getVersion(), fuenteImport));
             Chunk folioSer = new Chunk("Folio y serie: ",fuenteDirSucur);
             Chunk datoFolioSer = new Chunk(strFolioSerie,fuenteImport);
             Paragraph datosFolioSer = new Paragraph();
@@ -415,7 +416,7 @@ public class TemplateJenner extends PdfPageEventHelper{
 			pcTimbre.setColspan(2);
 			
 			PdfPCell uuidRelacionados = null;
-            if(comprobante.getCfdiRelacionados() != null) {
+			if(comprobante.getCfdiRelacionados() != null) {
             	List<CfdiRelacionado> listRelacionados = comprobante.getCfdiRelacionados().getCfdiRelacionado();
 				if(listRelacionados.size()>0) {
 					uuidRelacionados = new PdfPCell(new Paragraph("CFDI Relacionado: "+uuidRelacionado+" Tipo de Relación: "+tipoRelacionado,fuenteTimbradoImpor));
