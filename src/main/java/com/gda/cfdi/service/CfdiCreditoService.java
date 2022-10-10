@@ -65,9 +65,9 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 		DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosMarca(marca);
 		
 		TFacturaCreditoDto dtoFac = consultaService.getTFacturaCreditoDtoBySerieAndFolio(sserie, folio);
-		if(dtoFac.getUuid().length()>0){
-			throw new Exception("La factura "+sserie+"-"+folio+" ya esta facturada.");
-		}
+//		if(dtoFac.getUuid().length()>0){
+//			throw new Exception("La factura "+sserie+"-"+folio+" ya esta facturada.");
+//		}
 		consultaService.updateAjusteFactura(dtoFac.getIdFactura(), dtoFac.getUserId(), new BigDecimal(msubtotal), new BigDecimal(miva), new BigDecimal(mtotal));
 		consultaService.updateMetodoPago(strnocuenta.trim(), strmetodopago.trim(), dtoFac.getIdConvenio());
 		

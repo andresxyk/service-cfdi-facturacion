@@ -14,8 +14,15 @@ public class TOrdenSucursalDto {
 	private Integer cconvenio;
 	private String sordenexterna;
 	private Integer cmarca;
+	private String dregistro;
 	
 	
+	public String getDregistro() {
+		return dregistro;
+	}
+	public void setDregistro(String dregistro) {
+		this.dregistro = dregistro;
+	}
 	public Integer getCmarca() {
 		return cmarca;
 	}

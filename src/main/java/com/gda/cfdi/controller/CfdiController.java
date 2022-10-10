@@ -106,8 +106,7 @@ public class CfdiController {
 				cfdiDto = cfdiService.generarCfdi(kordensucursal, cusocfdi, kdatofiscal);	
 				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else if(version.equals(4)){
-//				cfdiDto = cfdi4Service.generarCfdi(kordensucursal);
-				cfdiDto = null;
+				cfdiDto = cfdi4Service.generarCfdi(kordensucursal, cusocfdi, kdatofiscal);
 				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else {
 				ResponseErrorDto dto = new ResponseErrorDto();

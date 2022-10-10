@@ -150,7 +150,7 @@ public class CfdiService {
 					tipoPago = "PUE";
 				}
 				
-				DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosMarca(cmarca, csucursal, bandAzteca);
+				DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosMarca(cmarca, csucursal, bandAzteca, 3);
 				
 				String FORMATER = "yyyy-MM-dd'T'HH:mm:ss";
 				DateFormat format = new SimpleDateFormat(FORMATER);

@@ -42,17 +42,17 @@ public class EstudioDto {
 	public void setValorUnitario(BigDecimal valorUnitario) {
 		this.valorUnitario = valorUnitario;
 	}
-	public BigDecimal getImporte() {
-		return importe;
-	}
-	public void setImporte(BigDecimal importe) {
-		this.importe = importe;
-	}
 	public Integer getKfactura() {
 		return kfactura;
 	}
 	public void setKfactura(Integer kfactura) {
 		this.kfactura = kfactura;
+	}
+	public BigDecimal getImporte() {
+		return importe;
+	}
+	public void setImporte(BigDecimal importe) {
+		this.importe = importe;
 	}
 	@Override
 	public String toString() {

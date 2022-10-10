@@ -8,7 +8,29 @@ public class TDatoFiscalDto {
 	private String sdireccion;
 	private Integer ccodigopostal;
 	private String spais;
+	private Integer cregimenfiscal;
+	private String cpostal;
+	private String sclaveregimenfiscal;
 	
+	
+	public String getSclaveregimenfiscal() {
+		return sclaveregimenfiscal;
+	}
+	public void setSclaveregimenfiscal(String sclaveregimenfiscal) {
+		this.sclaveregimenfiscal = sclaveregimenfiscal;
+	}
+	public Integer getCregimenfiscal() {
+		return cregimenfiscal;
+	}
+	public void setCregimenfiscal(Integer cregimenfiscal) {
+		this.cregimenfiscal = cregimenfiscal;
+	}
+	public String getCpostal() {
+		return cpostal;
+	}
+	public void setCpostal(String cpostal) {
+		this.cpostal = cpostal;
+	}
 	public Integer getKdatofiscal() {
 		return kdatofiscal;
 	}

@@ -427,13 +427,14 @@ public class UtilsService {
 	}
 	
 	
-	public DatosMarcaDto obtenerDatosMarca(Integer marca, Integer csucursal, boolean bandAzteca){
+	public DatosMarcaDto obtenerDatosMarca(Integer marca, Integer csucursal, boolean bandAzteca, Integer version){
 		String sucursalesPrado = env.getProperty("list.sucursal.jenner.prado");
 		String sucursalesLean = env.getProperty("list.sucursal.jenner.lean");
 		List<String> listPrado = new ArrayList<String>(Arrays.asList(sucursalesPrado.split(",")));
 		List<String> listLean = new ArrayList<String>(Arrays.asList(sucursalesLean.split(",")));
 		
-		String rutaCadenaOriginal = env.getProperty("path.file.cadena.original");
+		String rutaCadenaOriginal = version.equals(3) ? env.getProperty("path.file.cadena.original") : 
+									env.getProperty("path.file.cadena.original.4");
 		String pasword = "";
 		String rfcMarca = "";
 		String razonSocialMarca = "";
