@@ -78,8 +78,7 @@ public class CfdiController {
 				cfdiDto = cfdiComprobanteService.requestCfdiComprobante(facturacionComprobanteDto);	
 				return new ResponseEntity<FacturacionComprobanteDto>(cfdiDto, HttpStatus.OK);
 			}else if(version.equals(4)){
-//				cfdiDto = cfdi4Service.generarCfdi(kordensucursal);
-				cfdiDto = null;
+				cfdiDto = cfdiComprobanteService.requestCfdiComprobanteV4(facturacionComprobanteDto);
 				return new ResponseEntity<FacturacionComprobanteDto>(cfdiDto, HttpStatus.OK);
 			}else {
 				ResponseErrorDto dto = new ResponseErrorDto();

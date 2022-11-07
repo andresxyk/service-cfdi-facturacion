@@ -20,7 +20,7 @@ public class CfdiComprobanteService {
 	
 	public FacturacionComprobanteDto requestCfdiComprobante(FacturacionComprobanteDto facturacionComprobanteDto) throws Exception {	
 		Comprobante cfdi = utilsService.createComplementoFromXml(facturacionComprobanteDto.gettFacturaEntityDto().getSxml());
-		DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosRfcEmisor(cfdi.getEmisor().getRfc());
+		DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosRfcEmisor(cfdi.getEmisor().getRfc(), 3);
 		String xmlOriginal = utilsService.getXmlFromComprobante(cfdi);	
 		log.info(xmlOriginal);
 		SelloDto selloDto = utilsService.obtenerSello(datosMarcaDto, xmlOriginal);		
@@ -30,6 +30,21 @@ public class CfdiComprobanteService {
 		facturacionComprobanteDto.gettFacturaEntityDto().setScadenaoriginal(selloDto.getCadenaOriginal().length()>4000?selloDto.getCadenaOriginal().substring(0, 3999):selloDto.getCadenaOriginal());
 		facturacionComprobanteDto.gettFacturaEntityDto().setSsellodigital(selloDto.getSelloCFDI());
 		facturacionComprobanteDto.setComprobante(cfdi);
+		return facturacionComprobanteDto;
+	}
+	
+	public FacturacionComprobanteDto requestCfdiComprobanteV4(FacturacionComprobanteDto facturacionComprobanteDto) throws Exception{
+		mx.gob.sat.cfd._4.Comprobante cfdi = utilsService.createComprabanteFromXml4(facturacionComprobanteDto.gettFacturaEntityDto().getSxml());
+		DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosRfcEmisor(cfdi.getEmisor().getRfc(), 4);
+		String xmlOriginal = utilsService.getXmlFromComprobanteV4(cfdi);	
+		log.info(xmlOriginal);
+		SelloDto selloDto = utilsService.obtenerSello(datosMarcaDto, xmlOriginal);
+		cfdi.setSello(selloDto.getSelloCFDI());	
+		String xmlOriginalSello = utilsService.getXmlFromComprobanteV4(cfdi);	
+		facturacionComprobanteDto.gettFacturaEntityDto().setSxml(xmlOriginalSello);		
+		facturacionComprobanteDto.gettFacturaEntityDto().setScadenaoriginal(selloDto.getCadenaOriginal().length()>4000?selloDto.getCadenaOriginal().substring(0, 3999):selloDto.getCadenaOriginal());
+		facturacionComprobanteDto.gettFacturaEntityDto().setSsellodigital(selloDto.getSelloCFDI());
+		facturacionComprobanteDto.setComprobanteV4(cfdi);
 		return facturacionComprobanteDto;
 	}
 	

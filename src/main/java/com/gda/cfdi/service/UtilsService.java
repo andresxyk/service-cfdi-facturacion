@@ -153,6 +153,33 @@ public class UtilsService {
 		return xml;
 	}
 	
+	
+	public String getXmlFromComprobanteV4(mx.gob.sat.cfd._4.Comprobante comprobante) throws JAXBException {
+		String xml;
+		JAXBContext jaxbContext;
+		List<Class<?>> classesMarshall = new ArrayList<Class<?>>();
+		if(comprobante.getComplemento()!=null) {
+			List<Object> listComplementos = comprobante.getComplemento().getAny();
+			for (Object object : listComplementos) {
+				if (object instanceof TimbreFiscalDigital) {
+					classesMarshall.add(TimbreFiscalDigital.class);
+				}
+			}			
+		}
+		classesMarshall.add(mx.gob.sat.cfd._4.Comprobante.class);
+		classesMarshall.add(PorCuentadeTerceros.class);
+//		classesMarshall.add(Pagos.class);
+		jaxbContext = JAXBContext.newInstance(classesMarshall.toArray(new Class<?>[classesMarshall.size()]));
+		Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
+				"http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd");
+		StringWriter sw = new StringWriter();
+		marshaller.marshal(comprobante, sw);
+		xml = sw.toString();
+		return xml;
+	}
+	
 	public String createXmlFromComprobante(Comprobante comprobante) throws JAXBException {
 		String xml;
 		JAXBContext jaxbContext;
@@ -358,13 +385,14 @@ public class UtilsService {
 	}
 	
 	
-	public DatosMarcaDto obtenerDatosRfcEmisor(String rfcEmisor){
+	public DatosMarcaDto obtenerDatosRfcEmisor(String rfcEmisor, Integer version){
 		String sucursalesPrado = env.getProperty("list.sucursal.jenner.prado");
 		String sucursalesLean = env.getProperty("list.sucursal.jenner.lean");
 		List<String> listPrado = new ArrayList<String>(Arrays.asList(sucursalesPrado.split(",")));
 		List<String> listLean = new ArrayList<String>(Arrays.asList(sucursalesLean.split(",")));
 		
-		String rutaCadenaOriginal = env.getProperty("path.file.cadena.original");
+		String rutaCadenaOriginal = version.equals(3) ? env.getProperty("path.file.cadena.original") : 
+			env.getProperty("path.file.cadena.original.4");
 		String pasword = "";
 		String rfcMarca = "";
 		String razonSocialMarca = "";

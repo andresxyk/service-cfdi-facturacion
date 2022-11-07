@@ -122,7 +122,7 @@ public class CfdiCancenlacionService {
 	
 	public String getXMLCancelacionConFirmaDigital(String xmlCancelacion, String rfcEmisor) throws Exception {
 		System.out.println("ObtenerFirmaDigial*****");
-		DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosRfcEmisor(rfcEmisor);
+		DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosRfcEmisor(rfcEmisor,0);
 		X509Certificate x509 = null;
 		x509 = getX509Certificate(new File(datosMarcaDto.getRutaCer()));
 		System.out.println("x509--->>>   " + x509);
