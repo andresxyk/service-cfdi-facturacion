@@ -80,10 +80,12 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		
 		String montoTerceros = null;
 		int cont1 = 0;
+		Boolean bHonorarioMedico = false;
 		for(Comprobante.Conceptos.Concepto infConcepto: comprobante.getConceptos().getConcepto()){
 			
 			if(infConcepto.getDescripcion().equals("Honorario Medico") && infConcepto.getClaveProdServ().equals("85121600")){
 				montoTerceros = infConcepto.getImpuestos().getTraslados().getTraslado().get(0).getBase().toString();
+				bHonorarioMedico = true;
 			}
 			cont1++;
 		}
@@ -357,7 +359,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcTotal.setColspan(2);
 	    
 	    
-	    if(infoPDF.getComplementoConcepto()){
+	    if(bHonorarioMedico){
 		    tabDetalleMontos.addCell(pcTitleTerceros);
 		    tabDetalleMontos.addCell(pcTitleVersion);
 		    tabDetalleMontos.addCell(pcTitleRFC);
@@ -494,7 +496,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		   reporteAzteca.add(tabDatosFactura);
 	    if (tamanioCOncepto == bandera) {
         	PdfContentByte canvas = writerOlab.getDirectContent();
-        	if(infoPDF.getComplementoConcepto()){
+        	if(bHonorarioMedico){
         		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 340f,canvas);
         	}else{        		
         		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 230f,canvas);
@@ -548,10 +550,12 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		
 		String montoTerceros = null;
 		int cont1 = 0;
+		Boolean bHonorarioMedico = false;
 		for(Comprobante.Conceptos.Concepto infConcepto: comprobante.getConceptos().getConcepto()){
 			
 			if(infConcepto.getDescripcion().equals("Honorario Medico") && infConcepto.getClaveProdServ().equals("85121600")){
 				montoTerceros = infConcepto.getImpuestos().getTraslados().getTraslado().get(0).getBase().toString();
+				bHonorarioMedico = true;
 			}
 			cont1++;
 		}
@@ -823,7 +827,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcTotal.setColspan(2);
 	    
 	    
-	    if(infoPDF.getComplementoConcepto()){
+	    if(bHonorarioMedico){
 		    tabDetalleMontos.addCell(pcTitleTerceros);
 		    tabDetalleMontos.addCell(pcTitleVersion);
 		    tabDetalleMontos.addCell(pcTitleRFC);
@@ -961,7 +965,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		   reporteAzteca.add(tabDatosFactura);
 	    if (tamanioCOncepto == bandera) {
         	PdfContentByte canvas = writerAzteca.getDirectContent();
-        	if(infoPDF.getComplementoConcepto()){
+        	if(bHonorarioMedico){
         		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 340f,canvas);
         	}else{        		
         		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 230f,canvas);
@@ -1021,10 +1025,12 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		
 		String montoTerceros = null;
 		int cont1 = 0;
+		Boolean bHonorarioMedico = false;
 		for(Comprobante.Conceptos.Concepto infConcepto: comprobante.getConceptos().getConcepto()){
 			
 			if(infConcepto.getDescripcion().equals("Honorario Medico") && infConcepto.getClaveProdServ().equals("85121600")){
 				montoTerceros = infConcepto.getImpuestos().getTraslados().getTraslado().get(0).getBase().toString();
+				 bHonorarioMedico = true;
 			}
 			cont1++;
 		}
@@ -1298,7 +1304,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcTotal.setColspan(2);
 	    
 	    
-	    if(infoPDF.getComplementoConcepto()){
+	    if(bHonorarioMedico){
 		    tabDetalleMontos.addCell(pcTitleTerceros);
 		    tabDetalleMontos.addCell(pcTitleVersion);
 		    tabDetalleMontos.addCell(pcTitleRFC);
@@ -1436,7 +1442,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		   reporteAzteca.add(tabDatosFactura);
 	    if (tamanioCOncepto == bandera) {
         	PdfContentByte canvas = writerSwiss.getDirectContent();
-        	if(infoPDF.getComplementoConcepto()){
+        	if(bHonorarioMedico){
         		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 340f,canvas);
         	}else{        		
         		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 230f,canvas);
@@ -1494,10 +1500,12 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		
 		String montoTerceros = null;
 		int cont1 = 0;
+		Boolean bHonorarioMedico = false;
 		for(Comprobante.Conceptos.Concepto infConcepto: comprobante.getConceptos().getConcepto()){
 			
 			if(infConcepto.getDescripcion().equals("Honorario Medico") && infConcepto.getClaveProdServ().equals("85121600")){
 				montoTerceros = infConcepto.getImpuestos().getTraslados().getTraslado().get(0).getBase().toString();
+				bHonorarioMedico = true;
 			}
 			cont1++;
 		}
@@ -1771,7 +1779,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcTotal.setColspan(2);
 	    
 	    
-	    if(infoPDF.getComplementoConcepto()){
+	    if(bHonorarioMedico){
 		    tabDetalleMontos.addCell(pcTitleTerceros);
 		    tabDetalleMontos.addCell(pcTitleVersion);
 		    tabDetalleMontos.addCell(pcTitleRFC);
@@ -1909,7 +1917,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		   reporteAzteca.add(tabDatosFactura);
 	    if (tamanioCOncepto == bandera) {
         	PdfContentByte canvas = writerSwiss.getDirectContent();
-        	if(infoPDF.getComplementoConcepto()){
+        	if(bHonorarioMedico){
         		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 340f,canvas);
         	}else{        		
         		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 230f,canvas);
@@ -1970,10 +1978,12 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		
 		String montoTerceros = null;
 		int cont1 = 0;
+		Boolean bHonorarioMedico = false;
 		for(Comprobante.Conceptos.Concepto infConcepto: comprobante.getConceptos().getConcepto()){
 			
 			if(infConcepto.getDescripcion().equals("Honorario Medico") && infConcepto.getClaveProdServ().equals("85121600")){
 				montoTerceros = infConcepto.getImpuestos().getTraslados().getTraslado().get(0).getBase().toString();
+				bHonorarioMedico = true;
 			}
 			cont1++;
 		}
@@ -2246,7 +2256,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcTotal.setColspan(2);
 	    
 	    
-	    if(infoPDF.getComplementoConcepto()){
+	    if(bHonorarioMedico){
 		    tabDetalleMontos.addCell(pcTitleTerceros);
 		    tabDetalleMontos.addCell(pcTitleVersion);
 		    tabDetalleMontos.addCell(pcTitleRFC);
@@ -2384,7 +2394,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		   reporteAzteca.add(tabDatosFactura);
 	    if (tamanioCOncepto == bandera) {
         	PdfContentByte canvas = writerJenner.getDirectContent();
-        	if(infoPDF.getComplementoConcepto()){
+        	if(bHonorarioMedico){
         		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 340f,canvas);
         	}else{        		
         		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 230f,canvas);
