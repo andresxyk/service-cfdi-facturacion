@@ -87,7 +87,9 @@ public class PdfContadoService {
 					}else if(arrLean.contains(csucursal)){
 						System.out.println("**** Lean *****");
 						centidadlegal = 8;	
-					}				
+					}else {
+						centidadlegal = 5;
+					}
 				}else if (cmarca == 5) {
 					centidadlegal = 6;
 				}else if (cmarca == 15) {
@@ -193,7 +195,9 @@ public class PdfContadoService {
 					}else if(arrLean.contains(csucursal)){
 						System.out.println("**** Lean *****");
 						centidadlegal = 8;	
-					}				
+					}else {
+						centidadlegal = 5;
+					}
 				}else if (cmarca == 5) {
 					centidadlegal = 6;
 				}else if (cmarca == 15) {

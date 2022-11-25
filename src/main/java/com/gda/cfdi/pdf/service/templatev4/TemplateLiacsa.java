@@ -86,6 +86,9 @@ public class TemplateLiacsa extends PdfPageEventHelper{
 			String strConcep = infoPDF.getDescripcionUsoCfdi();
 			String strRFCReceptor = receptor.getRfc();
 			String strRegFiscal = emisor.getRegimenFiscal();
+			String strRegFiscalReceptor = receptor.getRegimenFiscalReceptor();
+			String strDomicilioFiscalReceptor = receptor.getDomicilioFiscalReceptor();
+			
 			//String strDomicFiscalRecep = "FALTA DATO";
 			System.out.println("direccion:::   "+infoPDF.getDirFiscalEmisor());
 			String strDomicFiscalEmis = infoPDF.getDirFiscalEmisor();
@@ -181,14 +184,17 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             PdfPCell pcTipoComp = new PdfPCell(datostipoComp);
             
             PdfPCell pcLeyendaCFDI = new PdfPCell(new Paragraph("Uso de CFDI",fuenteDirSucur));
-            Paragraph paraFechaTimbrado = new Paragraph("Lugar, fecha y hora de expedición: \r\n",fuenteDirSucur);
-            Paragraph paraFechaTimbradoII = new Paragraph(strFechaExped,fuenteImport);
-            Paragraph parrafoLeyndaTim = new Paragraph();
-            parrafoLeyndaTim.add(paraFechaTimbrado);
-            parrafoLeyndaTim.add(paraFechaTimbradoII);
-            PdfPCell pcLeyendaTimb = new PdfPCell(parrafoLeyndaTim);
-            //PdfPCell pcCFDI = new PdfPCell(new Paragraph(strConcep,fuenteImport));
+            PdfPCell pcLeyendaTimb = new PdfPCell(new Paragraph("Lugar, fecha y hora de expedición:",fuenteDirSucur));
+            PdfPCell pcInputFechaTimbrado = new PdfPCell(new Paragraph(strFechaExped,fuenteImport));
             PdfPCell pcCFDI = new PdfPCell(new Paragraph(strConcep,fuenteImport));
+            
+            Chunk paraExportacionLabel = new Chunk("Exportación: ",fuenteDirSucur);
+            Chunk paraExportacionTxt = new Chunk("No aplica",fuenteImport);
+            Paragraph parraExportacion = new Paragraph();
+            parraExportacion.add(paraExportacionLabel);
+            parraExportacion.add(paraExportacionTxt);
+            PdfPCell pcExportacion = new PdfPCell(parraExportacion);
+            
             pcVersion.setBorder(Rectangle.RIGHT);
             pcVersion.setHorizontalAlignment(Element.ALIGN_CENTER);
             pcFolioSerie.setBorder(Rectangle.UNDEFINED);
@@ -199,12 +205,17 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             pcLeyendaCFDI.setHorizontalAlignment(Element.ALIGN_CENTER);
             pcLeyendaTimb.setBorder(Rectangle.RIGHT);
             pcLeyendaTimb.setHorizontalAlignment(Element.ALIGN_CENTER);
+            pcInputFechaTimbrado.setBorder(Rectangle.RIGHT);
+            pcInputFechaTimbrado.setHorizontalAlignment(Element.ALIGN_CENTER);
             pcCFDI.setBorder(Rectangle.UNDEFINED);
             pcCFDI.setHorizontalAlignment(Element.ALIGN_CENTER);
+            pcExportacion.setBorder(Rectangle.UNDEFINED);
+            pcExportacion.setHorizontalAlignment(Element.ALIGN_CENTER);
             
             pcVersion.setBorderColor(colorFondoTituloFact);
             pcTipoComp.setBorderColor(colorFondoTituloFact);
             pcLeyendaTimb.setBorderColor(colorFondoTituloFact);
+            pcInputFechaTimbrado.setBorderColor(colorFondoTituloFact);
             
             tabInfFact.addCell(pcVersion);
             tabInfFact.addCell(pcFolioSerie);
@@ -212,6 +223,8 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             tabInfFact.addCell(pcLeyendaCFDI);
             tabInfFact.addCell(pcLeyendaTimb);
             tabInfFact.addCell(pcCFDI);
+            tabInfFact.addCell(pcInputFechaTimbrado);
+            tabInfFact.addCell(pcExportacion);
             tabInfFact.setTotalWidth(300);
             
             ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -261,6 +274,9 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             datosRegimenEmisor.add(datoRegimenEmisor);
             PdfPCell pcRegimenEmisor = new PdfPCell(datosRegimenEmisor);
             
+            PdfPCell pcEmisorSeccion1 = new PdfPCell(new Paragraph("",fuenteContenidoImporTab));
+            PdfPCell pcEmisorSeccion2 = new PdfPCell(new Paragraph("",fuenteContenidoImporTab));
+            
 //            System.out.println("Direccion::::---->>>>>>   "+comprobante.getAdendaDireccion());
 //            Chunk DomicilioReceptor = new Chunk("Domicilio fiscal: ",fuenteContenidoTab);
 //            Chunk datoDomicilioReceptor = new Chunk(comprobante.getAdendaDireccion(),fuenteContenidoImporTab);
@@ -278,14 +294,32 @@ public class TemplateLiacsa extends PdfPageEventHelper{
 
             PdfPCell pcNumOrdenPaciente = new PdfPCell(new Paragraph(strNomOrdPac,fuenteContenidoImporTab));
             
+            Chunk RegimenReceptor = new Chunk("Régimen Fiscal Receptor: ",fuenteContenidoTab);
+            Chunk datoRegimenReceptor = new Chunk(strRegFiscalReceptor,fuenteContenidoImporTab);
+            Paragraph datosRegimenReceptor = new Paragraph();
+            datosRegimenReceptor.add(RegimenReceptor);
+            datosRegimenReceptor.add(datoRegimenReceptor);
+            PdfPCell pcRegimenFiscalReceptor = new PdfPCell(datosRegimenReceptor);
+            
+            Chunk DomFiscalReceptor = new Chunk("Domicilio Fiscal Receptor: ",fuenteContenidoTab);
+            Chunk datoDomFiscalReceptor = new Chunk(strDomicilioFiscalReceptor,fuenteContenidoImporTab);
+            Paragraph datosDomFiscalReceptor = new Paragraph();
+            datosDomFiscalReceptor.add(DomFiscalReceptor);
+            datosDomFiscalReceptor.add(datoDomFiscalReceptor);
+            PdfPCell pcDomFiscalReceptor = new PdfPCell(datosDomFiscalReceptor);
+            
             pcNomEmisor.setPaddingLeft(7);
             pcNomReceptor.setPaddingLeft(7);
             pcRFCEmisor.setPaddingLeft(7);
             pcRFCReceptor.setPaddingLeft(7);
             pcRegimenEmisor.setPaddingLeft(7);
+            pcEmisorSeccion1.setPaddingLeft(7);
+            pcEmisorSeccion2.setPaddingLeft(7);
 //            pcDomicilioReceptor.setPaddingLeft(7);
 //            pcDomicilioEmisor.setPaddingLeft(7);
             pcNumOrdenPaciente.setPaddingLeft(7);
+            pcRegimenFiscalReceptor.setPaddingLeft(7);
+            pcDomFiscalReceptor.setPaddingLeft(7);
             
             pcDatosReceptor.setBackgroundColor(colorFondoTituloFact);
             pcDatosEmisor.setBackgroundColor(colorFondoTituloFact);
@@ -296,9 +330,13 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             pcRFCEmisor.setBackgroundColor(colorFondoContenidoFact);
             pcRFCReceptor.setBackgroundColor(colorFondoContenidoFact);
             pcRegimenEmisor.setBackgroundColor(colorFondoContenidoFact);
+            pcEmisorSeccion1.setBackgroundColor(colorFondoContenidoFact);
+            pcEmisorSeccion2.setBackgroundColor(colorFondoContenidoFact);
 //            pcDomicilioReceptor.setBackgroundColor(colorFondoContenidoFact);
 //            pcDomicilioEmisor.setBackgroundColor(colorFondoContenidoFact);
             pcNumOrdenPaciente.setBackgroundColor(colorFondoContenidoFact);
+            pcRegimenFiscalReceptor.setBackgroundColor(colorFondoContenidoFact);
+            pcDomFiscalReceptor.setBackgroundColor(colorFondoContenidoFact);
             pcDatosReceptor.setBorder(Rectangle.UNDEFINED);
             pcDatosEmisor.setBorder(Rectangle.UNDEFINED);
             pcLineas.setBorder(Rectangle.UNDEFINED);
@@ -308,9 +346,13 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             pcRFCEmisor.setBorder(Rectangle.UNDEFINED);
             pcRFCReceptor.setBorder(Rectangle.UNDEFINED);
             pcRegimenEmisor.setBorder(Rectangle.UNDEFINED);
+            pcEmisorSeccion1.setBorder(Rectangle.UNDEFINED);
+            pcEmisorSeccion2.setBorder(Rectangle.UNDEFINED);
 //            pcDomicilioReceptor.setBorder(Rectangle.UNDEFINED);
 //            pcDomicilioEmisor.setBorder(Rectangle.UNDEFINED);
             pcNumOrdenPaciente.setBorder(Rectangle.UNDEFINED);
+            pcRegimenFiscalReceptor.setBorder(Rectangle.UNDEFINED);
+            pcDomFiscalReceptor.setBorder(Rectangle.UNDEFINED);
             tabDetalleFact.addCell(pcDatosEmisor);
             tabDetalleFact.addCell(pcDatosReceptor);
             tabDetalleFact.addCell(pcLineas);
@@ -322,6 +364,10 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             tabDetalleFact.addCell(pcRegimenEmisor);
 //            tabDetalleFact.addCell(pcDomicilioReceptor);
 //            tabDetalleFact.addCell(pcDomicilioEmisor);
+            tabDetalleFact.addCell(pcRegimenFiscalReceptor);
+            tabDetalleFact.addCell(pcEmisorSeccion1);
+            tabDetalleFact.addCell(pcDomFiscalReceptor);
+            tabDetalleFact.addCell(pcEmisorSeccion2);
             tabDetalleFact.addCell(pcNumOrdenPaciente);
             tabDetalleFact.addCell(pcLineas);
             tabDetalleFact.addCell(pcLineasII);
@@ -332,7 +378,7 @@ public class TemplateLiacsa extends PdfPageEventHelper{
 			///////////////////////////////////////////////////////////////////////////////////////////////
             
             PdfPCell pcClavePro = new PdfPCell(new Paragraph("\r\n CLAVE \r\n PRODUCTO \r\n / SERVICIO", fuenteTituloTabDetalle));
-            PdfPCell pcCodigo = new PdfPCell(new Paragraph("\r\n \r\nCODIGO",fuenteTituloTabDetalle));
+            PdfPCell pcCodigo = new PdfPCell(new Paragraph("\r\nNÚMERO \r\n DE ORDEN",fuenteTituloTabDetalle));
             PdfPCell pcCantidad = new PdfPCell(new Paragraph("\r\n \r\nCANTIDAD",fuenteTituloTabDetalle));
             PdfPCell pcClaveUnidad = new PdfPCell(new Paragraph("\r\n CLAVE \r\n UNIDAD",fuenteTituloTabDetalle));
             PdfPCell pcValorUni = new PdfPCell(new Paragraph("\r\n VALOR \r\n UNTARIO",fuenteTituloTabDetalle));

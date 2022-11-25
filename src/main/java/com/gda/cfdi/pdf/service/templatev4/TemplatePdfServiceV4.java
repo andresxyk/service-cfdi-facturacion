@@ -78,7 +78,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		reporteAzteca.open();	
 		reporteAzteca.newPage();
 		
-		String montoTerceros = null;
+		String montoTerceros = "0.00";
 		int cont1 = 0;
 		Boolean bHonorarioMedico = false;
 		for(Comprobante.Conceptos.Concepto infConcepto: comprobante.getConceptos().getConcepto()){
@@ -132,11 +132,15 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		
 		PdfPCell pcMonedaPeso = new PdfPCell(new Paragraph("Moneda MXN ", fuenteContenidoImporTab));
 		PdfPCell pcFormaPago = new PdfPCell(new Paragraph("Forma de pago "+comprobante.getFormaPago(),fuenteContenidoImporTab));
-		PdfPCell pcSubTotal = new PdfPCell(new Paragraph("Subtotal: ",fuenteContenidoImporTab));
+		PdfPCell pcSubTotal = new PdfPCell(new Paragraph("Subtotal(16%): ",fuenteContenidoImporTab));
 		PdfPCell pcMontoSubTotal = new PdfPCell(new Paragraph(strMontoSubTotal,fuenteContenidoImporTab));	    
 		PdfPCell pcMetodo = new PdfPCell(new Paragraph("Método de pago "+infoPDF.getDescripcionMetodoPago(),fuenteContenidoImporTab)); 
-		PdfPCell pcImpuesto = new PdfPCell(new Paragraph("Impuesto trasladado (IVA):",fuenteContenidoImporTab));
+		PdfPCell pcImpuesto = new PdfPCell(new Paragraph("Impuesto trasladado (IVA 16%):",fuenteContenidoImporTab));
 		PdfPCell pcMontoImpuesto = new PdfPCell(new Paragraph(strMontoImpuesto,fuenteContenidoImporTab));
+		PdfPCell pcSubtotalExento = new PdfPCell(new Paragraph("Subtotal exento:",fuenteContenidoImporTab));
+		PdfPCell pcMontoSubtotalExento = new PdfPCell(new Paragraph(montoTerceros,fuenteContenidoImporTab));
+		PdfPCell pcImpuestoTrasladado = new PdfPCell(new Paragraph("Impuesto trasladado (IVA exento):",fuenteContenidoImporTab));
+		PdfPCell pcMontoImpuestoTrasladado = new PdfPCell(new Paragraph("0.00",fuenteContenidoImporTab));
 		
 		
 	    PdfPCell pcTotal = new PdfPCell(new Paragraph("Total: ",fuenteContenidoImporTab));
@@ -155,6 +159,9 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 //		String strMontoTotalLetra = Character.toUpperCase(qulqi.showMeTheMoney(strMontoTotal).charAt(0)) + qulqi.showMeTheMoney(strMontoTotal).substring(1,qulqi.showMeTheMoney(strMontoTotal).length());
 	    String strMontoTotalLetra = montoConLetra(strMontoTotal);
 	    PdfPCell pcMontoLetra = new PdfPCell(new Paragraph(strMontoTotalLetra,fuenteContenidoImporTab));
+	    PdfPCell pcMontoVacio1 = new PdfPCell(new Paragraph("",fuenteContenidoImporTab));
+	    PdfPCell pcMontoVacio2 = new PdfPCell(new Paragraph("",fuenteContenidoImporTab));
+	    
 	    pcMonedaPeso.setPaddingTop(8);
         pcMonedaPeso.setIndent(8);
         
@@ -168,7 +175,6 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
         pcMontoLetra.setPaddingBottom(8);
         pcMontoTotal.setPaddingBottom(8);
         pcTotal.setPaddingBottom(8);
-        
         
         
         
@@ -211,7 +217,13 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMetodo.setBackgroundColor(colorFondoContenidoFact);
 	    pcTotal.setBackgroundColor(colorFondoContenidoFact);
 	    pcMontoTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcSubtotalExento.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoSubtotalExento.setBackgroundColor(colorFondoContenidoFact);
+	    pcImpuestoTrasladado.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoImpuestoTrasladado.setBackgroundColor(colorFondoContenidoFact);
 	    pcMontoLetra.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoVacio1.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoVacio2.setBackgroundColor(colorFondoContenidoFact);
 	    
 	    pcTitleTerceros.setBorder(Rectangle.BOTTOM);
 	    pcTitleVersion.setBorder(Rectangle.RIGHT);
@@ -273,7 +285,13 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMetodo.setBorder(Rectangle.UNDEFINED);
 	    pcTotal.setBorder(Rectangle.UNDEFINED);
 	    pcMontoTotal.setBorder(Rectangle.UNDEFINED);
+	    pcSubtotalExento.setBorder(Rectangle.UNDEFINED);
+	    pcMontoSubtotalExento.setBorder(Rectangle.UNDEFINED);
+	    pcImpuestoTrasladado.setBorder(Rectangle.UNDEFINED);
+	    pcMontoImpuestoTrasladado.setBorder(Rectangle.UNDEFINED);
 	    pcMontoLetra.setBorder(Rectangle.UNDEFINED);
+	    pcMontoVacio1.setBorder(Rectangle.UNDEFINED);
+	    pcMontoVacio2.setBorder(Rectangle.UNDEFINED);
 	    
 	    pcTitleTerceros.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    pcTitleTerceros.setVerticalAlignment(Element.ALIGN_CENTER);
@@ -301,6 +319,8 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMontoImpuesto.setHorizontalAlignment(Element.ALIGN_RIGHT);
 	    pcMontoTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
 	    pcMontoLetra.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    pcMontoVacio1.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    pcMontoVacio2.setHorizontalAlignment(Element.ALIGN_LEFT);
 	    pcTxtImpuesto.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    pcTxtImpuesto.setVerticalAlignment(Element.ALIGN_CENTER);
 	    pcTxtTasa.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -336,7 +356,10 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		pcSubTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pcImpuesto.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pcTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
-		
+		pcSubtotalExento.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		pcMontoSubtotalExento.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		pcImpuestoTrasladado.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		pcMontoImpuestoTrasladado.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		
 	    
 	    pcTitleTerceros.setColspan(6);
@@ -356,7 +379,11 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMetodo.setColspan(3);
 	    pcImpuesto.setColspan(2);
 	    pcMontoLetra.setColspan(3);
+	    pcMontoVacio1.setColspan(3);
+	    pcMontoVacio2.setColspan(3);
 	    pcTotal.setColspan(2);
+	    pcSubtotalExento.setColspan(2);
+	    pcImpuestoTrasladado.setColspan(2);
 	    
 	    
 	    if(bHonorarioMedico){
@@ -400,6 +427,12 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    tabDetalleMontos.addCell(pcImpuesto);
 	    tabDetalleMontos.addCell(pcMontoImpuesto);
 	    
+	    tabDetalleMontos.addCell(pcMontoVacio1);
+	    tabDetalleMontos.addCell(pcSubtotalExento);
+	    tabDetalleMontos.addCell(pcMontoSubtotalExento);
+	    tabDetalleMontos.addCell(pcMontoVacio2);
+	    tabDetalleMontos.addCell(pcImpuestoTrasladado);
+	    tabDetalleMontos.addCell(pcMontoImpuestoTrasladado);
 	    tabDetalleMontos.addCell(pcMontoLetra);
 	    tabDetalleMontos.addCell(pcTotal);
 	    tabDetalleMontos.addCell(pcMontoTotal);
@@ -497,9 +530,9 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    if (tamanioCOncepto == bandera) {
         	PdfContentByte canvas = writerOlab.getDirectContent();
         	if(bHonorarioMedico){
-        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 340f,canvas);
+        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 342f,canvas);
         	}else{        		
-        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 230f,canvas);
+        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 232f,canvas);
         	}
 		}
 		reporteAzteca.close();
@@ -548,7 +581,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		reporteAzteca.open();	
 		reporteAzteca.newPage();
 		
-		String montoTerceros = null;
+		String montoTerceros = "0.00";
 		int cont1 = 0;
 		Boolean bHonorarioMedico = false;
 		for(Comprobante.Conceptos.Concepto infConcepto: comprobante.getConceptos().getConcepto()){
@@ -600,11 +633,15 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		
 		PdfPCell pcMonedaPeso = new PdfPCell(new Paragraph("Moneda MXN ", fuenteContenidoImporTab));
 		PdfPCell pcFormaPago = new PdfPCell(new Paragraph("Forma de pago "+comprobante.getFormaPago(),fuenteContenidoImporTab));
-		PdfPCell pcSubTotal = new PdfPCell(new Paragraph("Subtotal: ",fuenteContenidoImporTab));
+		PdfPCell pcSubTotal = new PdfPCell(new Paragraph("Subtotal(16%): ",fuenteContenidoImporTab));
 		PdfPCell pcMontoSubTotal = new PdfPCell(new Paragraph(strMontoSubTotal,fuenteContenidoImporTab));	    
 		PdfPCell pcMetodo = new PdfPCell(new Paragraph("Método de pago "+infoPDF.getDescripcionMetodoPago(),fuenteContenidoImporTab)); 
-		PdfPCell pcImpuesto = new PdfPCell(new Paragraph("Impuesto trasladado (IVA):",fuenteContenidoImporTab));
+		PdfPCell pcImpuesto = new PdfPCell(new Paragraph("Impuesto trasladado (IVA 16%):",fuenteContenidoImporTab));
 		PdfPCell pcMontoImpuesto = new PdfPCell(new Paragraph(strMontoImpuesto,fuenteContenidoImporTab));
+		PdfPCell pcSubtotalExento = new PdfPCell(new Paragraph("Subtotal exento:",fuenteContenidoImporTab));
+		PdfPCell pcMontoSubtotalExento = new PdfPCell(new Paragraph(montoTerceros,fuenteContenidoImporTab));
+		PdfPCell pcImpuestoTrasladado = new PdfPCell(new Paragraph("Impuesto trasladado (IVA exento):",fuenteContenidoImporTab));
+		PdfPCell pcMontoImpuestoTrasladado = new PdfPCell(new Paragraph("0.00",fuenteContenidoImporTab));
 		
 		
 	    PdfPCell pcTotal = new PdfPCell(new Paragraph("Total: ",fuenteContenidoImporTab));
@@ -623,6 +660,9 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 //		String strMontoTotalLetra = Character.toUpperCase(qulqi.showMeTheMoney(strMontoTotal).charAt(0)) + qulqi.showMeTheMoney(strMontoTotal).substring(1,qulqi.showMeTheMoney(strMontoTotal).length());
 	    String strMontoTotalLetra = montoConLetra(strMontoTotal);
 	    PdfPCell pcMontoLetra = new PdfPCell(new Paragraph(strMontoTotalLetra,fuenteContenidoImporTab));
+	    PdfPCell pcMontoVacio1 = new PdfPCell(new Paragraph("",fuenteContenidoImporTab));
+	    PdfPCell pcMontoVacio2 = new PdfPCell(new Paragraph("",fuenteContenidoImporTab));
+	    
 	    pcMonedaPeso.setPaddingTop(8);
         pcMonedaPeso.setIndent(8);
         
@@ -636,7 +676,6 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
         pcMontoLetra.setPaddingBottom(8);
         pcMontoTotal.setPaddingBottom(8);
         pcTotal.setPaddingBottom(8);
-        
         
         
         
@@ -679,7 +718,13 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMetodo.setBackgroundColor(colorFondoContenidoFact);
 	    pcTotal.setBackgroundColor(colorFondoContenidoFact);
 	    pcMontoTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcSubtotalExento.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoSubtotalExento.setBackgroundColor(colorFondoContenidoFact);
+	    pcImpuestoTrasladado.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoImpuestoTrasladado.setBackgroundColor(colorFondoContenidoFact);
 	    pcMontoLetra.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoVacio1.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoVacio2.setBackgroundColor(colorFondoContenidoFact);
 	    
 	    pcTitleTerceros.setBorder(Rectangle.BOTTOM);
 	    pcTitleVersion.setBorder(Rectangle.RIGHT);
@@ -723,7 +768,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		pcTitleIdentificacion.setBorderColor(colorLetraEncabezados);
 		pcTitleDescripcion.setBorderColor(colorLetraEncabezados);
 		pcTitleUnitario.setBorderColor(colorLetraEncabezados);
-		pcTitleImporteParte.setBorderColor(colorLetraEncabezados);		
+		pcTitleImporteParte.setBorderColor(colorLetraEncabezados);
 		pcTxtCantidad.setBorderColor(colorLetraEncabezados);
 		pcTxtUnidad.setBorderColor(colorLetraEncabezados);
 		pcTxtIdentificacion.setBorderColor(colorLetraEncabezados);
@@ -741,7 +786,13 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMetodo.setBorder(Rectangle.UNDEFINED);
 	    pcTotal.setBorder(Rectangle.UNDEFINED);
 	    pcMontoTotal.setBorder(Rectangle.UNDEFINED);
+	    pcSubtotalExento.setBorder(Rectangle.UNDEFINED);
+	    pcMontoSubtotalExento.setBorder(Rectangle.UNDEFINED);
+	    pcImpuestoTrasladado.setBorder(Rectangle.UNDEFINED);
+	    pcMontoImpuestoTrasladado.setBorder(Rectangle.UNDEFINED);
 	    pcMontoLetra.setBorder(Rectangle.UNDEFINED);
+	    pcMontoVacio1.setBorder(Rectangle.UNDEFINED);
+	    pcMontoVacio2.setBorder(Rectangle.UNDEFINED);
 	    
 	    pcTitleTerceros.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    pcTitleTerceros.setVerticalAlignment(Element.ALIGN_CENTER);
@@ -769,6 +820,8 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMontoImpuesto.setHorizontalAlignment(Element.ALIGN_RIGHT);
 	    pcMontoTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
 	    pcMontoLetra.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    pcMontoVacio1.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    pcMontoVacio2.setHorizontalAlignment(Element.ALIGN_LEFT);
 	    pcTxtImpuesto.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    pcTxtImpuesto.setVerticalAlignment(Element.ALIGN_CENTER);
 	    pcTxtTasa.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -804,7 +857,10 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		pcSubTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pcImpuesto.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pcTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
-		
+		pcSubtotalExento.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		pcMontoSubtotalExento.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		pcImpuestoTrasladado.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		pcMontoImpuestoTrasladado.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		
 	    
 	    pcTitleTerceros.setColspan(6);
@@ -824,7 +880,11 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMetodo.setColspan(3);
 	    pcImpuesto.setColspan(2);
 	    pcMontoLetra.setColspan(3);
+	    pcMontoVacio1.setColspan(3);
+	    pcMontoVacio2.setColspan(3);
 	    pcTotal.setColspan(2);
+	    pcSubtotalExento.setColspan(2);
+	    pcImpuestoTrasladado.setColspan(2);
 	    
 	    
 	    if(bHonorarioMedico){
@@ -868,6 +928,12 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    tabDetalleMontos.addCell(pcImpuesto);
 	    tabDetalleMontos.addCell(pcMontoImpuesto);
 	    
+	    tabDetalleMontos.addCell(pcMontoVacio1);
+	    tabDetalleMontos.addCell(pcSubtotalExento);
+	    tabDetalleMontos.addCell(pcMontoSubtotalExento);
+	    tabDetalleMontos.addCell(pcMontoVacio2);
+	    tabDetalleMontos.addCell(pcImpuestoTrasladado);
+	    tabDetalleMontos.addCell(pcMontoImpuestoTrasladado);
 	    tabDetalleMontos.addCell(pcMontoLetra);
 	    tabDetalleMontos.addCell(pcTotal);
 	    tabDetalleMontos.addCell(pcMontoTotal);
@@ -966,9 +1032,9 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    if (tamanioCOncepto == bandera) {
         	PdfContentByte canvas = writerAzteca.getDirectContent();
         	if(bHonorarioMedico){
-        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 340f,canvas);
+        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 342f,canvas);
         	}else{        		
-        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 230f,canvas);
+        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 232f,canvas);
         	}
 		}
 		reporteAzteca.close();
@@ -1023,7 +1089,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		reporteAzteca.open();	
 		reporteAzteca.newPage();
 		
-		String montoTerceros = null;
+		String montoTerceros = "0.00";
 		int cont1 = 0;
 		Boolean bHonorarioMedico = false;
 		for(Comprobante.Conceptos.Concepto infConcepto: comprobante.getConceptos().getConcepto()){
@@ -1077,11 +1143,15 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		
 		PdfPCell pcMonedaPeso = new PdfPCell(new Paragraph("Moneda MXN ", fuenteContenidoImporTab));
 		PdfPCell pcFormaPago = new PdfPCell(new Paragraph("Forma de pago "+comprobante.getFormaPago(),fuenteContenidoImporTab));
-		PdfPCell pcSubTotal = new PdfPCell(new Paragraph("Subtotal: ",fuenteContenidoImporTab));
+		PdfPCell pcSubTotal = new PdfPCell(new Paragraph("Subtotal(16%): ",fuenteContenidoImporTab));
 		PdfPCell pcMontoSubTotal = new PdfPCell(new Paragraph(strMontoSubTotal,fuenteContenidoImporTab));	    
 		PdfPCell pcMetodo = new PdfPCell(new Paragraph("Método de pago "+infoPDF.getDescripcionMetodoPago(),fuenteContenidoImporTab)); 
-		PdfPCell pcImpuesto = new PdfPCell(new Paragraph("Impuesto trasladado (IVA):",fuenteContenidoImporTab));
+		PdfPCell pcImpuesto = new PdfPCell(new Paragraph("Impuesto trasladado (IVA 16%):",fuenteContenidoImporTab));
 		PdfPCell pcMontoImpuesto = new PdfPCell(new Paragraph(strMontoImpuesto,fuenteContenidoImporTab));
+		PdfPCell pcSubtotalExento = new PdfPCell(new Paragraph("Subtotal exento:",fuenteContenidoImporTab));
+		PdfPCell pcMontoSubtotalExento = new PdfPCell(new Paragraph(montoTerceros,fuenteContenidoImporTab));
+		PdfPCell pcImpuestoTrasladado = new PdfPCell(new Paragraph("Impuesto trasladado (IVA exento):",fuenteContenidoImporTab));
+		PdfPCell pcMontoImpuestoTrasladado = new PdfPCell(new Paragraph("0.00",fuenteContenidoImporTab));
 		
 		
 	    PdfPCell pcTotal = new PdfPCell(new Paragraph("Total: ",fuenteContenidoImporTab));
@@ -1100,6 +1170,9 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 //		String strMontoTotalLetra = Character.toUpperCase(qulqi.showMeTheMoney(strMontoTotal).charAt(0)) + qulqi.showMeTheMoney(strMontoTotal).substring(1,qulqi.showMeTheMoney(strMontoTotal).length());
 	    String strMontoTotalLetra = montoConLetra(strMontoTotal);
 	    PdfPCell pcMontoLetra = new PdfPCell(new Paragraph(strMontoTotalLetra,fuenteContenidoImporTab));
+	    PdfPCell pcMontoVacio1 = new PdfPCell(new Paragraph("",fuenteContenidoImporTab));
+	    PdfPCell pcMontoVacio2 = new PdfPCell(new Paragraph("",fuenteContenidoImporTab));
+	    
 	    pcMonedaPeso.setPaddingTop(8);
         pcMonedaPeso.setIndent(8);
         
@@ -1113,7 +1186,6 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
         pcMontoLetra.setPaddingBottom(8);
         pcMontoTotal.setPaddingBottom(8);
         pcTotal.setPaddingBottom(8);
-        
         
         
         
@@ -1156,7 +1228,13 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMetodo.setBackgroundColor(colorFondoContenidoFact);
 	    pcTotal.setBackgroundColor(colorFondoContenidoFact);
 	    pcMontoTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcSubtotalExento.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoSubtotalExento.setBackgroundColor(colorFondoContenidoFact);
+	    pcImpuestoTrasladado.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoImpuestoTrasladado.setBackgroundColor(colorFondoContenidoFact);
 	    pcMontoLetra.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoVacio1.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoVacio2.setBackgroundColor(colorFondoContenidoFact);
 	    
 	    pcTitleTerceros.setBorder(Rectangle.BOTTOM);
 	    pcTitleVersion.setBorder(Rectangle.RIGHT);
@@ -1218,7 +1296,13 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMetodo.setBorder(Rectangle.UNDEFINED);
 	    pcTotal.setBorder(Rectangle.UNDEFINED);
 	    pcMontoTotal.setBorder(Rectangle.UNDEFINED);
+	    pcSubtotalExento.setBorder(Rectangle.UNDEFINED);
+	    pcMontoSubtotalExento.setBorder(Rectangle.UNDEFINED);
+	    pcImpuestoTrasladado.setBorder(Rectangle.UNDEFINED);
+	    pcMontoImpuestoTrasladado.setBorder(Rectangle.UNDEFINED);
 	    pcMontoLetra.setBorder(Rectangle.UNDEFINED);
+	    pcMontoVacio1.setBorder(Rectangle.UNDEFINED);
+	    pcMontoVacio2.setBorder(Rectangle.UNDEFINED);
 	    
 	    pcTitleTerceros.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    pcTitleTerceros.setVerticalAlignment(Element.ALIGN_CENTER);
@@ -1246,6 +1330,8 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMontoImpuesto.setHorizontalAlignment(Element.ALIGN_RIGHT);
 	    pcMontoTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
 	    pcMontoLetra.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    pcMontoVacio1.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    pcMontoVacio2.setHorizontalAlignment(Element.ALIGN_LEFT);
 	    pcTxtImpuesto.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    pcTxtImpuesto.setVerticalAlignment(Element.ALIGN_CENTER);
 	    pcTxtTasa.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -1281,7 +1367,10 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		pcSubTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pcImpuesto.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pcTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
-		
+		pcSubtotalExento.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		pcMontoSubtotalExento.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		pcImpuestoTrasladado.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		pcMontoImpuestoTrasladado.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		
 	    
 	    pcTitleTerceros.setColspan(6);
@@ -1301,7 +1390,11 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMetodo.setColspan(3);
 	    pcImpuesto.setColspan(2);
 	    pcMontoLetra.setColspan(3);
+	    pcMontoVacio1.setColspan(3);
+	    pcMontoVacio2.setColspan(3);
 	    pcTotal.setColspan(2);
+	    pcSubtotalExento.setColspan(2);
+	    pcImpuestoTrasladado.setColspan(2);
 	    
 	    
 	    if(bHonorarioMedico){
@@ -1345,6 +1438,12 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    tabDetalleMontos.addCell(pcImpuesto);
 	    tabDetalleMontos.addCell(pcMontoImpuesto);
 	    
+	    tabDetalleMontos.addCell(pcMontoVacio1);
+	    tabDetalleMontos.addCell(pcSubtotalExento);
+	    tabDetalleMontos.addCell(pcMontoSubtotalExento);
+	    tabDetalleMontos.addCell(pcMontoVacio2);
+	    tabDetalleMontos.addCell(pcImpuestoTrasladado);
+	    tabDetalleMontos.addCell(pcMontoImpuestoTrasladado);
 	    tabDetalleMontos.addCell(pcMontoLetra);
 	    tabDetalleMontos.addCell(pcTotal);
 	    tabDetalleMontos.addCell(pcMontoTotal);
@@ -1443,9 +1542,9 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    if (tamanioCOncepto == bandera) {
         	PdfContentByte canvas = writerSwiss.getDirectContent();
         	if(bHonorarioMedico){
-        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 340f,canvas);
+        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 342f,canvas);
         	}else{        		
-        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 230f,canvas);
+        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 232f,canvas);
         	}
 		}
 		reporteAzteca.close();
@@ -1498,7 +1597,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		reporteAzteca.open();	
 		reporteAzteca.newPage();
 		
-		String montoTerceros = null;
+		String montoTerceros = "0.00";
 		int cont1 = 0;
 		Boolean bHonorarioMedico = false;
 		for(Comprobante.Conceptos.Concepto infConcepto: comprobante.getConceptos().getConcepto()){
@@ -1552,11 +1651,15 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		
 		PdfPCell pcMonedaPeso = new PdfPCell(new Paragraph("Moneda MXN ", fuenteContenidoImporTab));
 		PdfPCell pcFormaPago = new PdfPCell(new Paragraph("Forma de pago "+comprobante.getFormaPago(),fuenteContenidoImporTab));
-		PdfPCell pcSubTotal = new PdfPCell(new Paragraph("Subtotal: ",fuenteContenidoImporTab));
+		PdfPCell pcSubTotal = new PdfPCell(new Paragraph("Subtotal(16%): ",fuenteContenidoImporTab));
 		PdfPCell pcMontoSubTotal = new PdfPCell(new Paragraph(strMontoSubTotal,fuenteContenidoImporTab));	    
 		PdfPCell pcMetodo = new PdfPCell(new Paragraph("Método de pago "+infoPDF.getDescripcionMetodoPago(),fuenteContenidoImporTab)); 
-		PdfPCell pcImpuesto = new PdfPCell(new Paragraph("Impuesto trasladado (IVA):",fuenteContenidoImporTab));
+		PdfPCell pcImpuesto = new PdfPCell(new Paragraph("Impuesto trasladado (IVA 16%):",fuenteContenidoImporTab));
 		PdfPCell pcMontoImpuesto = new PdfPCell(new Paragraph(strMontoImpuesto,fuenteContenidoImporTab));
+		PdfPCell pcSubtotalExento = new PdfPCell(new Paragraph("Subtotal exento:",fuenteContenidoImporTab));
+		PdfPCell pcMontoSubtotalExento = new PdfPCell(new Paragraph(montoTerceros,fuenteContenidoImporTab));
+		PdfPCell pcImpuestoTrasladado = new PdfPCell(new Paragraph("Impuesto trasladado (IVA exento):",fuenteContenidoImporTab));
+		PdfPCell pcMontoImpuestoTrasladado = new PdfPCell(new Paragraph("0.00",fuenteContenidoImporTab));
 		
 		
 	    PdfPCell pcTotal = new PdfPCell(new Paragraph("Total: ",fuenteContenidoImporTab));
@@ -1575,6 +1678,9 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 //		String strMontoTotalLetra = Character.toUpperCase(qulqi.showMeTheMoney(strMontoTotal).charAt(0)) + qulqi.showMeTheMoney(strMontoTotal).substring(1,qulqi.showMeTheMoney(strMontoTotal).length());
 	    String strMontoTotalLetra = montoConLetra(strMontoTotal);
 	    PdfPCell pcMontoLetra = new PdfPCell(new Paragraph(strMontoTotalLetra,fuenteContenidoImporTab));
+	    PdfPCell pcMontoVacio1 = new PdfPCell(new Paragraph("",fuenteContenidoImporTab));
+	    PdfPCell pcMontoVacio2 = new PdfPCell(new Paragraph("",fuenteContenidoImporTab));
+	    
 	    pcMonedaPeso.setPaddingTop(8);
         pcMonedaPeso.setIndent(8);
         
@@ -1588,7 +1694,6 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
         pcMontoLetra.setPaddingBottom(8);
         pcMontoTotal.setPaddingBottom(8);
         pcTotal.setPaddingBottom(8);
-        
         
         
         
@@ -1631,7 +1736,13 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMetodo.setBackgroundColor(colorFondoContenidoFact);
 	    pcTotal.setBackgroundColor(colorFondoContenidoFact);
 	    pcMontoTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcSubtotalExento.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoSubtotalExento.setBackgroundColor(colorFondoContenidoFact);
+	    pcImpuestoTrasladado.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoImpuestoTrasladado.setBackgroundColor(colorFondoContenidoFact);
 	    pcMontoLetra.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoVacio1.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoVacio2.setBackgroundColor(colorFondoContenidoFact);
 	    
 	    pcTitleTerceros.setBorder(Rectangle.BOTTOM);
 	    pcTitleVersion.setBorder(Rectangle.RIGHT);
@@ -1693,7 +1804,13 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMetodo.setBorder(Rectangle.UNDEFINED);
 	    pcTotal.setBorder(Rectangle.UNDEFINED);
 	    pcMontoTotal.setBorder(Rectangle.UNDEFINED);
+	    pcSubtotalExento.setBorder(Rectangle.UNDEFINED);
+	    pcMontoSubtotalExento.setBorder(Rectangle.UNDEFINED);
+	    pcImpuestoTrasladado.setBorder(Rectangle.UNDEFINED);
+	    pcMontoImpuestoTrasladado.setBorder(Rectangle.UNDEFINED);
 	    pcMontoLetra.setBorder(Rectangle.UNDEFINED);
+	    pcMontoVacio1.setBorder(Rectangle.UNDEFINED);
+	    pcMontoVacio2.setBorder(Rectangle.UNDEFINED);
 	    
 	    pcTitleTerceros.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    pcTitleTerceros.setVerticalAlignment(Element.ALIGN_CENTER);
@@ -1721,6 +1838,8 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMontoImpuesto.setHorizontalAlignment(Element.ALIGN_RIGHT);
 	    pcMontoTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
 	    pcMontoLetra.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    pcMontoVacio1.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    pcMontoVacio2.setHorizontalAlignment(Element.ALIGN_LEFT);
 	    pcTxtImpuesto.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    pcTxtImpuesto.setVerticalAlignment(Element.ALIGN_CENTER);
 	    pcTxtTasa.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -1756,7 +1875,10 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		pcSubTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pcImpuesto.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pcTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
-		
+		pcSubtotalExento.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		pcMontoSubtotalExento.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		pcImpuestoTrasladado.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		pcMontoImpuestoTrasladado.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		
 	    
 	    pcTitleTerceros.setColspan(6);
@@ -1776,7 +1898,11 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMetodo.setColspan(3);
 	    pcImpuesto.setColspan(2);
 	    pcMontoLetra.setColspan(3);
+	    pcMontoVacio1.setColspan(3);
+	    pcMontoVacio2.setColspan(3);
 	    pcTotal.setColspan(2);
+	    pcSubtotalExento.setColspan(2);
+	    pcImpuestoTrasladado.setColspan(2);
 	    
 	    
 	    if(bHonorarioMedico){
@@ -1820,6 +1946,12 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    tabDetalleMontos.addCell(pcImpuesto);
 	    tabDetalleMontos.addCell(pcMontoImpuesto);
 	    
+	    tabDetalleMontos.addCell(pcMontoVacio1);
+	    tabDetalleMontos.addCell(pcSubtotalExento);
+	    tabDetalleMontos.addCell(pcMontoSubtotalExento);
+	    tabDetalleMontos.addCell(pcMontoVacio2);
+	    tabDetalleMontos.addCell(pcImpuestoTrasladado);
+	    tabDetalleMontos.addCell(pcMontoImpuestoTrasladado);
 	    tabDetalleMontos.addCell(pcMontoLetra);
 	    tabDetalleMontos.addCell(pcTotal);
 	    tabDetalleMontos.addCell(pcMontoTotal);
@@ -1918,9 +2050,9 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    if (tamanioCOncepto == bandera) {
         	PdfContentByte canvas = writerSwiss.getDirectContent();
         	if(bHonorarioMedico){
-        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 340f,canvas);
+        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 342f,canvas);
         	}else{        		
-        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 230f,canvas);
+        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 232f,canvas);
         	}
 		}
 		reporteAzteca.close();
@@ -1976,7 +2108,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		reporteAzteca.open();	
 		reporteAzteca.newPage();
 		
-		String montoTerceros = null;
+		String montoTerceros = "0.00";
 		int cont1 = 0;
 		Boolean bHonorarioMedico = false;
 		for(Comprobante.Conceptos.Concepto infConcepto: comprobante.getConceptos().getConcepto()){
@@ -2030,11 +2162,15 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		
 		PdfPCell pcMonedaPeso = new PdfPCell(new Paragraph("Moneda MXN ", fuenteContenidoImporTab));
 		PdfPCell pcFormaPago = new PdfPCell(new Paragraph("Forma de pago "+comprobante.getFormaPago(),fuenteContenidoImporTab));
-		PdfPCell pcSubTotal = new PdfPCell(new Paragraph("Subtotal: ",fuenteContenidoImporTab));
+		PdfPCell pcSubTotal = new PdfPCell(new Paragraph("Subtotal(16%): ",fuenteContenidoImporTab));
 		PdfPCell pcMontoSubTotal = new PdfPCell(new Paragraph(strMontoSubTotal,fuenteContenidoImporTab));	    
 		PdfPCell pcMetodo = new PdfPCell(new Paragraph("Método de pago "+infoPDF.getDescripcionMetodoPago(),fuenteContenidoImporTab)); 
-		PdfPCell pcImpuesto = new PdfPCell(new Paragraph("Impuesto trasladado (IVA):",fuenteContenidoImporTab));
+		PdfPCell pcImpuesto = new PdfPCell(new Paragraph("Impuesto trasladado (IVA 16%):",fuenteContenidoImporTab));
 		PdfPCell pcMontoImpuesto = new PdfPCell(new Paragraph(strMontoImpuesto,fuenteContenidoImporTab));
+		PdfPCell pcSubtotalExento = new PdfPCell(new Paragraph("Subtotal exento:",fuenteContenidoImporTab));
+		PdfPCell pcMontoSubtotalExento = new PdfPCell(new Paragraph(montoTerceros,fuenteContenidoImporTab));
+		PdfPCell pcImpuestoTrasladado = new PdfPCell(new Paragraph("Impuesto trasladado (IVA exento):",fuenteContenidoImporTab));
+		PdfPCell pcMontoImpuestoTrasladado = new PdfPCell(new Paragraph("0.00",fuenteContenidoImporTab));
 		
 		
 	    PdfPCell pcTotal = new PdfPCell(new Paragraph("Total: ",fuenteContenidoImporTab));
@@ -2053,6 +2189,9 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 //		String strMontoTotalLetra = Character.toUpperCase(qulqi.showMeTheMoney(strMontoTotal).charAt(0)) + qulqi.showMeTheMoney(strMontoTotal).substring(1,qulqi.showMeTheMoney(strMontoTotal).length());
 	    String strMontoTotalLetra = montoConLetra(strMontoTotal);
 	    PdfPCell pcMontoLetra = new PdfPCell(new Paragraph(strMontoTotalLetra,fuenteContenidoImporTab));
+	    PdfPCell pcMontoVacio1 = new PdfPCell(new Paragraph("",fuenteContenidoImporTab));
+	    PdfPCell pcMontoVacio2 = new PdfPCell(new Paragraph("",fuenteContenidoImporTab));
+	    
 	    pcMonedaPeso.setPaddingTop(8);
         pcMonedaPeso.setIndent(8);
         
@@ -2066,7 +2205,6 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
         pcMontoLetra.setPaddingBottom(8);
         pcMontoTotal.setPaddingBottom(8);
         pcTotal.setPaddingBottom(8);
-        
         
         
         
@@ -2109,7 +2247,13 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMetodo.setBackgroundColor(colorFondoContenidoFact);
 	    pcTotal.setBackgroundColor(colorFondoContenidoFact);
 	    pcMontoTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcSubtotalExento.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoSubtotalExento.setBackgroundColor(colorFondoContenidoFact);
+	    pcImpuestoTrasladado.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoImpuestoTrasladado.setBackgroundColor(colorFondoContenidoFact);
 	    pcMontoLetra.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoVacio1.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoVacio2.setBackgroundColor(colorFondoContenidoFact);
 	    
 	    pcTitleTerceros.setBorder(Rectangle.BOTTOM);
 	    pcTitleVersion.setBorder(Rectangle.RIGHT);
@@ -2161,6 +2305,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		pcTxtUnitario.setBorderColor(colorLetraEncabezados);
 		pcTxtImporteParte.setBorderColor(colorLetraEncabezados);
 	    
+	    
 	    pcMonedaPeso.setBorder(Rectangle.UNDEFINED);
 	    pcSubTotal.setBorder(Rectangle.UNDEFINED);
 	    pcMontoSubTotal.setBorder(Rectangle.UNDEFINED);
@@ -2170,7 +2315,13 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMetodo.setBorder(Rectangle.UNDEFINED);
 	    pcTotal.setBorder(Rectangle.UNDEFINED);
 	    pcMontoTotal.setBorder(Rectangle.UNDEFINED);
+	    pcSubtotalExento.setBorder(Rectangle.UNDEFINED);
+	    pcMontoSubtotalExento.setBorder(Rectangle.UNDEFINED);
+	    pcImpuestoTrasladado.setBorder(Rectangle.UNDEFINED);
+	    pcMontoImpuestoTrasladado.setBorder(Rectangle.UNDEFINED);
 	    pcMontoLetra.setBorder(Rectangle.UNDEFINED);
+	    pcMontoVacio1.setBorder(Rectangle.UNDEFINED);
+	    pcMontoVacio2.setBorder(Rectangle.UNDEFINED);
 	    
 	    pcTitleTerceros.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    pcTitleTerceros.setVerticalAlignment(Element.ALIGN_CENTER);
@@ -2198,6 +2349,8 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMontoImpuesto.setHorizontalAlignment(Element.ALIGN_RIGHT);
 	    pcMontoTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
 	    pcMontoLetra.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    pcMontoVacio1.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    pcMontoVacio2.setHorizontalAlignment(Element.ALIGN_LEFT);
 	    pcTxtImpuesto.setHorizontalAlignment(Element.ALIGN_CENTER);
 	    pcTxtImpuesto.setVerticalAlignment(Element.ALIGN_CENTER);
 	    pcTxtTasa.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -2233,7 +2386,10 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		pcSubTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pcImpuesto.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		pcTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
-		
+		pcSubtotalExento.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		pcMontoSubtotalExento.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		pcImpuestoTrasladado.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		pcMontoImpuestoTrasladado.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		
 	    
 	    pcTitleTerceros.setColspan(6);
@@ -2253,7 +2409,11 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    pcMetodo.setColspan(3);
 	    pcImpuesto.setColspan(2);
 	    pcMontoLetra.setColspan(3);
+	    pcMontoVacio1.setColspan(3);
+	    pcMontoVacio2.setColspan(3);
 	    pcTotal.setColspan(2);
+	    pcSubtotalExento.setColspan(2);
+	    pcImpuestoTrasladado.setColspan(2);
 	    
 	    
 	    if(bHonorarioMedico){
@@ -2297,6 +2457,12 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    tabDetalleMontos.addCell(pcImpuesto);
 	    tabDetalleMontos.addCell(pcMontoImpuesto);
 	    
+	    tabDetalleMontos.addCell(pcMontoVacio1);
+	    tabDetalleMontos.addCell(pcSubtotalExento);
+	    tabDetalleMontos.addCell(pcMontoSubtotalExento);
+	    tabDetalleMontos.addCell(pcMontoVacio2);
+	    tabDetalleMontos.addCell(pcImpuestoTrasladado);
+	    tabDetalleMontos.addCell(pcMontoImpuestoTrasladado);
 	    tabDetalleMontos.addCell(pcMontoLetra);
 	    tabDetalleMontos.addCell(pcTotal);
 	    tabDetalleMontos.addCell(pcMontoTotal);
@@ -2395,9 +2561,9 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 	    if (tamanioCOncepto == bandera) {
         	PdfContentByte canvas = writerJenner.getDirectContent();
         	if(bHonorarioMedico){
-        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 340f,canvas);
+        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 342f,canvas);
         	}else{        		
-        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 230f,canvas);
+        		tabDetalleMontos.writeSelectedRows(0, -1, 35f, 232f,canvas);
         	}
 		}
 		reporteAzteca.close();
