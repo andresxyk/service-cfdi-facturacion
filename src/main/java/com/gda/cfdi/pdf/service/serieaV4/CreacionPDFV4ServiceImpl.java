@@ -1,4 +1,4 @@
-package com.gda.cfdi.pdf.service.seriea;
+package com.gda.cfdi.pdf.service.serieaV4;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -29,12 +29,12 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import mx.gob.sat.cfd._3.Comprobante;
-import mx.gob.sat.cfd._3.Comprobante.Conceptos.Concepto;
+import mx.gob.sat.cfd._4.Comprobante;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto;
 
 @Service
-public class CreacionPDFServiceImpl implements CreacionPDFService{
-	private static final Logger log = LoggerFactory.getLogger(CreacionPDFServiceImpl.class);
+public class CreacionPDFV4ServiceImpl implements CreacionPDFV4Service{
+	private static final Logger log = LoggerFactory.getLogger(CreacionPDFV4ServiceImpl.class);
 	
 	@Override
 	public String CrearPdfMarcaAzteca(PdfInfoDto infoPDF,Integer kfactura,String nombreArchivo, 
@@ -303,7 +303,7 @@ public class CreacionPDFServiceImpl implements CreacionPDFService{
 	
 	@Override
 	public String CrearPdfMarcaJenner(PdfInfoDto infoPDF,Integer kfactura, String nombreArchivo, boolean razonsocial
-			, boolean retencion, mx.gob.sat.cfd._3.Comprobante comprobante, boolean bDirFiscal, Environment env) throws DocumentException, IOException {
+			, boolean retencion, mx.gob.sat.cfd._4.Comprobante comprobante, boolean bDirFiscal, Environment env) throws DocumentException, IOException {
 		String ruta = "";
 		PdfPTable tabDetalleMontos = new PdfPTable(3);
 		PdfPTable tabDatosFactura  = null;
@@ -580,7 +580,7 @@ public class CreacionPDFServiceImpl implements CreacionPDFService{
 	
 	@Override
 	public String CrearPdfMarcaOlab(PdfInfoDto infoPDF,Integer kfactura,String nobreArchivo, 
-			boolean retencion, mx.gob.sat.cfd._3.Comprobante comprobante, boolean bDirFiscal, Environment env) throws DocumentException, IOException, Exception{
+			boolean retencion, mx.gob.sat.cfd._4.Comprobante comprobante, boolean bDirFiscal, Environment env) throws DocumentException, IOException, Exception{
 		log.info("CrearPdfMarcaOlab:::::     " +nobreArchivo);
 		String ruta = "";
 		PdfPTable tabDetalleMontos = new PdfPTable(3);
@@ -892,7 +892,7 @@ public class CreacionPDFServiceImpl implements CreacionPDFService{
 
 	@Override
 	public String CrearPdfMarcaSwiss(PdfInfoDto infoPDF,Integer kfactura, String nombreArchivo, 
-			boolean retencion, mx.gob.sat.cfd._3.Comprobante comprobante, boolean bDirFiscal, Environment env) throws DocumentException, SocketException, IOException{
+			boolean retencion, mx.gob.sat.cfd._4.Comprobante comprobante, boolean bDirFiscal, Environment env) throws DocumentException, SocketException, IOException{
 		String ruta = "";
 		PdfPTable tabDetalleMontos = new PdfPTable(3);
 		PdfPTable tabDatosFactura  = null;
@@ -1167,7 +1167,7 @@ public class CreacionPDFServiceImpl implements CreacionPDFService{
 	
 	@Override
 	public String CrearPdfMarcaLiacsa(PdfInfoDto infoPDF,Integer kfactura, String nombreArchivo, 
-			boolean retencion, mx.gob.sat.cfd._3.Comprobante comprobante, boolean bDirFiscal, Environment env) throws DocumentException, SocketException, IOException{
+			boolean retencion, mx.gob.sat.cfd._4.Comprobante comprobante, boolean bDirFiscal, Environment env) throws DocumentException, SocketException, IOException{
 		String ruta = "";
 		PdfPTable tabDetalleMontos = new PdfPTable(3);
 		PdfPTable tabDatosFactura  = null;
@@ -1439,10 +1439,10 @@ public class CreacionPDFServiceImpl implements CreacionPDFService{
 		return ruta;
 	}
 
-
+	
 	@Override
 	public String CrearPdfMarcaFamilyLabsNorte(PdfInfoDto infoPDF,Integer kfactura, String nombreArchivo, 
-			boolean retencion, mx.gob.sat.cfd._3.Comprobante comprobante, boolean bDirFiscal, Environment env) throws DocumentException, SocketException, IOException{
+			boolean retencion, mx.gob.sat.cfd._4.Comprobante comprobante, boolean bDirFiscal, Environment env) throws DocumentException, SocketException, IOException{
 		String ruta = "";
 		PdfPTable tabDetalleMontos = new PdfPTable(3);
 		PdfPTable tabDatosFactura  = null;
@@ -1464,18 +1464,17 @@ public class CreacionPDFServiceImpl implements CreacionPDFService{
 		
 		
 		
-		Document reporteAzteca = new Document(PageSize.A4, 36, 36, 260,136);
+		Document reporteFamilyLabs = new Document(PageSize.A4, 36, 36, 260,136);
 		FileOutputStream ficheroPdf = null;
-		try {
-			
+		try {			
 			ruta = env.getProperty("path.file.ordenes.pdf.familylabsnorte")+nombreArchivo+".pdf";
 			ficheroPdf = new FileOutputStream(ruta);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 		try {
-			writerSwiss = PdfWriter.getInstance(reporteAzteca, ficheroPdf);
-			writerSwiss.setPageEvent(new TemplateFamilyLabsNorte(infoPDF,comprobante,retencion, bDirFiscal, env));
+			writerSwiss = PdfWriter.getInstance(reporteFamilyLabs, ficheroPdf);
+			writerSwiss.setPageEvent(new TemplateFamilyLabsNorte(infoPDF,comprobante,retencion,bDirFiscal, env));
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -1483,8 +1482,8 @@ public class CreacionPDFServiceImpl implements CreacionPDFService{
 			e.printStackTrace();
 		}
 		
-		reporteAzteca.open();	
-		reporteAzteca.newPage();
+		reporteFamilyLabs.open();	
+		reporteFamilyLabs.newPage();
 		
 		String mntRetenido = "";
 		if(retencion){
@@ -1612,6 +1611,7 @@ public class CreacionPDFServiceImpl implements CreacionPDFService{
 		int bandera = 0;
 		int tamanioCOncepto = comprobante.getConceptos().getConcepto().size();
 
+
 		List<Concepto> listConceptos = comprobante.getConceptos().getConcepto();
 		for (Concepto concepto : listConceptos) {
 			PdfPCell espacioBlanco = new PdfPCell(new Paragraph(" ", fuenteContenidoTab));
@@ -1704,15 +1704,16 @@ public class CreacionPDFServiceImpl implements CreacionPDFService{
 		}
 		   tabDatosFactura.setWidthPercentage(101);
 		   tabDatosFactura.setHorizontalAlignment(0);
-		   reporteAzteca.add(tabDatosFactura);
+		   reporteFamilyLabs.add(tabDatosFactura);
 	    if (tamanioCOncepto == bandera) {
         	PdfContentByte canvas = writerSwiss.getDirectContent();
         	tabDetalleMontos.writeSelectedRows(0, -1, 35f, 200f,canvas);
 		}
-		reporteAzteca.close();
-		
+	    reporteFamilyLabs.close();
+
 		return ruta;
 	}
+
 
 	@Override
 	public String CrearPdfMarcaJennerLogoAzteca(Comprobante comprobante, Integer kfactura, String nombreArchivo,

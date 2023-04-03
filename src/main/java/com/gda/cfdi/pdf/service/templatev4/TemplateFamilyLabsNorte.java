@@ -32,11 +32,12 @@ import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados;
 import mx.gob.sat.cfd._4.Comprobante.Emisor;
 import mx.gob.sat.cfd._4.Comprobante.Receptor;
 import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados.CfdiRelacionado;
+import mx.gob.sat.sitio_internet.cfd.catalogos.CRegimenFiscal;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CTipoDeComprobante;
 import mx.gob.sat.timbrefiscaldigital.TimbreFiscalDigital;
 
-public class TemplateAzteca extends PdfPageEventHelper{
-	private static final Logger log = LoggerFactory.getLogger(TemplateAzteca.class);
+public class TemplateFamilyLabsNorte extends PdfPageEventHelper{
+	private static final Logger log = LoggerFactory.getLogger(TemplateFamilyLabsNorte.class);
 	
 	private Image imagenLogo;
 	PdfPTable tabDirSuc = new PdfPTable(1);
@@ -46,7 +47,7 @@ public class TemplateAzteca extends PdfPageEventHelper{
 	PdfPTable tabPieCFDI = new PdfPTable(2);
 	private Image imagenQr;
 	
-	public TemplateAzteca(Comprobante comprobante, PdfInfoDto infoPDF, Environment env) throws Exception{
+	public TemplateFamilyLabsNorte(Comprobante comprobante, PdfInfoDto infoPDF, Environment env) throws Exception{
 		try {
 			String strDirSucursal = infoPDF.getDirSucursal();
 			CTipoDeComprobante tipoComprobante = comprobante.getTipoDeComprobante();
@@ -73,7 +74,6 @@ public class TemplateAzteca extends PdfPageEventHelper{
 				}
 			}
 			
-			char[] caracteres;
 			SimpleDateFormat parseador = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 			String strFechaExped = comprobante.getLugarExpedicion() +" "+parseador.format(comprobante.getFecha().toGregorianCalendar().getTime());
 			String strFechaCertificacion = parseador.format(timbreFiscalDigital.getFechaTimbrado().toGregorianCalendar().getTime());
@@ -85,20 +85,20 @@ public class TemplateAzteca extends PdfPageEventHelper{
 			String strRFCEmisor = emisor.getRfc();
 			String strConcep = infoPDF.getDescripcionUsoCfdi();
 			String strRFCReceptor = receptor.getRfc();
-			String strDomicFiscalRecep = "";//comprobante.getAdendaDireccion()
 			String strRegFiscal = getRegimen(emisor.getRegimenFiscal());
 			String strRegFiscalReceptor = getRegimen(receptor.getRegimenFiscalReceptor());
-			
 			String strDomicilioFiscalReceptor = receptor.getDomicilioFiscalReceptor();
 			
-			
+			//String strDomicFiscalRecep = "FALTA DATO";
+			System.out.println("direccion:::   "+infoPDF.getDirFiscalEmisor());
 			String strDomicFiscalEmis = infoPDF.getDirFiscalEmisor();
 			String strNomOrdPac = infoPDF.getConsecutivo()+" "+infoPDF.getNombrePaciente();
 			String strCadenaTimbre = "CADENA ORIGINAL DEL COMPLEMENTO DE CERTIFICACION DIGITAL SAT:"+infoPDF.getCadenaOriginal()+" "
 					+ "Sello Digital del SAT: "+timbreFiscalDigital.getSelloSAT()+" CERTIFICADO SAT: "+ timbreFiscalDigital.getNoCertificadoSAT();
 			String uuid = timbreFiscalDigital.getUUID();
 			String sello = comprobante.getSello();
-			
+
+
 			String uuidRelacionado="";
 			String codeTipoRelacionado=null;
 			if(comprobante.getCfdiRelacionados()!=null && comprobante.getCfdiRelacionados().size()>0) {
@@ -110,40 +110,39 @@ public class TemplateAzteca extends PdfPageEventHelper{
 				}
 			}
 			
-			
 			String tipoRelacionado = "";
 			if(codeTipoRelacionado != null){
 				switch (codeTipoRelacionado) {
 				case "01":
-					tipoRelacionado = "Nota de crédito de los documentos relacionados";
+					tipoRelacionado = codeTipoRelacionado+" - Nota de crédito de los documentos relacionados";
 					break;
 				case "02":
-					tipoRelacionado = "Nota de débito de los documentos relacionados";
+					tipoRelacionado = codeTipoRelacionado+" - Nota de débito de los documentos relacionados";
 					break;
 				case "03":
-					tipoRelacionado = "Devolución de mercancía sobre facturas o traslados previos";
+					tipoRelacionado = codeTipoRelacionado+" - Devolución de mercancía sobre facturas o traslados previos";
 					break;
 				case "04":
-					tipoRelacionado = "Sustitución de los CFDI previos";
+					tipoRelacionado = codeTipoRelacionado+" - Sustitución de los CFDI previos";
 					break;
 				case "05":
-					tipoRelacionado = "Traslados de mercancías facturados previamente";
+					tipoRelacionado = codeTipoRelacionado+" - Traslados de mercancías facturados previamente";
 					break;
 				case "06":
-					tipoRelacionado = "Factura generada por los traslados previos";
+					tipoRelacionado = codeTipoRelacionado+" - Factura generada por los traslados previos";
 					break;
 				case "07":
-					tipoRelacionado = "CFDI por aplicación de anticipo";
+					tipoRelacionado = codeTipoRelacionado+" - CFDI por aplicación de anticipo";
 					break;
 				default:
 					break;
 				}
 			}
 			
-			
+			//BaseColor colorLetraEncabezadoImagen = WebColors.getRGBColor("#1F49B6");
 			BaseColor colorLetraEncabezados = WebColors.getRGBColor("#FFFFFF");
-			BaseColor colorFondoTituloFact = WebColors.getRGBColor("#005CB9");
-			BaseColor colorFondoContenidoFact = WebColors.getRGBColor("#E0E8F7");			
+			BaseColor colorFondoTituloFact = WebColors.getRGBColor("#1F49B6");
+			BaseColor colorFondoContenidoFact = WebColors.getRGBColor("#F4F4F9");			
 			Font fuenteDirSucur = new Font(Font.FontFamily.HELVETICA,7,Font.NORMAL,BaseColor.BLACK);
 			Font fuenteImport = new Font(Font.FontFamily.HELVETICA,7,Font.BOLD,BaseColor.BLACK);
 			Font fuenteImportPie = new Font(Font.FontFamily.HELVETICA,5,Font.BOLD,BaseColor.BLACK);
@@ -154,18 +153,19 @@ public class TemplateAzteca extends PdfPageEventHelper{
 			Font fuenteTimbrado = new Font(Font.FontFamily.HELVETICA,4,Font.NORMAL,BaseColor.BLACK);
 			Font fuenteTimbradoImpor = new Font(Font.FontFamily.HELVETICA,4,Font.BOLD,BaseColor.BLACK);
 			
-			/*rutapruebas*/// imagenLogo = Image.getInstance("C:/Users/Desarrollo_GDA/documentos Timbrado/imgs/AZTECA.png");
-			/*rutaproduccion*/ imagenLogo = Image.getInstance(env.getProperty("path.file.logo.azteca"));
-			imagenLogo.setAbsolutePosition(400,730f);           
-            imagenLogo.scaleAbsoluteWidth(160f);
-            imagenLogo.scaleAbsoluteHeight(75f);             
+			
+			
+			/*rutaproduccion*/ imagenLogo = Image.getInstance(env.getProperty("path.file.logo.familylabsnorte"));
+			imagenLogo.setAbsolutePosition(370, 730f);           
+            imagenLogo.scaleAbsoluteWidth(200f);
+            imagenLogo.scaleAbsoluteHeight(90f);             
 			///////////////////////////////////////////////////////////////////////////////////////////////
 			//////////////////	Direccion del PDF
 			///////////////////////////////////////////////////////////////////////////////////////////////            
-            PdfPCell direccionSucursal = new PdfPCell(new Paragraph(strDirSucursal,fuenteDirSucur));
+            PdfPCell direccionSucursal = new PdfPCell(new Paragraph("  ",fuenteDirSucur));
             direccionSucursal.setBorder(Rectangle.UNDEFINED);
             tabDirSuc.addCell(direccionSucursal);
-            tabDirSuc.setTotalWidth(350);            
+            tabDirSuc.setTotalWidth(350);                   
 			///////////////////////////////////////////////////////////////////////////////////////////////
 			//////////////////	Detalle Encabezado Version / CFDI
 			///////////////////////////////////////////////////////////////////////////////////////////////            
@@ -177,7 +177,7 @@ public class TemplateAzteca extends PdfPageEventHelper{
             datosFolioSer.add(datoFolioSer);
             PdfPCell pcFolioSerie = new PdfPCell(datosFolioSer);
             
-            Chunk tipoComp = new Chunk("Tipo de comprobante: ",fuenteDirSucur);            
+            Chunk tipoComp = new Chunk("Tipo de comprobante: ",fuenteDirSucur);
             Chunk datotipoComp = new Chunk(strTipoCompr,fuenteImport);
             Paragraph datostipoComp = new Paragraph();
             datostipoComp.add(tipoComp);
@@ -268,7 +268,7 @@ public class TemplateAzteca extends PdfPageEventHelper{
             datosReceptor.setLeading(30);
             PdfPCell pcRFCReceptor = new PdfPCell(datosRFCReceptor);
             
-            Chunk RegimenEmisor = new Chunk("Régimen fiscal: ",fuenteContenidoTab);
+            Chunk RegimenEmisor = new Chunk("Régimen: ",fuenteContenidoTab);
             Chunk datoRegimenEmisor = new Chunk(strRegFiscal,fuenteContenidoImporTab);
             Paragraph datosRegimenEmisor = new Paragraph();
             datosRegimenEmisor.add(RegimenEmisor);
@@ -278,19 +278,20 @@ public class TemplateAzteca extends PdfPageEventHelper{
             PdfPCell pcEmisorSeccion1 = new PdfPCell(new Paragraph("",fuenteContenidoImporTab));
             PdfPCell pcEmisorSeccion2 = new PdfPCell(new Paragraph("",fuenteContenidoImporTab));
             
-          //DESCOMENTAR Chunk DomicilioReceptor = new Chunk("Domicilio fiscal: ",fuenteContenidoTab);
-          //DESCOMENTAR Chunk datoDomicilioReceptor = new Chunk(strDomicFiscalRecep,fuenteContenidoImporTab);
-          //DESCOMENTAR Paragraph datosDomicilioReceptor = new Paragraph();
-          //DESCOMENTAR datosDomicilioReceptor.add(DomicilioReceptor);
-          //DESCOMENTAR datosDomicilioReceptor.add(datoDomicilioReceptor);
-          //DESCOMENTAR PdfPCell pcDomicilioReceptor = new PdfPCell(datosDomicilioReceptor);
-            
-          //DESCOMENTAR Chunk DomicilioEmisor = new Chunk("Domicilio fiscal: ",fuenteContenidoTab);
-          //DESCOMENTAR  Chunk datoDomicilioEmisor = new Chunk(strDomicFiscalEmis,fuenteContenidoImporTab);
-          //DESCOMENTAR  Paragraph datosDomicilioEmisor = new Paragraph();
-          //DESCOMENTAR  datosDomicilioEmisor.add(DomicilioEmisor);
-          //DESCOMENTAR  datosDomicilioEmisor.add(datoDomicilioEmisor);            
-          //DESCOMENTAR  PdfPCell pcDomicilioEmisor = new PdfPCell(datosDomicilioEmisor);
+//            System.out.println("Direccion::::---->>>>>>   "+comprobante.getAdendaDireccion());
+//            Chunk DomicilioReceptor = new Chunk("Domicilio fiscal: ",fuenteContenidoTab);
+//            Chunk datoDomicilioReceptor = new Chunk(comprobante.getAdendaDireccion(),fuenteContenidoImporTab);
+//            Paragraph datosDomicilioReceptor = new Paragraph();
+//            datosDomicilioReceptor.add(DomicilioReceptor);
+//            datosDomicilioReceptor.add(datoDomicilioReceptor);
+//            PdfPCell pcDomicilioReceptor = new PdfPCell(datosDomicilioReceptor);
+//            
+//            Chunk DomicilioEmisor = new Chunk("Domicilio fiscal: ",fuenteContenidoTab);
+//            Chunk datoDomicilioEmisor = new Chunk(strDomicFiscalEmis.toUpperCase(),fuenteContenidoImporTab);
+//            Paragraph datosDomicilioEmisor = new Paragraph();
+//            datosDomicilioEmisor.add(DomicilioEmisor);
+//            datosDomicilioEmisor.add(datoDomicilioEmisor);            
+//            PdfPCell pcDomicilioEmisor = new PdfPCell(datosDomicilioEmisor);
 
             PdfPCell pcNumOrdenPaciente = new PdfPCell(new Paragraph(strNomOrdPac,fuenteContenidoImporTab));
             
@@ -315,8 +316,8 @@ public class TemplateAzteca extends PdfPageEventHelper{
             pcRegimenEmisor.setPaddingLeft(7);
             pcEmisorSeccion1.setPaddingLeft(7);
             pcEmisorSeccion2.setPaddingLeft(7);
-          //DESCOMENTAR  pcDomicilioReceptor.setPaddingLeft(7);
-          //DESCOMENTAR  pcDomicilioEmisor.setPaddingLeft(7);
+//            pcDomicilioReceptor.setPaddingLeft(7);
+//            pcDomicilioEmisor.setPaddingLeft(7);
             pcNumOrdenPaciente.setPaddingLeft(7);
             pcRegimenFiscalReceptor.setPaddingLeft(7);
             pcDomFiscalReceptor.setPaddingLeft(7);
@@ -332,8 +333,8 @@ public class TemplateAzteca extends PdfPageEventHelper{
             pcRegimenEmisor.setBackgroundColor(colorFondoContenidoFact);
             pcEmisorSeccion1.setBackgroundColor(colorFondoContenidoFact);
             pcEmisorSeccion2.setBackgroundColor(colorFondoContenidoFact);
-          //DESCOMENTAR pcDomicilioReceptor.setBackgroundColor(colorFondoContenidoFact);
-          //DESCOMENTAR  pcDomicilioEmisor.setBackgroundColor(colorFondoContenidoFact);
+//            pcDomicilioReceptor.setBackgroundColor(colorFondoContenidoFact);
+//            pcDomicilioEmisor.setBackgroundColor(colorFondoContenidoFact);
             pcNumOrdenPaciente.setBackgroundColor(colorFondoContenidoFact);
             pcRegimenFiscalReceptor.setBackgroundColor(colorFondoContenidoFact);
             pcDomFiscalReceptor.setBackgroundColor(colorFondoContenidoFact);
@@ -348,8 +349,8 @@ public class TemplateAzteca extends PdfPageEventHelper{
             pcRegimenEmisor.setBorder(Rectangle.UNDEFINED);
             pcEmisorSeccion1.setBorder(Rectangle.UNDEFINED);
             pcEmisorSeccion2.setBorder(Rectangle.UNDEFINED);
-          //DESCOMENTAR pcDomicilioReceptor.setBorder(Rectangle.UNDEFINED);
-          //DESCOMENTAR  pcDomicilioEmisor.setBorder(Rectangle.UNDEFINED);
+//            pcDomicilioReceptor.setBorder(Rectangle.UNDEFINED);
+//            pcDomicilioEmisor.setBorder(Rectangle.UNDEFINED);
             pcNumOrdenPaciente.setBorder(Rectangle.UNDEFINED);
             pcRegimenFiscalReceptor.setBorder(Rectangle.UNDEFINED);
             pcDomFiscalReceptor.setBorder(Rectangle.UNDEFINED);
@@ -362,8 +363,8 @@ public class TemplateAzteca extends PdfPageEventHelper{
             tabDetalleFact.addCell(pcRFCEmisor);
             tabDetalleFact.addCell(pcRFCReceptor);
             tabDetalleFact.addCell(pcRegimenEmisor);
-          //DESCOMENTAR tabDetalleFact.addCell(pcDomicilioReceptor);
-          //DESCOMENTAR  tabDetalleFact.addCell(pcDomicilioEmisor);
+//            tabDetalleFact.addCell(pcDomicilioReceptor);
+//            tabDetalleFact.addCell(pcDomicilioEmisor);
             tabDetalleFact.addCell(pcRegimenFiscalReceptor);
             tabDetalleFact.addCell(pcEmisorSeccion1);
             tabDetalleFact.addCell(pcDomFiscalReceptor);
@@ -372,15 +373,17 @@ public class TemplateAzteca extends PdfPageEventHelper{
             tabDetalleFact.addCell(pcLineas);
             tabDetalleFact.addCell(pcLineasII);
             tabDetalleFact.setTotalWidth(530);
+            
 			///////////////////////////////////////////////////////////////////////////////////////////////
 			////////////////// Encabezado de Detalle de Factura
 			///////////////////////////////////////////////////////////////////////////////////////////////
+            
             PdfPCell pcClavePro = new PdfPCell(new Paragraph("\r\n CLAVE \r\n PRODUCTO \r\n / SERVICIO", fuenteTituloTabDetalle));
             PdfPCell pcCodigo = new PdfPCell(new Paragraph("\r\nNÚMERO \r\n DE ORDEN",fuenteTituloTabDetalle));
             PdfPCell pcCantidad = new PdfPCell(new Paragraph("\r\n \r\nCANTIDAD",fuenteTituloTabDetalle));
             PdfPCell pcClaveUnidad = new PdfPCell(new Paragraph("\r\n CLAVE \r\n UNIDAD",fuenteTituloTabDetalle));
             PdfPCell pcValorUni = new PdfPCell(new Paragraph("\r\n VALOR \r\n UNTARIO",fuenteTituloTabDetalle));
-            PdfPCell pcDescuento = new PdfPCell(new Paragraph("\r\n \r\n DESCUENTO",fuenteTituloTabDetalle));
+            PdfPCell pcDescuento = new PdfPCell(new Paragraph("\r\n \r\n IVA",fuenteTituloTabDetalle));
             PdfPCell pcImporte = new PdfPCell(new Paragraph("\r\n \r\n IMPORTE",fuenteTituloTabDetalle));
             pcClavePro.setBackgroundColor(colorFondoTituloFact);
             pcCodigo.setBackgroundColor(colorFondoTituloFact);
@@ -438,27 +441,27 @@ public class TemplateAzteca extends PdfPageEventHelper{
 //            String imgCrearQr = "?re="+strRFCEmisor+"&rr="+strRFCReceptor+"&tt="+comprobante.getTotal().toString()+"&id="+uuid;
             String imgCrearQr = "https://verificacfdi.facturaelectronica.sat.gob.mx/?id="+uuid+"&re="+strRFCEmisor+"&rr="+strRFCReceptor+
             		"&tt="+comprobante.getTotal().toString()+"&fe="+timbreFiscalDigital.getSelloCFD().substring(timbreFiscalDigital.getSelloCFD().length()-8, timbreFiscalDigital.getSelloCFD().length());
-            /*rutaproduccion*/ File f = new File(env.getProperty("path.file.qr"));
-            GenerarQRCode qrCode = new GenerarQRCode();
-            qrCode.generateQR(f, imgCrearQr, 600, 600);
-            
-            /*rutaproduccion*/ imagenQr = Image.getInstance(env.getProperty("path.file.qr")); 
-            imagenQr.setAbsolutePosition(32, 60f);         
+            /*rutaproduccion*/ File f = new File(env.getProperty("path.file.qr")); 
+	      	GenerarQRCode qrCode = new GenerarQRCode();
+	      	qrCode.generateQR(f, imgCrearQr, 600, 600);
+          
+      		/*rutaproduccion*/ imagenQr = Image.getInstance(env.getProperty("path.file.qr"));
+      		imagenQr.setAbsolutePosition(32, 60f);         
 			imagenQr.scaleAbsoluteWidth(97.06f);
 			imagenQr.scaleAbsoluteHeight(97.06f);
-            
-            PdfPCell pcTituloCFDI = new PdfPCell(new Paragraph("CFDI RELACIONADO",fuenteImportPie));
+			
+			 PdfPCell pcTituloCFDI = new PdfPCell(new Paragraph("CFDI RELACIONADO",fuenteImportPie));
             pcTituloCFDI.setHorizontalAlignment(Element.ALIGN_CENTER);
             pcTituloCFDI.setColspan(2);
             PdfPCell pcTituloRelacionCFDI = new PdfPCell(new Paragraph(" ",fuenteImportPie));
             pcTituloRelacionCFDI.setHorizontalAlignment(Element.ALIGN_LEFT);
-            PdfPCell pcTituloCFDIRelacionado = new PdfPCell(new Paragraph(" ",fuenteImportPie));
+            PdfPCell pcTituloCFDIRelacionado = new PdfPCell(new Paragraph("  ",fuenteImportPie));
             pcTituloCFDIRelacionado.setHorizontalAlignment(Element.ALIGN_RIGHT);
             PdfPCell pcTimbre = new PdfPCell(new Paragraph(strCadenaTimbre,fuenteTimbrado));
             pcTimbre.setMinimumHeight(35);
             pcTimbre.setHorizontalAlignment(Element.ALIGN_LEFT);
-            pcTimbre.setColspan(2);   
-            
+            pcTimbre.setColspan(2);        
+         
             PdfPCell uuidRelacionados = null;
             if(comprobante.getCfdiRelacionados() != null && comprobante.getCfdiRelacionados().size()>0) {
             	List<CfdiRelacionado> listRelacionados = comprobante.getCfdiRelacionados().get(0).getCfdiRelacionado();
@@ -487,18 +490,18 @@ public class TemplateAzteca extends PdfPageEventHelper{
             pcLeyendaDoc.setColspan(2);
             pcTituloCFDI.setBorder(Rectangle.UNDEFINED);
             pcTituloRelacionCFDI.setBorder(Rectangle.UNDEFINED);
+            pcTituloCFDIRelacionado.setBorder(Rectangle.UNDEFINED);
             if(uuidRelacionados != null){
             	uuidRelacionados.setBorder(Rectangle.UNDEFINED);
-            }            
-            pcTituloCFDIRelacionado.setBorder(Rectangle.UNDEFINED);
+            }
             pcTimbre.setBorder(Rectangle.UNDEFINED);
             pcFolioFiscal.setBorder(Rectangle.UNDEFINED);
             pcNoSerieSAT.setBorder(Rectangle.UNDEFINED);
             pcLeyendaDoc.setBorder(Rectangle.UNDEFINED);
             pcCertEmisor.setBorder(Rectangle.UNDEFINED);
             pcLeyendaDoc.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            
-            tabPieCFDI.setTotalWidth(445);
+			
+			tabPieCFDI.setTotalWidth(445);
             tabPieCFDI.addCell(pcTituloCFDI);
             tabPieCFDI.addCell(pcTituloRelacionCFDI);
             tabPieCFDI.addCell(pcTituloCFDIRelacionado);

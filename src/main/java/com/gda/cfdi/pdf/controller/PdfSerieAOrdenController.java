@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gda.cfdi.pdf.exception.ResponseErrorDto;
 import com.gda.cfdi.pdf.service.PdfSerieAOrdenService;
 import com.gda.cfdi.pdf.service.PdfSerieAService;
+import com.gda.cfdi.pdf.service.PdfService;
 
 @RestController
 @RequestMapping(value = "/gda/service-pdf")
@@ -21,13 +22,13 @@ public class PdfSerieAOrdenController {
 	private static final Logger log = LoggerFactory.getLogger(PdfSerieAOrdenController.class);
 	
 	@Autowired
-	private PdfSerieAOrdenService pdfSerieAOrdenService;
+	private PdfService pdfService;
 	
 	@GetMapping("/pdf-serie-a-orden")
 	public ResponseEntity<?> getXmlOrden(@RequestParam("kfactura") Integer kfactura, @RequestParam("isDescuento") boolean isDescuento, 
 			@RequestParam("notaDescuento") String notaDescuento, @RequestParam("isRetencion") boolean isRetencion){
 		try {			
-			return new ResponseEntity<String>(pdfSerieAOrdenService.generarPdfOrden(kfactura, isDescuento, notaDescuento, isRetencion), HttpStatus.OK);
+			return new ResponseEntity<String>(pdfService.generarPdfOrden(kfactura, isDescuento, notaDescuento, isRetencion), HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			ResponseErrorDto dto = new ResponseErrorDto();

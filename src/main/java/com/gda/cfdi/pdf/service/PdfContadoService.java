@@ -94,6 +94,8 @@ public class PdfContadoService {
 					centidadlegal = 6;
 				}else if (cmarca == 15) {
 					centidadlegal = 6;
+				}else if (cmarca == 19) {
+					centidadlegal = 19;
 				}
 				
 				String dirEmisorSucursal = consultaService.getDireccionFiscalEmisor(centidadlegal);
@@ -130,6 +132,10 @@ public class PdfContadoService {
 					case 7:
 						log.info("JENNER*****");
 						ruta = iTemplatePdfServiceV4.CrearPdfMarcaJenner(comprobante, infoPDF,env);
+						break;
+					case 19:
+						log.info("FamilyLabsNorte*****");
+						ruta = iTemplatePdfServiceV4.CrearPdfMarcaFamilyLabsNorte(comprobante, infoPDF,env);
 						break;
 					default:
 						break;
@@ -202,6 +208,8 @@ public class PdfContadoService {
 					centidadlegal = 6;
 				}else if (cmarca == 15) {
 					centidadlegal = 6;
+				}else if (cmarca == 19) {
+					centidadlegal = 19;
 				}
 				
 				String dirEmisorSucursal = consultaService.getDireccionFiscalEmisor(centidadlegal);
@@ -238,6 +246,10 @@ public class PdfContadoService {
 					case 7:
 						log.info("JENNER*****");
 						ruta = iTemplatePdfServiceV3.CrearPdfMarcaJenner(comprobante, infoPDF,env);
+						break;
+					case 19:
+						log.info("FamilyLabsNorte*****");
+						ruta = iTemplatePdfServiceV3.CrearPdfMarcaFamilyLabsNorte(comprobante, infoPDF,env);
 						break;
 					default:
 						break;

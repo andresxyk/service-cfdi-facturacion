@@ -14,6 +14,7 @@ import com.gda.cfdi.pdf.exception.ResponseErrorDto;
 import com.gda.cfdi.pdf.service.PdfComplementoPagoService;
 import com.gda.cfdi.pdf.service.PdfSerieAOrdenService;
 import com.gda.cfdi.pdf.service.PdfSerieAService;
+import com.gda.cfdi.pdf.service.PdfService;
 
 @RestController
 @RequestMapping(value = "/gda/service-pdf")
@@ -22,12 +23,12 @@ public class PdfComplementoPagoController {
 	private static final Logger log = LoggerFactory.getLogger(PdfComplementoPagoController.class);
 	
 	@Autowired
-	private PdfComplementoPagoService pdfComplementoPagoService;
+	private PdfService pdfService;
 	
 	@GetMapping("/pdf-complemento-pago")
 	public ResponseEntity<?> getXmlOrden(@RequestParam("kfactura") Integer kfactura, @RequestParam("bReturnBase64") Boolean bReturnBase64){
 		try {			
-			return new ResponseEntity<String>(pdfComplementoPagoService.generarPdfOrden(kfactura, bReturnBase64), HttpStatus.OK);
+			return new ResponseEntity<String>(pdfService.generarPdfComplementoPago(kfactura, bReturnBase64), HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			ResponseErrorDto dto = new ResponseErrorDto();

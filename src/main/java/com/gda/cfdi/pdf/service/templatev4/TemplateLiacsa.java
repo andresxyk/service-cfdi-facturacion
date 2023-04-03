@@ -85,8 +85,8 @@ public class TemplateLiacsa extends PdfPageEventHelper{
 			String strRFCEmisor = emisor.getRfc();
 			String strConcep = infoPDF.getDescripcionUsoCfdi();
 			String strRFCReceptor = receptor.getRfc();
-			String strRegFiscal = emisor.getRegimenFiscal();
-			String strRegFiscalReceptor = receptor.getRegimenFiscalReceptor();
+			String strRegFiscal = getRegimen(emisor.getRegimenFiscal());
+			String strRegFiscalReceptor = getRegimen(receptor.getRegimenFiscalReceptor());
 			String strDomicilioFiscalReceptor = receptor.getDomicilioFiscalReceptor();
 			
 			//String strDomicFiscalRecep = "FALTA DATO";
@@ -236,14 +236,14 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             PdfPCell pcLineas = new PdfPCell(new Paragraph("\r\n", fuenteTituloTab));
             PdfPCell pcLineasII = new PdfPCell(new Paragraph("\r\n",fuenteTituloTab));
             
-            Chunk NomEmisor = new Chunk("Nombre del Emisor: ",fuenteContenidoTab);
+            Chunk NomEmisor = new Chunk("Nombre: ",fuenteContenidoTab);
             Chunk datoNomEmisor = new Chunk(strNomEmisor,fuenteContenidoImporTab);
             Paragraph datosEmisor = new Paragraph();
             datosEmisor.add(NomEmisor);
             datosEmisor.add(datoNomEmisor);
             PdfPCell pcNomEmisor = new PdfPCell(datosEmisor);
             
-            Chunk NomReceptor = new Chunk("Nombre del Receptor: ",fuenteContenidoTab);
+            Chunk NomReceptor = new Chunk("Nombre: ",fuenteContenidoTab);
             Chunk datoNomReceptor = new Chunk(strNomReceptor,fuenteContenidoImporTab);
             Paragraph datosReceptor = new Paragraph();
             datosReceptor.add(NomReceptor);
@@ -251,7 +251,7 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             datosReceptor.setLeading(30);
             PdfPCell pcNomReceptor = new PdfPCell(datosReceptor);
             
-            Chunk RFCEmisor = new Chunk("RFC Emisor: ",fuenteContenidoTab);
+            Chunk RFCEmisor = new Chunk("RFC: ",fuenteContenidoTab);
             Chunk datoRFCEmisor = new Chunk(strRFCEmisor,fuenteContenidoImporTab);
             Paragraph datosRFCEmisor = new Paragraph();
             datosRFCEmisor.add(RFCEmisor);
@@ -259,7 +259,7 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             datosRFCEmisor.setLeading(30);
             PdfPCell pcRFCEmisor = new PdfPCell(datosRFCEmisor);
             
-            Chunk RFCReceptor = new Chunk("RFC Receptor: ",fuenteContenidoTab);
+            Chunk RFCReceptor = new Chunk("RFC: ",fuenteContenidoTab);
             Chunk datoRFCReceptor = new Chunk(strRFCReceptor,fuenteContenidoImporTab);
             Paragraph datosRFCReceptor = new Paragraph();
             datosRFCReceptor.add(RFCReceptor);
@@ -268,7 +268,7 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             PdfPCell pcRFCReceptor = new PdfPCell(datosRFCReceptor);
             
             Chunk RegimenEmisor = new Chunk("Régimen fiscal: ",fuenteContenidoTab);
-            Chunk datoRegimenEmisor = new Chunk(strRegFiscal+" RÉGIMEN GENERAL DE LEY",fuenteContenidoImporTab);
+            Chunk datoRegimenEmisor = new Chunk(strRegFiscal,fuenteContenidoImporTab);
             Paragraph datosRegimenEmisor = new Paragraph();
             datosRegimenEmisor.add(RegimenEmisor);
             datosRegimenEmisor.add(datoRegimenEmisor);
@@ -294,14 +294,14 @@ public class TemplateLiacsa extends PdfPageEventHelper{
 
             PdfPCell pcNumOrdenPaciente = new PdfPCell(new Paragraph(strNomOrdPac,fuenteContenidoImporTab));
             
-            Chunk RegimenReceptor = new Chunk("Régimen Fiscal Receptor: ",fuenteContenidoTab);
+            Chunk RegimenReceptor = new Chunk("Régimen Fiscal: ",fuenteContenidoTab);
             Chunk datoRegimenReceptor = new Chunk(strRegFiscalReceptor,fuenteContenidoImporTab);
             Paragraph datosRegimenReceptor = new Paragraph();
             datosRegimenReceptor.add(RegimenReceptor);
             datosRegimenReceptor.add(datoRegimenReceptor);
             PdfPCell pcRegimenFiscalReceptor = new PdfPCell(datosRegimenReceptor);
             
-            Chunk DomFiscalReceptor = new Chunk("Domicilio Fiscal Receptor: ",fuenteContenidoTab);
+            Chunk DomFiscalReceptor = new Chunk("Domicilio Fiscal: ",fuenteContenidoTab);
             Chunk datoDomFiscalReceptor = new Chunk(strDomicilioFiscalReceptor,fuenteContenidoImporTab);
             Paragraph datosDomFiscalReceptor = new Paragraph();
             datosDomFiscalReceptor.add(DomFiscalReceptor);
@@ -355,8 +355,8 @@ public class TemplateLiacsa extends PdfPageEventHelper{
             pcDomFiscalReceptor.setBorder(Rectangle.UNDEFINED);
             tabDetalleFact.addCell(pcDatosEmisor);
             tabDetalleFact.addCell(pcDatosReceptor);
-            tabDetalleFact.addCell(pcLineas);
-            tabDetalleFact.addCell(pcLineasII);
+//            tabDetalleFact.addCell(pcLineas);
+//            tabDetalleFact.addCell(pcLineasII);
             tabDetalleFact.addCell(pcNomEmisor);
             tabDetalleFact.addCell(pcNomReceptor);
             tabDetalleFact.addCell(pcRFCEmisor);
@@ -437,10 +437,12 @@ public class TemplateLiacsa extends PdfPageEventHelper{
 			///////////////////////////////////////////////////////////////////////////////////////////////
 			////////////////// Pie de Pagina 
 			///////////////////////////////////////////////////////////////////////////////////////////////
-            String imgCrearQr = "?re="+strRFCEmisor+"&rr="+strRFCReceptor+"&tt="+comprobante.getTotal().toString()+"&id="+uuid;
+//            String imgCrearQr = "?re="+strRFCEmisor+"&rr="+strRFCReceptor+"&tt="+comprobante.getTotal().toString()+"&id="+uuid;
+            String imgCrearQr = "https://verificacfdi.facturaelectronica.sat.gob.mx/?id="+uuid+"&re="+strRFCEmisor+"&rr="+strRFCReceptor+
+            		"&tt="+comprobante.getTotal().toString()+"&fe="+timbreFiscalDigital.getSelloCFD().substring(timbreFiscalDigital.getSelloCFD().length()-8, timbreFiscalDigital.getSelloCFD().length());
             /*rutaproduccion*/ File f = new File(env.getProperty("path.file.qr")); 
-      	GenerarQRCode qrCode = new GenerarQRCode();
-      	qrCode.generateQR(f, imgCrearQr, 600, 600);
+	      	GenerarQRCode qrCode = new GenerarQRCode();
+	      	qrCode.generateQR(f, imgCrearQr, 600, 600);
           
       		/*rutaproduccion*/ imagenQr = Image.getInstance(env.getProperty("path.file.qr"));
       		imagenQr.setAbsolutePosition(32, 60f);         
@@ -527,5 +529,84 @@ public class TemplateLiacsa extends PdfPageEventHelper{
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public String getRegimen(String code) {
+		String strRegFiscalReceptor = "";
+		switch (code) {
+		case "601":
+			strRegFiscalReceptor = "601 - GENERAL DE LEY PERSONAS MORALES";
+			break;
+		case "603":
+			strRegFiscalReceptor = "603 - PERSONAS MORALES CON FINES NO LUCRATIVOS";
+			break;
+		case "605":
+			strRegFiscalReceptor = "605 - SUELDOS Y SALARIOS E INGRESOS ASIMILADOS A SALARIOS";
+			break;
+		case "606":
+			strRegFiscalReceptor = "606 - ARRENDAMIENTO";
+			break;
+		case "608":
+			strRegFiscalReceptor = "608 - DEMAS INGRESOS";
+			break;
+		case "609":
+			strRegFiscalReceptor = "609 - CONSOLIDACION";
+			break;
+		case "610":
+			strRegFiscalReceptor = "610 - RESIDENTES EN EL EXTRANJERO SIN ESTABLECIMIENTO PERMANENTE EN MEXICO";
+			break;
+		case "611":
+			strRegFiscalReceptor = "611 - INGRESOS POR DIVIDENDOS (SOCIOS Y ACCIONISTAS)";
+			break;
+		case "612":
+			strRegFiscalReceptor = "612 - PERSONAS FISICAS CON ACTIVIDADES EMPRESARIALES Y PROFESIONALES";
+			break;
+		case "614":
+			strRegFiscalReceptor = "614 - INGRESOS POR INTERESES";
+			break;
+		case "616":
+			strRegFiscalReceptor = "616 - SIN OBLIGACIONES FISCALES";
+			break;
+		case "620":
+			strRegFiscalReceptor = "620 - SOCIEDADES COOPERATIVAS DE PRODUCCION QUE OPTAN POR DIFERIR SUS INGRESOS";
+			break;
+		case "621":
+			strRegFiscalReceptor = "621 - INCORPORACION FISCAL";
+			break;
+		case "622":
+			strRegFiscalReceptor = "622 - ACTIVIDADES AGRICOLAS, GANADERAS, SILVICOLAS Y PESQUERAS";
+			break;
+		case "623":
+			strRegFiscalReceptor = "623 - OPCIONAL PARA GRUPOS DE SOCIEDADES";
+			break;
+		case "624":
+			strRegFiscalReceptor = "624 - COORDINADOS";
+			break;
+		case "628":
+			strRegFiscalReceptor = "628 - HIDROCARBUROS";
+			break;
+		case "607":
+			strRegFiscalReceptor = "607 - REGIMEN DE ENAJENACION O ADQUISICION DE BIENES";
+			break;
+		case "629":
+			strRegFiscalReceptor = "629 - DE LOS REGIMENES FISCALES PREFERENTES Y DE LAS EMPRESAS MULTINACIONALES";
+			break;
+		case "630":
+			strRegFiscalReceptor = "630 - ENAJENACION DE ACCIONES EN BOLSA DE VALORES";
+			break;
+		case "615":
+			strRegFiscalReceptor = "615 - REGIMEN DE LOS INGRESOS POR OBTENCION DE PREMIOS";
+			break;
+		case "625":
+			strRegFiscalReceptor = "625 - REGIMEN DE LAS ACTIVIDADES EMPRESARIALES CON INGRESOS A TRAVES DE PLATAFORMAS TECNOLOGICAS";
+			break;
+		case "626":
+			strRegFiscalReceptor = "626 - REGIMEN SIMPLIFICADO DE CONFIANZA";
+			break;
+			
+		default:
+			break;
+		}		
+		return strRegFiscalReceptor;
 	}
 }
