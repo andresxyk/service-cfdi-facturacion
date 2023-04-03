@@ -67,7 +67,6 @@ import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados.CfdiRelacionado;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.ACuentaTerceros;
-import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.ComplementoConcepto;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados.Traslado;

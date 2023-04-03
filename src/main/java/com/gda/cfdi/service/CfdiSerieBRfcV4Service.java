@@ -2,8 +2,6 @@ package com.gda.cfdi.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,28 +15,30 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.gda.cfdi.controller.CfdiController;
-import com.gda.cfdi.dto.AnticipadaSerieADto;
 import com.gda.cfdi.dto.CUsoCfdiDto;
 import com.gda.cfdi.dto.ConceptoDto;
 import com.gda.cfdi.dto.ConceptosExamenes;
 import com.gda.cfdi.dto.DatosFiscales;
 import com.gda.cfdi.dto.DatosMarcaDto;
+import com.gda.cfdi.dto.SerieBConvenioDto;
+import com.gda.cfdi.dto.SerieBRfcDto;
+import com.gda.cfdi.dto.TDatoFiscalDto;
 import com.gda.cfdi.dto.TFacturaEntity;
 import com.gda.cfdi.dto.TFacturaEntityDto;
 
-import mx.gob.sat.cfd._3.Comprobante;
-import mx.gob.sat.cfd._3.ObjectFactory;
-import mx.gob.sat.cfd._3.Comprobante.CfdiRelacionados;
-import mx.gob.sat.cfd._3.Comprobante.CfdiRelacionados.CfdiRelacionado;
-import mx.gob.sat.cfd._3.Comprobante.Conceptos;
-import mx.gob.sat.cfd._3.Comprobante.Conceptos.Concepto;
-import mx.gob.sat.cfd._3.Comprobante.Conceptos.Concepto.Impuestos;
-import mx.gob.sat.cfd._3.Comprobante.Conceptos.Concepto.Impuestos.Retenciones;
-import mx.gob.sat.cfd._3.Comprobante.Conceptos.Concepto.Impuestos.Retenciones.Retencion;
-import mx.gob.sat.cfd._3.Comprobante.Conceptos.Concepto.Impuestos.Traslados;
-import mx.gob.sat.cfd._3.Comprobante.Conceptos.Concepto.Impuestos.Traslados.Traslado;
-import mx.gob.sat.cfd._3.Comprobante.Emisor;
-import mx.gob.sat.cfd._3.Comprobante.Receptor;
+import mx.gob.sat.cfd._4.Comprobante;
+import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados;
+import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados.CfdiRelacionado;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Retenciones;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Retenciones.Retencion;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados.Traslado;
+import mx.gob.sat.cfd._4.Comprobante.Emisor;
+import mx.gob.sat.cfd._4.Comprobante.Receptor;
+import mx.gob.sat.cfd._4.ObjectFactory;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CMetodoPago;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CMoneda;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CTipoDeComprobante;
@@ -46,7 +46,7 @@ import mx.gob.sat.sitio_internet.cfd.catalogos.CTipoFactor;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CUsoCFDI;
 
 @Service
-public class CfdiSerieAService {
+public class CfdiSerieBRfcV4Service {
 	private static final Logger log = LoggerFactory.getLogger(CfdiController.class);
 
 	@Autowired
@@ -57,20 +57,24 @@ public class CfdiSerieAService {
 
 	@Autowired
 	private UtilsService utilsService;
+	
+	@Autowired
+	private UtilsCfdi4Service utilsCfdi4Service;
 
-	public TFacturaEntityDto generarCfdiSerieA(AnticipadaSerieADto serieADto) throws Exception {
+	public TFacturaEntityDto generarCfdiSerieB(SerieBRfcDto serieBDto) throws Exception {
 		try {
 			Boolean isRFC = false;
-			String convenioRfc = serieADto.getIdConvenio().toString();
-			DatosFiscales datosFiscales = consultaService.obtenerDatosFiscalesByCConvenio(serieADto.getIdConvenio());
+			String convenioRfc = serieBDto.getRfc();
+			DatosFiscales datosFiscales = consultaService.obtenerDatosFiscalesByCConvenioAndBconvenio(Integer.valueOf(serieBDto.getIdDatoFiscal()),false);
 			List<CUsoCfdiDto> listUsoCFDI = null;
-			String usoCFDI = serieADto.getIdUsoCfdi();
-			Integer marca = serieADto.getIdMarca();
-			String subtotal = serieADto.getSubTotal();
-			String formaPago = serieADto.getFormaPago();
-			String metodoPago = serieADto.getMetodoPago();
+			String usoCFDI = serieBDto.getIdUsoCfdi();
+			Integer marca = serieBDto.getIdMarca();
+			String subtotal = serieBDto.getMontoTotal();
+			String formaPago = serieBDto.getFormaPago();
+			String metodoPago = serieBDto.getMetodoPago();
+			String idDatoFiscal = serieBDto.getIdDatoFiscal();
 
-			if (!utilsService.validarRFC(datosFiscales.getSrfc().trim())) {
+			if (!utilsService.validarRFC(serieBDto.getRfc().trim().toUpperCase())) {
 				throw new Exception("El RFC del Emisor es invalido.");
 			}
 			if (datosFiscales.getSrfc().trim().length() == 13) {
@@ -91,19 +95,23 @@ public class CfdiSerieAService {
 				throw new Exception("El UsoCfdi es invalido.");
 			}
 
-			Integer cmarca = consultaService.obtenerMarcaConvenio(serieADto.getIdConvenio());
+			String convenio = serieBDto.getIdDatoFiscal();
+			
+			
+			
+			Integer cmarca =  Integer.valueOf(marca);
 
-			String query = getConsultaInsertSeriA(new BigDecimal(subtotal.replaceAll(",", "")),
-					serieADto.getIdConvenio(), cmarca, Integer.valueOf(marca));
+			String query = getConsultaInsertSerieB(new BigDecimal(subtotal.replaceAll(",", "")),
+					convenio,cmarca);
 
 			TFacturaEntity tFacturaEntity = consultaService.getTFacturaEntityQuery(query);
 
 			List<ConceptosExamenes> lstConcepto = new ArrayList<ConceptosExamenes>();
-			for (ConceptoDto conceptoDto : serieADto.getConceptos()) {
+			for (ConceptoDto conceptoDto : serieBDto.getConceptos()) {
 				ConceptosExamenes conceptoExamen = new ConceptosExamenes();
 
 				log.info("setCodigo: " + "85121800");
-				conceptoExamen.setCodigo("85121800");
+				conceptoExamen.setCodigo(conceptoDto.getClaveProdcuto());
 				String clave = "";
 				if (conceptoDto.getCodigoOlabAzteca() == null || conceptoDto.getCodigoOlabAzteca().isEmpty()) {
 					clave = "NO APLICA";
@@ -139,24 +147,24 @@ public class CfdiSerieAService {
 				conceptoExamen.setImporte(BigDecimal.ZERO);
 				lstConcepto.add(conceptoExamen);
 			}
-			DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosMarcaAnticipada(cmarca, marca);
+			DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosMarcaAnticipada(cmarca, marca, 4);
 			Comprobante comprobante = this.buildCFDI(cmarca, marca, tFacturaEntity, formaPago, 
-					metodoPago, serieADto.getSustitucion(), serieADto.getUuid(), serieADto.getRetencion(), usoCFDI, 
+					metodoPago, serieBDto.getSustitucion(), serieBDto.getUuid(), serieBDto.getRetencion(), usoCFDI, 
 					lstConcepto,datosMarcaDto);
 			
 			
-			String xml = utilsService.createXmlFromComprobante(comprobante);
+			String xml = utilsCfdi4Service.createXmlFromComprobante(comprobante);
 			comprobante.setCertificado(utilsService.getCertificadoB64(datosMarcaDto.getRutaCer()));
 			String cadenaOriginal = utilsService.createCadenaOriginal(xml, datosMarcaDto.getRutaCadenaOriginal());
 			comprobante.setSello(utilsService.createSello(cadenaOriginal, datosMarcaDto.getRutaKey(), datosMarcaDto.getPasword()));
 			
-			String xmlOriginalSello =  utilsService.createXmlFromComprobante(comprobante);
+			String xmlOriginalSello =  utilsCfdi4Service.createXmlFromComprobante(comprobante);
 			
 			TFacturaEntityDto tfactura = new TFacturaEntityDto();
-			tfactura.setUfoliofactura(tFacturaEntity.getUfoliofactura());
-			tfactura.setSserie(tFacturaEntity.getSserie());
 			tfactura.setKfactura(tFacturaEntity.getKfactura());
 			tfactura.setMsubtotal(comprobante.getSubTotal());
+			tfactura.setUfoliofactura(tFacturaEntity.getUfoliofactura());
+			tfactura.setSserie(tFacturaEntity.getSserie());
 			tfactura.setMiva(comprobante.getImpuestos().getTotalImpuestosTrasladados());
 			tfactura.setMtotal(comprobante.getTotal());
 			tfactura.setUser_id_change(tFacturaEntity.getUser_id().intValue());
@@ -180,9 +188,10 @@ public class CfdiSerieAService {
 		log.info("ufolio----->>>>>   " + tFacturaEntity.getUfoliofactura());
 
 		Comprobante cfdi33 = new Comprobante();
-		cfdi33.setVersion("3.3");
+		cfdi33.setVersion("4.0");
 		cfdi33.setFolio(String.valueOf(tFacturaEntity.getUfoliofactura()));
 		cfdi33.setSerie(tFacturaEntity.getSserie());
+		cfdi33.setExportacion("01");
 		cfdi33.setTipoCambio(BigDecimal.valueOf(1));
 		if (cmarca.equals(15)) {
 			cfdi33.setFecha(utilsService.toXmlGregorianCalendar(utilsService.sumarORestarMinutosAFecha(new Date(), -60),
@@ -233,13 +242,13 @@ public class CfdiSerieAService {
 		} else if (metodoPago.equals("PUE")) {
 			cfdi33.setMetodoPago(CMetodoPago.PUE);
 		}
-		if (sustitucion) {
-			CfdiRelacionados cfdiRelacionados = new CfdiRelacionados();
-			CfdiRelacionado cfdiRelacionado = new CfdiRelacionado();
+		if (sustitucion) {			
+			Comprobante.CfdiRelacionados cfdiRelacionados = new ObjectFactory().createComprobanteCfdiRelacionados();
+			CfdiRelacionado cfdiRelacionado = new ObjectFactory().createComprobanteCfdiRelacionadosCfdiRelacionado();
 			cfdiRelacionado.setUUID(uuid);
 			cfdiRelacionados.setTipoRelacion("04");
 			cfdiRelacionados.getCfdiRelacionado().add(cfdiRelacionado);
-			cfdi33.setCfdiRelacionados(cfdiRelacionados);
+			cfdi33.getCfdiRelacionados().add(cfdiRelacionados);
 		}
 		// Emisor
 		Emisor emisor = new Emisor();
@@ -252,19 +261,13 @@ public class CfdiSerieAService {
 
 		// Receptor
 		Receptor receptor = new Receptor();
-		boolean convenioKdato = true;
+		boolean convenioKdato = false;
 		DatosFiscales datoFiscal = consultaService
-				.obtenerDatosFiscalesByCConvenioAndBconvenio(tFacturaEntity.getCconvenio(), convenioKdato);
-		if (datoFiscal.getSrfc() != null) {
-			receptor.setNombre(datoFiscal.getSrazonsocial());
-			receptor.setRfc(datoFiscal.getSrfc());
-		} else {
-			convenioKdato = false;
-			datoFiscal = consultaService.obtenerDatosFiscalesByCConvenioAndBconvenio(tFacturaEntity.getKdatofiscal(),
-					convenioKdato);
-			receptor.setNombre(datoFiscal.getSrazonsocial());
-			receptor.setRfc(datoFiscal.getSrfc());
-		}
+				.obtenerDatosFiscalesByCConvenioAndBconvenio(tFacturaEntity.getKdatofiscal(), convenioKdato);
+		TDatoFiscalDto datoFiscalDto = consultaService.getTDatoFiscalById(datoFiscal.getKdatofiscal());
+		receptor.setNombre(utilsService.darFormatoCFDI(datoFiscal.getSrazonsocial()));
+		receptor.setRfc(datoFiscal.getSrfc());
+		
 		log.info("cusoCfdi--->>>   " + usoCFDI);
 		switch (usoCFDI) {
 		case "G01":
@@ -338,12 +341,14 @@ public class CfdiSerieAService {
 		default:
 			break;
 		}
-
+		receptor.setRegimenFiscalReceptor(datoFiscalDto.getSclaveregimenfiscal());
+		receptor.setDomicilioFiscalReceptor(datoFiscalDto.getCpostalcliente());
 		cfdi33.setReceptor(receptor);
 
 		// Conceptos
 		Conceptos conceptos = new Conceptos();
 		BigDecimal importeTotal = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+		BigDecimal importeBaseTotal = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		BigDecimal importePadre = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		BigDecimal importeRetencion = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		for (ConceptosExamenes tOrdenExamen : lstConcepto) {
@@ -368,7 +373,7 @@ public class CfdiSerieAService {
 				concepto1.setClaveProdServ(claveProductoServicioSat);
 			}
 			concepto1.setNoIdentificacion(String.valueOf(tOrdenExamen.getClave()));
-
+			concepto1.setObjetoImp("02");
 			concepto1.setClaveUnidad((tOrdenExamen.getUnidadMedida() == null || tOrdenExamen.getUnidadMedida().isEmpty()
 					|| tOrdenExamen.getUnidadMedida().equals("NO APLICA")) ? "E48" : tOrdenExamen.getUnidadMedida()); // tOrdenExamen.getCexamen().getCclaveunidad().getSclaveunidad());
 			
@@ -419,6 +424,7 @@ public class CfdiSerieAService {
 			log.info("traslado.getImporte()--->>>  " + traslado.getImporte());
 
 			importeTotal = importeTotal.add(traslado.getImporte().setScale(2, BigDecimal.ROUND_HALF_UP));
+			importeBaseTotal = importeBaseTotal.add(traslado.getBase().setScale(2, BigDecimal.ROUND_HALF_UP));
 			traslado.setImpuesto("002");
 			traslado.setTipoFactor(CTipoFactor.TASA);
 			traslado.setTasaOCuota(tOrdenExamen.getIva().setScale(6, BigDecimal.ROUND_HALF_UP));
@@ -442,11 +448,12 @@ public class CfdiSerieAService {
 		
 		log.info("TotalCalculado--->   " + cfdi33.getTotal());
 		// log.info("importeTotal-->>> " + importeTotal);
-		mx.gob.sat.cfd._3.Comprobante.Impuestos impuestos = new mx.gob.sat.cfd._3.Comprobante.Impuestos();
-		mx.gob.sat.cfd._3.Comprobante.Impuestos.Traslados traslados = new mx.gob.sat.cfd._3.Comprobante.Impuestos.Traslados();
-		List<mx.gob.sat.cfd._3.Comprobante.Impuestos.Traslados.Traslado> lstTrasladosTotales = new ArrayList<mx.gob.sat.cfd._3.Comprobante.Impuestos.Traslados.Traslado>();
-		mx.gob.sat.cfd._3.Comprobante.Impuestos.Traslados.Traslado trasladosTotales = new mx.gob.sat.cfd._3.Comprobante.Impuestos.Traslados.Traslado();
+		mx.gob.sat.cfd._4.Comprobante.Impuestos impuestos = new mx.gob.sat.cfd._4.Comprobante.Impuestos();
+		mx.gob.sat.cfd._4.Comprobante.Impuestos.Traslados traslados = new mx.gob.sat.cfd._4.Comprobante.Impuestos.Traslados();
+		List<mx.gob.sat.cfd._4.Comprobante.Impuestos.Traslados.Traslado> lstTrasladosTotales = new ArrayList<mx.gob.sat.cfd._4.Comprobante.Impuestos.Traslados.Traslado>();
+		mx.gob.sat.cfd._4.Comprobante.Impuestos.Traslados.Traslado trasladosTotales = new mx.gob.sat.cfd._4.Comprobante.Impuestos.Traslados.Traslado();
 		
+		trasladosTotales.setBase(importeBaseTotal);
 		trasladosTotales.setImporte(importeTotal.setScale(2, BigDecimal.ROUND_DOWN));
 
 		log.info("trasladosTotales.getImporte()-->>  " + trasladosTotales.getImporte());
@@ -460,8 +467,8 @@ public class CfdiSerieAService {
 		impuestos.setTotalImpuestosTrasladados(importeTotal.setScale(2, BigDecimal.ROUND_DOWN));
 		
 		if(bRetencion){
-			mx.gob.sat.cfd._3.Comprobante.Impuestos.Retenciones retenciones = new ObjectFactory().createComprobanteImpuestosRetenciones();
-			mx.gob.sat.cfd._3.Comprobante.Impuestos.Retenciones.Retencion retencionTotales = new ObjectFactory().createComprobanteImpuestosRetencionesRetencion();
+			mx.gob.sat.cfd._4.Comprobante.Impuestos.Retenciones retenciones = new ObjectFactory().createComprobanteImpuestosRetenciones();
+			mx.gob.sat.cfd._4.Comprobante.Impuestos.Retenciones.Retencion retencionTotales = new ObjectFactory().createComprobanteImpuestosRetencionesRetencion();
 			retencionTotales.setImporte(importeRetencion.setScale(2, BigDecimal.ROUND_DOWN));
 			retencionTotales.setImpuesto("002");
 			retenciones.getRetencion().add(retencionTotales);
@@ -474,81 +481,36 @@ public class CfdiSerieAService {
 		return cfdi33;
 	}
 
-	public String getConsultaInsertSeriA(BigDecimal subTotal, Integer convenio, Integer cmarca, Integer razonSocial) {
+	public String getConsultaInsertSerieB(BigDecimal subTotal, String rfc, Integer marca) {
 		log.info("================");
 		log.info(subTotal.toString());
-		log.info(convenio.toString());
-		log.info(cmarca.toString());
-		log.info(razonSocial.toString());
-		String ssucursal = "";
-		String csucursal = "";
-		String sserie = "";
-		String centidadlegal = "";
-		if (cmarca == 1) {
-			ssucursal = "EMPRESAS";
-			csucursal = "1003";
-			sserie = "A";
-			centidadlegal = "1";
-		} else if (cmarca == 4) {
-			ssucursal = "EMPRESAS AZTECA";
-			csucursal = "1012";
-			sserie = "AZ";
-			centidadlegal = "5";
-		} else if (cmarca == 5) {
-			ssucursal = "EMPRESAS SWISSLAB";
-			csucursal = "1013";
-			sserie = "AS";
-			centidadlegal = "6";
-		} else if (cmarca == 15) {
-			ssucursal = "EMPRESAS LIACSA";
-			csucursal = "1017";
-			sserie = "ASL";
-			centidadlegal = "6";
-		} else if (cmarca == 19) {
-			ssucursal = "EMPRESAS FAMILYLABS NORTE";
-			csucursal = "1020";
-			sserie = "AFN";
-			centidadlegal = "19";
-		} else if (cmarca == 7) {
-			if (razonSocial == 7) {
-				ssucursal = "EMPRESAS JENNER PRADO";
-				csucursal = "1014";
-				sserie = "AJP";
-				centidadlegal = "7";
-//				ssucursal="EMPRESAS AZTECA";
-//				csucursal="1012";
-//				sserie="AZ";
-//				centidadlegal="5";
-			} else if (razonSocial == 8) {
-				ssucursal = "EMPRESAS JENNER LEAN";
-				csucursal = "1015";
-				sserie = "AJL";
-				centidadlegal = "8";
-//				ssucursal="EMPRESAS AZTECA";
-//				csucursal="1012";
-//				sserie="AZ";
-//				centidadlegal="5";
-			} else if (razonSocial == 9) {
-				ssucursal = "EMPRESAS AZTECA";
-				csucursal = "1012";
-				sserie = "AZ";
-				centidadlegal = "5";
-			}
+		
+		String sqlRFC = "";
+		String convenio = "";
+		sqlRFC = rfc;
+		if(marca == 1){
+			convenio = "0" ;
+		}else if (marca == 4 || marca == 9){
+			convenio = "2672" ;
+		}else if (marca == 5 || marca == 15){
+			convenio = "4858";
+		}else{
+			convenio = "7827";
 		}
-		log.info("getConsultaInsertSeriA::   " + subTotal + " :::convenio   " + convenio);
-		String query = "SELECT \r\n"
-				+ "'INSERT INTO t_factura VALUES(t_factura_sequence.nextval,'||(SELECT kdatofiscal FROM c_convenio_dato_fiscal WHERE cconvenio = "
-				+ convenio + " limit 1)||\r\n" + "',''" + ssucursal
-				+ "'','||(SELECT SUM(ufolioactual+1) FROM c_control_folio WHERE csucursal=" + csucursal
-				+ " AND cestadoregistro=31)||','||\r\n" + "(SELECT ccliente FROM c_convenio WHERE cconvenio=" + convenio
-				+ ")||'," + csucursal + ",1,'\r\n" + "||SUM (" + subTotal + "  )||',0.00,0.00,'||\r\n" + "SUM ("
-				+ subTotal + " *.16)||','||\r\n" + "SUM (" + subTotal + " *1.16)||',1,'||" + convenio
-				+ "||','' '','' ''," + centidadlegal + ",sysdate,33,sysdate,'||1||','||1||', '' '','' '','' '', ''"
-				+ sserie + "'') RETURNING kfactura;' AS query1,\r\n"
-				+ "'UPDATE c_control_folio SET ufolioactual='||(SELECT SUM(ufolioactual+1) FROM c_control_folio WHERE csucursal="
-				+ csucursal + " AND cestadoregistro=31)||\r\n" + "' WHERE csucursal=" + csucursal
-				+ " AND cestadoregistro=31;' AS query2";
-		log.info("query-->>>   " + query);
+		
+//		sqlRFC = "SELECT kdatofiscal FROM c_convenio_dato_fiscal WHERE cconvenio = "+convenio;
+		String query = "SELECT \r\n" + 
+				"'INSERT INTO t_factura VALUES(t_factura_sequence.nextval,'||("+sqlRFC+")||\r\n" + 
+				"',''CONTABILIDAD'','||(SELECT sum(ufolioactual+1) FROM c_control_folio WHERE csucursal=1007 AND cestadoregistro=31)||','||\r\n" + 
+				"(SELECT ccliente FROM c_convenio WHERE cconvenio="+convenio+")||',1007,1,'\r\n" + 
+				"||SUM ( "+subTotal+"/1.16)||',0.00,0.00,'||\r\n" + 
+				"SUM ( "+subTotal+" - ("+subTotal+" /1.16))||','||\r\n" + 
+				"SUM ( "+subTotal+")||',1,'||"+convenio+"||','' '','' '',1,sysdate,33,sysdate,'||1||','||1||', '' '','' '','' '', ''B'')  RETURNING kfactura;' AS query1,\r\n" + 
+				"'UPDATE c_control_folio SET ufolioactual='||(SELECT SUM(ufolioactual+1) FROM c_control_folio WHERE csucursal=1007 AND cestadoregistro=31)||\r\n" + 
+				"' WHERE csucursal=1007 AND cestadoregistro=31;' AS query2";
+		
+		log.info("query-->>>   "+query);
+		
 		return query;
 	}
 

@@ -11,8 +11,14 @@ public class TDatoFiscalDto {
 	private Integer cregimenfiscal;
 	private String cpostal;
 	private String sclaveregimenfiscal;
+	private String cpostalcliente;
 	
-	
+	public String getCpostalcliente() {
+		return cpostalcliente;
+	}
+	public void setCpostalcliente(String cpostalcliente) {
+		this.cpostalcliente = cpostalcliente;
+	}
 	public String getSclaveregimenfiscal() {
 		return sclaveregimenfiscal;
 	}

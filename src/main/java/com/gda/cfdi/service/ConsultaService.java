@@ -35,6 +35,8 @@ import com.gda.cfdi.dto.TOrdenSucursalDto;
 import com.gda.cfdi.dto.TPagoPacienteDto;
 import com.gda.cfdi.dto.TSociedadCivilDto;
 
+import facturacion.domain.dto.DatosCfdiDto;
+
 @Service
 public class ConsultaService {
 	
@@ -335,6 +337,19 @@ public class ConsultaService {
 			RestTemplate template = new RestTemplate();
 			String url = env.getProperty("url.service.database")+"tdatofiscal-by-id?kdatofiscal="+kdatofiscal;
 			TDatoFiscalDto dto = template.getForObject(url, TDatoFiscalDto.class);
+			return dto;			
+		}catch (RestClientResponseException e) {
+			log.error(e.getMessage());
+			log.error(e.getResponseBodyAsString());
+			return null;
+		}
+	}
+	
+	public DatosCfdiDto getDatosCfdiByConvenio(Integer cconvenio) {
+		try {
+			RestTemplate template = new RestTemplate();
+			String url = env.getProperty("url.service.database")+"datoscfdi-by-convenio?cconvenio="+cconvenio;
+			DatosCfdiDto dto = template.getForObject(url, DatosCfdiDto.class);
 			return dto;			
 		}catch (RestClientResponseException e) {
 			log.error(e.getMessage());

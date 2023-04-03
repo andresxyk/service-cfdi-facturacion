@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import com.gda.cfdi.controller.CfdiController;
 import com.gda.cfdi.dto.CUsoCfdiDto;
 import com.gda.cfdi.dto.ConceptoDto;
 import com.gda.cfdi.dto.ConceptosExamenes;
@@ -45,7 +44,7 @@ import mx.gob.sat.sitio_internet.cfd.catalogos.CUsoCFDI;
 
 @Service
 public class CfdiSerieBConvenioService {
-	private static final Logger log = LoggerFactory.getLogger(CfdiController.class);
+	private static final Logger log = LoggerFactory.getLogger(CfdiSerieBConvenioService.class);
 
 	@Autowired
 	private Environment env;

@@ -96,6 +96,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+		<finalName>facturacion_cfdi_1.0.31032023</finalName>
 	</build>
 
 </project>

@@ -106,6 +106,15 @@ public class DomainService {
 			razonSocialMarca = env.getProperty("razon.social.swisslab");
 			numeroCertificado = env.getProperty("numero.certificado.swisslab");
 			break;	
+		case "LAB020416Q67":
+			log.info("**** FAMILYLABSNORTE *****");
+			rutaKey = env.getProperty("path.file.key.familylabsnorte");
+			rutaCer = env.getProperty("path.file.cer.familylabsnorte");		
+			pasword = env.getProperty("password.cer.familylabsnorte");	
+			rfcMarca = env.getProperty("rfc.marca.familylabsnorte");	
+			razonSocialMarca = env.getProperty("razon.social.familylabsnorte");
+			numeroCertificado = env.getProperty("numero.certificado.familylabsnorte");
+			break;	
 		default:
 			break;
 		}

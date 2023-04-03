@@ -22,12 +22,18 @@ import com.gda.cfdi.dto.TNotaCreditoEntityDto;
 import com.gda.cfdi.exception.ResponseErrorDto;
 import com.gda.cfdi.service.Cfdi4Service;
 import com.gda.cfdi.service.CfdiComplementoPagoService;
+import com.gda.cfdi.service.CfdiComplementoPagoV4Service;
 import com.gda.cfdi.service.CfdiComprobanteService;
+import com.gda.cfdi.service.CfdiCredito4Service;
 import com.gda.cfdi.service.CfdiCreditoService;
 import com.gda.cfdi.service.CfdiNotaCreditoService;
+import com.gda.cfdi.service.CfdiNotaCreditoV4Service;
 import com.gda.cfdi.service.CfdiSerieAService;
+import com.gda.cfdi.service.CfdiSerieAv4Service;
 import com.gda.cfdi.service.CfdiSerieBConvenioService;
+import com.gda.cfdi.service.CfdiSerieBConvenioV4Service;
 import com.gda.cfdi.service.CfdiSerieBRfcService;
+import com.gda.cfdi.service.CfdiSerieBRfcV4Service;
 import com.gda.cfdi.service.CfdiService;
 import com.google.gson.Gson;
 
@@ -40,32 +46,35 @@ public class CfdiController {
 	private static final Logger log = LoggerFactory.getLogger(CfdiController .class);
 	
 	@Autowired
-	private CfdiService cfdiService;
-	
+	private CfdiService cfdiService;	
 	@Autowired
-	private Cfdi4Service cfdi4Service;	
-	
+	private Cfdi4Service cfdi4Service;
 	@Autowired
 	private CfdiCreditoService cfdiCreditoService;
-	
 	@Autowired
-	private CfdiSerieAService cfdiSerieAService;
-	
+	private CfdiCredito4Service cfdiCredito4Service;
+	@Autowired
+	private CfdiSerieAService cfdiSerieAService;	
+	@Autowired
+	private CfdiSerieAv4Service cfdiSerieAv4Service;
 	@Autowired
 	private CfdiSerieBConvenioService cfdiSerieBConvenioService;
-	
+	@Autowired
+	private CfdiSerieBConvenioV4Service cfdiSerieBConvenioV4Service;
 	@Autowired
 	private CfdiSerieBRfcService cfdiSerieBRfcService;
-	
+	@Autowired
+	private CfdiSerieBRfcV4Service cfdiSerieBRfcV4Service;
 	@Autowired
 	private CfdiNotaCreditoService cfdiNotaCreditoService;
-	
+	@Autowired
+	private CfdiNotaCreditoV4Service cfdiNotaCreditoV4Service;
 	@Autowired
 	private CfdiComplementoPagoService cfdiComplementoPagoService;
-	
+	@Autowired
+	private CfdiComplementoPagoV4Service cfdiComplementoPagoV4Service;
 	@Autowired
 	private CfdiComprobanteService cfdiComprobanteService;
-	
 	private Gson gson = new Gson();
 	
 	@PostMapping("/request-cfdi-comprobante")
@@ -136,8 +145,8 @@ public class CfdiController {
 				cfdiDto = cfdiCreditoService.generarCfdiOrden(folio, tipofactura, msubtotal, miva, mtotal, strnocuenta, strmetodopago, uuidSustitucion, sustitucion, descuento, descuentos, notaDescuento, retencion, marca, descripcionFactura);	
 				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else if(version.equals(4)){
-//				cfdiDto = cfdi4Service.generarCfdi(kordensucursal);
-				return new ResponseEntity<TFacturaEntityDto>(new TFacturaEntityDto(), HttpStatus.OK);
+				cfdiDto = cfdiCredito4Service.generarCfdiOrden(folio, tipofactura, msubtotal, miva, mtotal, strnocuenta, strmetodopago, uuidSustitucion, sustitucion, descuento, descuentos, notaDescuento, retencion, marca, descripcionFactura);
+				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else {
 				ResponseErrorDto dto = new ResponseErrorDto();
 				dto.setCodigo("error");
@@ -163,8 +172,8 @@ public class CfdiController {
 				cfdiDto = cfdiSerieAService.generarCfdiSerieA(anticipadaSerieADto);
 				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else if(version.equals(4)){
-//				cfdiDto = cfdi4Service.generarCfdi(kordensucursal);
-				return new ResponseEntity<TFacturaEntityDto>(new TFacturaEntityDto(), HttpStatus.OK);
+				cfdiDto = cfdiSerieAv4Service.generarCfdiSerieA(anticipadaSerieADto);
+				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else {
 				ResponseErrorDto dto = new ResponseErrorDto();
 				dto.setCodigo("error");
@@ -190,8 +199,8 @@ public class CfdiController {
 				cfdiDto = cfdiSerieBConvenioService.generarCfdiSerieB(serieBConvenioDto);
 				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else if(version.equals(4)){
-//				cfdiDto = cfdi4Service.generarCfdi(kordensucursal);
-				return new ResponseEntity<TFacturaEntityDto>(new TFacturaEntityDto(), HttpStatus.OK);
+				cfdiDto = cfdiSerieBConvenioV4Service.generarCfdiSerieB(serieBConvenioDto);
+				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else {
 				ResponseErrorDto dto = new ResponseErrorDto();
 				dto.setCodigo("error");
@@ -217,8 +226,8 @@ public class CfdiController {
 				cfdiDto = cfdiSerieBRfcService.generarCfdiSerieB(serieBRfcDto);
 				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else if(version.equals(4)){
-//				cfdiDto = cfdi4Service.generarCfdi(kordensucursal);
-				return new ResponseEntity<TFacturaEntityDto>(new TFacturaEntityDto(), HttpStatus.OK);
+				cfdiDto = cfdiSerieBRfcV4Service.generarCfdiSerieB(serieBRfcDto);
+				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else {
 				ResponseErrorDto dto = new ResponseErrorDto();
 				dto.setCodigo("error");
@@ -244,8 +253,8 @@ public class CfdiController {
 				cfdiDto = cfdiNotaCreditoService.generarCfdiOrden(notaCreditoDto);
 				return new ResponseEntity<TNotaCreditoEntityDto>(cfdiDto, HttpStatus.OK);
 			}else if(version.equals(4)){
-//				cfdiDto = cfdi4Service.generarCfdi(kordensucursal);
-				return new ResponseEntity<TFacturaEntityDto>(new TFacturaEntityDto(), HttpStatus.OK);
+				cfdiDto = cfdiNotaCreditoV4Service.generarCfdiOrden(notaCreditoDto);
+				return new ResponseEntity<TNotaCreditoEntityDto>(cfdiDto, HttpStatus.OK);
 			}else {
 				ResponseErrorDto dto = new ResponseErrorDto();
 				dto.setCodigo("error");
@@ -269,8 +278,8 @@ public class CfdiController {
 				cfdiDto = cfdiComplementoPagoService.generarXML(idpago);	
 				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else if(version.equals(4)){
-//				cfdiDto = cfdi4Service.generarCfdi(kordensucursal);
-				return new ResponseEntity<TFacturaEntityDto>(new TFacturaEntityDto(), HttpStatus.OK);
+				cfdiDto = cfdiComplementoPagoV4Service.generarXML(idpago);
+				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else {
 				ResponseErrorDto dto = new ResponseErrorDto();
 				dto.setCodigo("error");
@@ -294,8 +303,8 @@ public class CfdiController {
 				cfdiDto = cfdiComplementoPagoService.generarXMLMultiPago(multiPagoDto);
 				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else if(version.equals(4)){
-//				cfdiDto = cfdi4Service.generarCfdi(kordensucursal);
-				return new ResponseEntity<TFacturaEntityDto>(new TFacturaEntityDto(), HttpStatus.OK);
+				cfdiDto = cfdiComplementoPagoV4Service.generarXMLMultiPago(multiPagoDto);
+				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else {
 				ResponseErrorDto dto = new ResponseErrorDto();
 				dto.setCodigo("error");
