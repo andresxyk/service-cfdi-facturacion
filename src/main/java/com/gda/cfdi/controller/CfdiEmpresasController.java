@@ -16,6 +16,7 @@ import com.gda.cfdi.service.exakta.ExaktaCfdiService;
 //import com.gda.cfdi.service.referencia.ReferenciaCfdiService;
 import com.gda.cfdi.service.referencia.ReferenciaCfdiService;
 
+import facturacion.domain.dto.AddendaDto;
 import facturacion.domain.dto.referencia.cfdi.GenerarCFDI40;
 import mx.gob.sat.cfd._4.Comprobante;
 
@@ -62,6 +63,19 @@ public class CfdiEmpresasController {
 	public ResponseEntity<?> getXmlCfdi(@RequestBody Comprobante comprobante){
 		try {
 			return new ResponseEntity<String>(empresaCfdiService.getXmlCfdi(comprobante), HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			ResponseErrorDto dto = new ResponseErrorDto();
+			dto.setCodigo("error");
+			dto.setDescripcion(e.getMessage());
+			return new ResponseEntity<ResponseErrorDto>(dto, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(path = "/xml-cfdi-add-addenda", method = RequestMethod.POST)
+	public ResponseEntity<?> getXmlCfdi(@RequestBody AddendaDto addendaDto){
+		try {
+			return new ResponseEntity<String>(empresaCfdiService.getXmlAddendaCfdi(addendaDto), HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			ResponseErrorDto dto = new ResponseErrorDto();

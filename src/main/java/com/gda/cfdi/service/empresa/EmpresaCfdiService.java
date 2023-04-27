@@ -1,9 +1,7 @@
 package com.gda.cfdi.service.empresa;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.Normalizer;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -20,6 +18,8 @@ import com.gda.cfdi.service.UtilsCfdi4Service;
 import com.gda.cfdi.service.UtilsService;
 import com.google.gson.Gson;
 
+import facturacion.domain.dto.AddendaDto;
+import mx.gob.sat.addenda.AddendaEmpresa;
 import mx.gob.sat.cfd._4.Comprobante;
 import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados.CfdiRelacionado;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos;
@@ -38,8 +38,6 @@ import mx.gob.sat.pagos20.Pagos.Pago.DoctoRelacionado.ImpuestosDR.TrasladosDR.Tr
 import mx.gob.sat.pagos20.Pagos.Pago.ImpuestosP;
 import mx.gob.sat.pagos20.Pagos.Pago.ImpuestosP.TrasladosP;
 import mx.gob.sat.pagos20.Pagos.Pago.ImpuestosP.TrasladosP.TrasladoP;
-import mx.gob.sat.sitio_internet.cfd.catalogos.CTipoFactor;
-import mx.gob.sat.timbrefiscaldigital.TimbreFiscalDigital;
 
 @Service("empresaCfdiService")
 public class EmpresaCfdiService {
@@ -52,6 +50,40 @@ public class EmpresaCfdiService {
 	@Autowired
 	private UtilsCfdi4Service utilsCfdi4Service;
 	private Gson gson = new Gson();
+	
+	public String getXmlAddendaCfdi(AddendaDto addendaDto) throws Exception {
+		try {
+			Comprobante comprobante = utilsCfdi4Service.createComprobanteFromXml(addendaDto.getXmltimbrado());
+			/**
+			 * Informacion Addenda
+			 */
+			if(addendaDto.getComprobante().getAddenda()!=null) {
+				if(addendaDto.getComprobante().getAddenda().getAny().size()>0) {
+					ObjectMapper mapper = new ObjectMapper();
+					AddendaEmpresa addendaItem = mapper.convertValue(addendaDto.getComprobante().getAddenda().getAny().get(0), AddendaEmpresa.class);
+					AddendaEmpresa addendaEmpresa = new AddendaEmpresa();
+					addendaEmpresa.setDatos(addendaItem.getDatos());
+					Comprobante.Addenda addenda = new Comprobante.Addenda();
+					addenda.getAny().add(addendaEmpresa);
+					comprobante.setAddenda(addenda);
+				}
+			}
+			Boolean bPago = false;		
+			if(comprobante.getComplemento()!=null) {
+				List<Object> listComplementos = comprobante.getComplemento().getAny();
+				for (Object object : listComplementos) {
+					if (object instanceof Pagos) {
+						bPago = true;
+					}
+				}			
+			}		
+			String xml = !bPago ? utilsCfdi4Service.createXmlFromComprobante(comprobante) : utilsCfdi4Service.createXmlFromComplementoPago(comprobante);
+			return xml;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
+	}
 	
 	public String getXmlCfdi(Comprobante comprobante)  throws Exception {
 		DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosRfcEmisor(comprobante.getEmisor().getRfc(), 4);
@@ -68,8 +100,7 @@ public class EmpresaCfdiService {
 					bPago = true;
 				}
 			}			
-		}
-		
+		}		
 		String xml = !bPago ? utilsCfdi4Service.createXmlFromComprobante(cfdi) : utilsCfdi4Service.createXmlFromComplementoPago(cfdi);
 		cfdi.setCertificado(utilsService.getCertificadoB64(datosMarcaDto.getRutaCer()));
 		String cadenaOriginal = utilsService.createCadenaOriginal(xml, datosMarcaDto.getRutaCadenaOriginal());
@@ -169,6 +200,7 @@ public class EmpresaCfdiService {
 					conceptos.getConcepto().add(concepto);
 					if(conceptoItem.getImpuestos()!=null) {
 						Impuestos impuestos = new ObjectFactory().createComprobanteConceptosConceptoImpuestos();
+						Boolean isIvaCero = false;
 						if(conceptoItem.getImpuestos().getTraslados()!=null) {
 							Traslados traslados = new ObjectFactory().createComprobanteConceptosConceptoImpuestosTraslados();
 							if(conceptoItem.getImpuestos().getTraslados().getTraslado()!=null) {
@@ -181,11 +213,14 @@ public class EmpresaCfdiService {
 										traslado.setTipoFactor(trasladoItem.getTipoFactor());
 										traslado.setTasaOCuota(trasladoItem.getTasaOCuota());
 										traslados.getTraslado().add(traslado);
+										log.info("1"+traslado.getTasaOCuota());
+										log.info("1"+BigDecimal.ZERO);
 									}									
 								}
 							}							
 							impuestos.setTraslados(traslados);
 						}
+						log.info("isIvaCero:"+isIvaCero);
 						concepto.setImpuestos(impuestos);
 					}					
 				}				

@@ -18,7 +18,15 @@ public class PagoFacturaDto {
 	private BigDecimal manticipo;
 	private BigDecimal mpago;
 	private Integer cestadoregistro;
+	private Integer kdatofiscal;
 	
+	
+	public Integer getKdatofiscal() {
+		return kdatofiscal;
+	}
+	public void setKdatofiscal(Integer kdatofiscal) {
+		this.kdatofiscal = kdatofiscal;
+	}
 	public Integer getCsucursal() {
 		return csucursal;
 	}

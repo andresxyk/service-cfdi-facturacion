@@ -25,16 +25,19 @@ import org.springframework.stereotype.Service;
 import com.gda.cfdi.controller.CfdiController;
 import com.gda.cfdi.dto.CUsoCfdiDto;
 import com.gda.cfdi.dto.ControlFolioDto;
+import com.gda.cfdi.dto.DatosMarcaDto;
 import com.gda.cfdi.dto.FacturaSelloDto;
 import com.gda.cfdi.dto.MultiPagoDto;
 import com.gda.cfdi.dto.PagoDto;
 import com.gda.cfdi.dto.PagoFacturaDto;
+import com.gda.cfdi.dto.TDatoFiscalDto;
 import com.gda.cfdi.dto.TFacturaCreditoDto;
 import com.gda.cfdi.dto.TFacturaDto;
 import com.gda.cfdi.dto.TFacturaEntityDto;
 import com.gda.cfdi.exception.ResponseErrorDto;
 import com.gda.cfdi.exception.ResponseErrorException;
 
+import facturacion.domain.dto.DatosCfdiDto;
 import mx.gob.sat.cfd._4.Comprobante;
 import mx.gob.sat.cfd._4.ObjectFactory;
 import mx.gob.sat.cfd._4.Comprobante.CfdiRelacionados;
@@ -97,17 +100,30 @@ public class CfdiComplementoPagoV4Service {
 				String cleanXml = xml.replace("\n", "").replace("\r", "").replace("\t", "");
 				pagoFacturaDto.setXml(cleanXml);
 			}
+			mx.gob.sat.cfd._3.Comprobante c3 = null;
 			Comprobante c = null;
 			try {
 				log.info(pagoFacturaDto.getXml());
-				c = utilsService.createComprabanteFromXml4(pagoFacturaDto.getXml());
-				log.info(pagoFacturaDto.getXml());
-				pagoFacturaDto.setMoneda(c.getMoneda().value());
-				pagoFacturaDto.setMetodoPago(c.getMetodoPago().value());
+				if(pagoFacturaDto.getXml().contains("Version=\"4.0\"")) {
+					c = utilsService.createComprabanteFromXml4(pagoFacturaDto.getXml());
+					log.info(pagoFacturaDto.getXml());
+					pagoFacturaDto.setMoneda(c.getMoneda().value());
+					pagoFacturaDto.setMetodoPago(c.getMetodoPago().value());
+					
+					BigDecimal manticipo = pagoFacturaDto.getManticipo() == null ? BigDecimal.ZERO : pagoFacturaDto.getManticipo();
+					
+					pagoFacturaDto.setSaldoInsoluto(c.getTotal().subtract(manticipo).subtract(pagoFacturaDto.getMpago()));
+				} else if(pagoFacturaDto.getXml().contains("Version=\"3.3\"")){
+					c3 = utilsService.createComplementoFromXml(pagoFacturaDto.getXml());
+					log.info(pagoFacturaDto.getXml());
+					pagoFacturaDto.setMoneda(c3.getMoneda().value());
+					pagoFacturaDto.setMetodoPago(c3.getMetodoPago().value());
+					
+					BigDecimal manticipo = pagoFacturaDto.getManticipo() == null ? BigDecimal.ZERO : pagoFacturaDto.getManticipo();
+					
+					pagoFacturaDto.setSaldoInsoluto(c3.getTotal().subtract(manticipo).subtract(pagoFacturaDto.getMpago()));
+				}
 				
-				BigDecimal manticipo = pagoFacturaDto.getManticipo() == null ? BigDecimal.ZERO : pagoFacturaDto.getManticipo();
-				
-				pagoFacturaDto.setSaldoInsoluto(c.getTotal().subtract(manticipo).subtract(pagoFacturaDto.getMpago()));
 				pagoFacturaDto.setImporteSaldoAnterior(pagoFacturaDto.getSaldoInsoluto().add(pagoFacturaDto.getMpago()));
 				pagoFacturaDto.setImportePagado(pagoFacturaDto.getMpago());
 				pagoFacturaDto.setEstatus(pagoFacturaDto.getCestadoregistro());
@@ -178,17 +194,29 @@ public class CfdiComplementoPagoV4Service {
 					String cleanXml = xml.replace("\n", "").replace("\r", "").replace("\t", "");
 					pagoFacturaDto.setXml(cleanXml);
 				}
+				mx.gob.sat.cfd._3.Comprobante c3 = null;
 				Comprobante c = null;
 				try {
 					log.info(pagoFacturaDto.getXml());
-					c = utilsService.createComprabanteFromXml4(pagoFacturaDto.getXml());
-					log.info(pagoFacturaDto.getXml());
-					pagoFacturaDto.setMoneda(c.getMoneda().value());
-					pagoFacturaDto.setMetodoPago(c.getMetodoPago().value());
-					
-					BigDecimal manticipo = pagoFacturaDto.getManticipo() == null ? BigDecimal.ZERO : pagoFacturaDto.getManticipo();
-					
-					pagoFacturaDto.setSaldoInsoluto(c.getTotal().subtract(manticipo).subtract(pagoFacturaDto.getMpago()));
+					if(pagoFacturaDto.getXml().contains("Version=\"4.0\"")) {
+						c = utilsService.createComprabanteFromXml4(pagoFacturaDto.getXml());
+						log.info(pagoFacturaDto.getXml());
+						pagoFacturaDto.setMoneda(c.getMoneda().value());
+						pagoFacturaDto.setMetodoPago(c.getMetodoPago().value());
+						
+						BigDecimal manticipo = pagoFacturaDto.getManticipo() == null ? BigDecimal.ZERO : pagoFacturaDto.getManticipo();
+						
+						pagoFacturaDto.setSaldoInsoluto(c.getTotal().subtract(manticipo).subtract(pagoFacturaDto.getMpago()));
+					} else if(pagoFacturaDto.getXml().contains("Version=\"3.3\"")){
+						c3 = utilsService.createComplementoFromXml(pagoFacturaDto.getXml());
+						log.info(pagoFacturaDto.getXml());
+						pagoFacturaDto.setMoneda(c3.getMoneda().value());
+						pagoFacturaDto.setMetodoPago(c3.getMetodoPago().value());
+						
+						BigDecimal manticipo = pagoFacturaDto.getManticipo() == null ? BigDecimal.ZERO : pagoFacturaDto.getManticipo();
+						
+						pagoFacturaDto.setSaldoInsoluto(c3.getTotal().subtract(manticipo).subtract(pagoFacturaDto.getMpago()));
+					}
 					pagoFacturaDto.setImporteSaldoAnterior(pagoFacturaDto.getSaldoInsoluto().add(pagoFacturaDto.getMpago()));
 					pagoFacturaDto.setImportePagado(pagoFacturaDto.getMpago());
 					pagoFacturaDto.setEstatus(pagoFacturaDto.getCestadoregistro());
@@ -238,15 +266,87 @@ public class CfdiComplementoPagoV4Service {
 	
 	
 	
-	
-	
-	
-	
 	public Comprobante buildPago(PagoDto pagoPadre, List<PagoDto> pagos, boolean procesaJenner) throws Exception {
 		Comprobante comprobante = new Comprobante();
 
 		String facturaPagadaXml = pagos.get(0).getFacturasRelacionadas().get(0).getXml();
-		Comprobante facturaBase = utilsService.createComprabanteFromXml4(facturaPagadaXml);
+		if(facturaPagadaXml.contains("Version=\"4.0\"")) {
+			Comprobante factura40Base = utilsService.createComprabanteFromXml4(facturaPagadaXml);
+			/**
+			 * Receptor
+			 */
+			Receptor receptor = new Receptor();
+			TDatoFiscalDto datoFiscalDto = consultaService.getTDatoFiscalById(pagos.get(0).getFacturasRelacionadas().get(0).getKdatofiscal());
+			receptor.setNombre(utilsService.darFormatoCFDI(datoFiscalDto.getSrazonsocial()));
+			receptor.setRfc(datoFiscalDto.getSrfc());
+			receptor.setRegimenFiscalReceptor(datoFiscalDto.getSclaveregimenfiscal());
+			receptor.setDomicilioFiscalReceptor(datoFiscalDto.getCpostalcliente());
+			receptor.setUsoCFDI(CUsoCFDI.CP_01);
+			comprobante.setReceptor(receptor);
+			/**
+			 * Emisor
+			 */
+			Emisor emisor = factura40Base.getEmisor();
+			comprobante.setEmisor(emisor);
+			/**
+			 * Información general
+			 */
+			comprobante.setLugarExpedicion(factura40Base.getLugarExpedicion());
+			if(factura40Base.getLugarExpedicion().equals("31203")){
+				comprobante.setFecha(utilsService.toXmlGregorianCalendar(utilsService.sumarORestarMinutosAFecha(new Date(),-62), "yyyy-MM-dd'T'HH:mm:ss"));
+			}else{
+				
+				comprobante.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+			}
+			
+			comprobante.setNoCertificado(factura40Base.getNoCertificado());
+			if(factura40Base.getNoCertificado().equals("00001000000404009726")){
+				comprobante.setNoCertificado("00001000000505145362");
+			}
+			if(factura40Base.getNoCertificado().equals("00001000000406347874")){
+				comprobante.setNoCertificado("00001000000507423256");
+			}
+			
+		} else if(facturaPagadaXml.contains("Version=\"3.3\"")) {
+			mx.gob.sat.cfd._3.Comprobante factura33Base = utilsService.createComplementoPagoFromXml(facturaPagadaXml);
+			/**
+			 * Receptor
+			 */
+			Receptor receptor = new Receptor();
+			TDatoFiscalDto datoFiscalDto = consultaService.getTDatoFiscalById(pagos.get(0).getFacturasRelacionadas().get(0).getKdatofiscal());
+			receptor.setNombre(utilsService.darFormatoCFDI(datoFiscalDto.getSrazonsocial()));
+			receptor.setRfc(datoFiscalDto.getSrfc());
+			receptor.setRegimenFiscalReceptor(datoFiscalDto.getSclaveregimenfiscal());
+			receptor.setDomicilioFiscalReceptor(datoFiscalDto.getCpostalcliente());
+			receptor.setUsoCFDI(CUsoCFDI.CP_01);
+			comprobante.setReceptor(receptor);
+			/**
+			 * Emisor
+			 */
+			DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosRfcEmisor(factura33Base.getEmisor().getRfc(), 4);
+			Emisor emisor = new Emisor();
+			emisor.setNombre(datosMarcaDto.getRazonSocialMarca());
+			emisor.setRfc(datosMarcaDto.getRfcMarca());
+			emisor.setRegimenFiscal(factura33Base.getEmisor().getRegimenFiscal());
+			comprobante.setEmisor(emisor);
+			/**
+			 * Información general
+			 */
+			comprobante.setLugarExpedicion(factura33Base.getLugarExpedicion());
+			if(factura33Base.getLugarExpedicion().equals("31203")){
+				comprobante.setFecha(utilsService.toXmlGregorianCalendar(utilsService.sumarORestarMinutosAFecha(new Date(),-62), "yyyy-MM-dd'T'HH:mm:ss"));
+			}else{
+				comprobante.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+			}
+			
+			comprobante.setNoCertificado(factura33Base.getNoCertificado());
+			if(factura33Base.getNoCertificado().equals("00001000000404009726")){
+				comprobante.setNoCertificado("00001000000505145362");
+			}
+			if(factura33Base.getNoCertificado().equals("00001000000406347874")){
+				comprobante.setNoCertificado("00001000000507423256");
+			}
+		}
 		
 		if(pagoPadre.getSuddi()!=null && pagoPadre.getSuddi() != ""){	
 			Comprobante.CfdiRelacionados cfdiRelacionados = new ObjectFactory().createComprobanteCfdiRelacionados();
@@ -258,30 +358,7 @@ public class CfdiComplementoPagoV4Service {
 			
 		}
 		
-		/**
-		 * Receptor
-		 */
-		Receptor receptor = facturaBase.getReceptor();
-		receptor.setUsoCFDI(CUsoCFDI.CP_01);
-		comprobante.setReceptor(receptor);
-
-		/**
-		 * Emisor
-		 */
-		Emisor emisor = facturaBase.getEmisor();
-//		if(emisor.getRfc().equals("LCP061017PA9") || emisor.getRfc().equals("LCL050622DD9")){
-//			if(!procesaJenner){
-//				emisor.setRfc("LQC920131M20");
-//				emisor.setNombre("LABORATORIO QUIMICO CLINICO AZTECA SAPI DE CV");				
-//			}
-//		}		
-		comprobante.setEmisor(emisor);
-
-		/**
-		 * Fecha
-		 */
-//		comprobante.setFecha(DateUtil.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
-
+		
 		/**
 		 * Serie y Folio
 		 */
@@ -297,42 +374,8 @@ public class CfdiComplementoPagoV4Service {
 		comprobante.setMoneda(CMoneda.XXX);
 		comprobante.setSubTotal(BigDecimal.ZERO);
 		comprobante.setTotal(BigDecimal.ZERO);
-		comprobante.setLugarExpedicion(facturaBase.getLugarExpedicion());
 		comprobante.setExportacion("01");
-		
-		/**
-		 * Fecha
-		 */
-		if(facturaBase.getLugarExpedicion().equals("31203")){
-			comprobante.setFecha(utilsService.toXmlGregorianCalendar(utilsService.sumarORestarMinutosAFecha(new Date(),-62), "yyyy-MM-dd'T'HH:mm:ss"));
-		}else{
 			
-			comprobante.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
-		}
-		
-		
-		
-		
-		comprobante.setNoCertificado(facturaBase.getNoCertificado());
-		
-		if(facturaBase.getNoCertificado().equals("00001000000404009726")){
-			comprobante.setNoCertificado("00001000000505145362");
-		}
-		if(facturaBase.getNoCertificado().equals("00001000000406347874")){
-			comprobante.setNoCertificado("00001000000507423256");
-		}
-		
-//		if(facturaBase.getNoCertificado().equals("00001000000402926302") || facturaBase.getNoCertificado().equals("00001000000504077717")){
-//			if(!procesaJenner){
-//				comprobante.setNoCertificado("00001000000502350617");				
-//			}else{
-//				comprobante.setNoCertificado(facturaBase.getNoCertificado().equals("00001000000400940461") 
-//						? "00001000000502350617":facturaBase.getNoCertificado());
-//			}
-//		}else{			
-//			comprobante.setNoCertificado(facturaBase.getNoCertificado().equals("00001000000400940461") 
-//					? "00001000000502350617":facturaBase.getNoCertificado());
-//		}
 		
 
 		/**
@@ -358,6 +401,7 @@ public class CfdiComplementoPagoV4Service {
 		BigDecimal totalTrasladosImpuestoIVA16 = BigDecimal.ZERO;
 		BigDecimal montoTotalPagos = BigDecimal.ZERO;
 		BigDecimal totalBaseP = BigDecimal.ZERO;
+		BigDecimal totalImporteP = BigDecimal.ZERO;
 		
 		Pagos pago = new Pagos();
 		pago.setVersion(env.getProperty("complemento.pagos.xml.default.version2"));
@@ -393,18 +437,28 @@ public class CfdiComplementoPagoV4Service {
 			ImpuestosDR impuestosDR = new ImpuestosDR();
 			TrasladosDR trasladosDR = new TrasladosDR();
 			TrasladoDR trasladoDR = new TrasladoDR();
-			BigDecimal baseDr = facturaPago.getMpago().divide(BigDecimal.valueOf(1.16), 6, RoundingMode.DOWN);
+			BigDecimal baseDr = facturaPago.getMpago().divide(BigDecimal.valueOf(1.16), 6, RoundingMode.HALF_UP);
 			log.info("baseDr:"+baseDr);
 			trasladoDR.setBaseDR(baseDr);
 			trasladoDR.setImpuestoDR("002");
 			trasladoDR.setTipoFactorDR(CTipoFactor.TASA);
 			trasladoDR.setTasaOCuotaDR(new BigDecimal(0.16).setScale(6, RoundingMode.HALF_UP));
 			trasladoDR.setImporteDR(baseDr.multiply(trasladoDR.getTasaOCuotaDR()).setScale(6, RoundingMode.DOWN));
+			
+			BigDecimal bdSumaDr = trasladoDR.getBaseDR().add(trasladoDR.getImporteDR()).setScale(6, RoundingMode.DOWN);
+			BigDecimal bdDiferencia = facturaPago.getMpago().subtract(bdSumaDr).setScale(6, RoundingMode.DOWN);
+			if(bdDiferencia.signum()>0) {
+				trasladoDR.setImporteDR(trasladoDR.getImporteDR().add(bdDiferencia).setScale(6, RoundingMode.DOWN));				
+			}else {
+				trasladoDR.setImporteDR(trasladoDR.getImporteDR().subtract(bdDiferencia).setScale(6, RoundingMode.DOWN));	
+			}
+			
 			totalTrasladosImpuestoIVA16 = totalTrasladosImpuestoIVA16.add(trasladoDR.getImporteDR());
 			trasladosDR.getTrasladoDR().add(trasladoDR);
 			impuestosDR.setTrasladosDR(trasladosDR);			
 			facturaRelacionada.setImpuestosDR(impuestosDR);
 			totalBaseP = totalBaseP.add(baseDr);
+			totalImporteP = totalImporteP.add(trasladoDR.getImporteDR());
 						
 			newPago.getDoctoRelacionado().add(facturaRelacionada);
 			if (facturaRelacionada.getImpSaldoInsoluto().compareTo(BigDecimal.ZERO) < 0) {
@@ -427,7 +481,7 @@ public class CfdiComplementoPagoV4Service {
 		trasladoP.setImpuestoP("002");
 		trasladoP.setTipoFactorP(CTipoFactor.TASA);
 		trasladoP.setTasaOCuotaP(new BigDecimal(0.16).setScale(6, RoundingMode.HALF_UP));
-		trasladoP.setImporteP(totalBaseP.multiply(trasladoP.getTasaOCuotaP()).setScale(6, RoundingMode.DOWN));
+		trasladoP.setImporteP(totalImporteP);
 		trasladosP.getTrasladoP().add(trasladoP);
 		impuestosP.setTrasladosP(trasladosP);
 		newPago.setImpuestosP(impuestosP);
@@ -458,8 +512,84 @@ public class CfdiComplementoPagoV4Service {
 		Comprobante comprobante = new Comprobante();
 
 		String facturaPagadaXml = pagoDto.getFacturasRelacionadas().get(0).getXml();
-		Comprobante facturaBase = utilsService.createComprabanteFromXml4(facturaPagadaXml);
-		
+		if(facturaPagadaXml.contains("Version=\"4.0\"")) {
+			Comprobante factura40Base = utilsService.createComprabanteFromXml4(facturaPagadaXml);
+			/**
+			 * Receptor
+			 */
+			Receptor receptor = new Receptor();
+			TDatoFiscalDto datoFiscalDto = consultaService.getTDatoFiscalById(pagoDto.getFacturasRelacionadas().get(0).getKdatofiscal());
+			receptor.setNombre(datoFiscalDto.getSrazonsocial());
+			receptor.setRfc(datoFiscalDto.getSrfc());
+			receptor.setRegimenFiscalReceptor(datoFiscalDto.getSclaveregimenfiscal());
+			receptor.setDomicilioFiscalReceptor(datoFiscalDto.getCpostalcliente());
+			receptor.setUsoCFDI(CUsoCFDI.CP_01);
+			comprobante.setReceptor(receptor);
+			/**
+			 * Emisor
+			 */
+			Emisor emisor = factura40Base.getEmisor();
+			comprobante.setEmisor(emisor);
+			/**
+			 * Información general
+			 */
+			comprobante.setLugarExpedicion(factura40Base.getLugarExpedicion());
+			if(factura40Base.getLugarExpedicion().equals("31203")){
+				comprobante.setFecha(utilsService.toXmlGregorianCalendar(utilsService.sumarORestarMinutosAFecha(new Date(),-62), "yyyy-MM-dd'T'HH:mm:ss"));
+			}else{
+				
+				comprobante.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+			}
+			
+			comprobante.setNoCertificado(factura40Base.getNoCertificado());
+			if(factura40Base.getNoCertificado().equals("00001000000404009726")){
+				comprobante.setNoCertificado("00001000000505145362");
+			}
+			if(factura40Base.getNoCertificado().equals("00001000000406347874")){
+				comprobante.setNoCertificado("00001000000507423256");
+			}
+			
+		} else if(facturaPagadaXml.contains("Version=\"3.3\"")) {
+			mx.gob.sat.cfd._3.Comprobante factura33Base = utilsService.createComplementoPagoFromXml(facturaPagadaXml);
+			/**
+			 * Receptor
+			 */
+			Receptor receptor = new Receptor();
+			TDatoFiscalDto datoFiscalDto = consultaService.getTDatoFiscalById(pagoDto.getFacturasRelacionadas().get(0).getKdatofiscal());
+			receptor.setNombre(datoFiscalDto.getSrazonsocial());
+			receptor.setRfc(datoFiscalDto.getSrfc());
+			receptor.setRegimenFiscalReceptor(datoFiscalDto.getSclaveregimenfiscal());
+			receptor.setDomicilioFiscalReceptor(datoFiscalDto.getCpostalcliente());
+			receptor.setUsoCFDI(CUsoCFDI.CP_01);
+			comprobante.setReceptor(receptor);
+			/**
+			 * Emisor
+			 */
+			DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosRfcEmisor(factura33Base.getEmisor().getRfc(), 4);
+			Emisor emisor = new Emisor();
+			emisor.setNombre(datosMarcaDto.getRazonSocialMarca());
+			emisor.setRfc(datosMarcaDto.getRfcMarca());
+			emisor.setRegimenFiscal(factura33Base.getEmisor().getRegimenFiscal());
+			comprobante.setEmisor(emisor);
+			/**
+			 * Información general
+			 */
+			comprobante.setLugarExpedicion(factura33Base.getLugarExpedicion());
+			if(factura33Base.getLugarExpedicion().equals("31203")){
+				comprobante.setFecha(utilsService.toXmlGregorianCalendar(utilsService.sumarORestarMinutosAFecha(new Date(),-62), "yyyy-MM-dd'T'HH:mm:ss"));
+			}else{
+				comprobante.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+			}
+			
+			comprobante.setNoCertificado(factura33Base.getNoCertificado());
+			if(factura33Base.getNoCertificado().equals("00001000000404009726")){
+				comprobante.setNoCertificado("00001000000505145362");
+			}
+			if(factura33Base.getNoCertificado().equals("00001000000406347874")){
+				comprobante.setNoCertificado("00001000000507423256");
+			}
+		}
+			
 		if(pagoDto.getSuddi()!=null && pagoDto.getSuddi() != ""){		
 			Comprobante.CfdiRelacionados cfdiRelacionados = new ObjectFactory().createComprobanteCfdiRelacionados();
 			CfdiRelacionado cfdiRelacionado = new ObjectFactory().createComprobanteCfdiRelacionadosCfdiRelacionado();
@@ -469,24 +599,9 @@ public class CfdiComplementoPagoV4Service {
 			comprobante.getCfdiRelacionados().add(cfdiRelacionados);
 		}
 		
-		/**
-		 * Receptor
-		 */
-		Receptor receptor = facturaBase.getReceptor();
-		receptor.setUsoCFDI(CUsoCFDI.CP_01);
-		comprobante.setReceptor(receptor);
+		
 
-		/**
-		 * Emisor
-		 */
-		Emisor emisor = facturaBase.getEmisor();
-//		if(emisor.getRfc().equals("LCP061017PA9") || emisor.getRfc().equals("LCL050622DD9")){
-//			if(!procesaJenner){
-//				emisor.setNombre("LABORATORIO QUIMICO CLINICO AZTECA SAPI DE CV");
-//				emisor.setRfc("LQC920131M20");				
-//			}
-//		}		
-		comprobante.setEmisor(emisor);
+		
 
 		/**
 		 * Fecha
@@ -508,45 +623,9 @@ public class CfdiComplementoPagoV4Service {
 		comprobante.setMoneda(CMoneda.XXX);
 		comprobante.setSubTotal(BigDecimal.ZERO);
 		comprobante.setTotal(BigDecimal.ZERO);
-		comprobante.setLugarExpedicion(facturaBase.getLugarExpedicion());
+		
 		comprobante.setExportacion("01");
-		
-		/**
-		 * Fecha
-		 */
-//		comprobante.setFecha(DateUtil.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
 
-		
-		if(facturaBase.getLugarExpedicion().equals("31203")){
-			comprobante.setFecha(utilsService.toXmlGregorianCalendar(utilsService.sumarORestarMinutosAFecha(new Date(),-62), "yyyy-MM-dd'T'HH:mm:ss"));
-		}else{
-			
-			comprobante.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
-		}
-		
-		
-		
-		
-		comprobante.setNoCertificado(facturaBase.getNoCertificado());
-		if(facturaBase.getNoCertificado().equals("00001000000404009726")){
-			comprobante.setNoCertificado("00001000000505145362");
-		}
-		if(facturaBase.getNoCertificado().equals("00001000000406347874")){
-			comprobante.setNoCertificado("00001000000507423256");
-		}
-		
-		
-//		if(facturaBase.getNoCertificado().equals("00001000000402926302") || facturaBase.getNoCertificado().equals("00001000000504077717")){
-//			if(!procesaJenner){
-//				comprobante.setNoCertificado("00001000000502350617");				
-//			}else{
-//				comprobante.setNoCertificado(facturaBase.getNoCertificado().equals("00001000000400940461") 
-//						? "00001000000502350617":facturaBase.getNoCertificado());
-//			}
-//		}else{			
-//			comprobante.setNoCertificado(facturaBase.getNoCertificado().equals("00001000000400940461") 
-//					? "00001000000502350617":facturaBase.getNoCertificado());
-//		}
 
 		/**
 		 * Concepto
@@ -570,6 +649,7 @@ public class CfdiComplementoPagoV4Service {
 		BigDecimal totalTrasladosImpuestoIVA16 = BigDecimal.ZERO;
 		BigDecimal montoTotalPagos = BigDecimal.ZERO;
 		BigDecimal totalBaseP = BigDecimal.ZERO;
+		BigDecimal totalImporteP = BigDecimal.ZERO;
 		
 		Pagos pago = new Pagos();
 		pago.setVersion(env.getProperty("complemento.pagos.xml.default.version2"));
@@ -605,18 +685,28 @@ public class CfdiComplementoPagoV4Service {
 			ImpuestosDR impuestosDR = new ImpuestosDR();
 			TrasladosDR trasladosDR = new TrasladosDR();
 			TrasladoDR trasladoDR = new TrasladoDR();
-			BigDecimal baseDr = facturaPago.getMpago().divide(BigDecimal.valueOf(1.16), 6, RoundingMode.DOWN);
+			BigDecimal baseDr = facturaPago.getMpago().divide(BigDecimal.valueOf(1.16), 6, RoundingMode.HALF_UP);
 			log.info("baseDr:"+baseDr);
 			trasladoDR.setBaseDR(baseDr);
 			trasladoDR.setImpuestoDR("002");
 			trasladoDR.setTipoFactorDR(CTipoFactor.TASA);
 			trasladoDR.setTasaOCuotaDR(new BigDecimal(0.16).setScale(6, RoundingMode.HALF_UP));
 			trasladoDR.setImporteDR(baseDr.multiply(trasladoDR.getTasaOCuotaDR()).setScale(6, RoundingMode.DOWN));
+			
+			BigDecimal bdSumaDr = trasladoDR.getBaseDR().add(trasladoDR.getImporteDR()).setScale(6, RoundingMode.DOWN);
+			BigDecimal bdDiferencia = facturaPago.getMpago().subtract(bdSumaDr).setScale(6, RoundingMode.DOWN);
+			if(bdDiferencia.signum()>0) {
+				trasladoDR.setImporteDR(trasladoDR.getImporteDR().add(bdDiferencia).setScale(6, RoundingMode.DOWN));				
+			}else {
+				trasladoDR.setImporteDR(trasladoDR.getImporteDR().subtract(bdDiferencia).setScale(6, RoundingMode.DOWN));	
+			}
+			
 			totalTrasladosImpuestoIVA16 = totalTrasladosImpuestoIVA16.add(trasladoDR.getImporteDR());
 			trasladosDR.getTrasladoDR().add(trasladoDR);
 			impuestosDR.setTrasladosDR(trasladosDR);			
 			facturaRelacionada.setImpuestosDR(impuestosDR);
 			totalBaseP = totalBaseP.add(baseDr);
+			totalImporteP = totalImporteP.add(trasladoDR.getImporteDR());
 						
 			newPago.getDoctoRelacionado().add(facturaRelacionada);
 			if (facturaRelacionada.getImpSaldoInsoluto().compareTo(BigDecimal.ZERO) < 0) {
@@ -639,7 +729,7 @@ public class CfdiComplementoPagoV4Service {
 		trasladoP.setImpuestoP("002");
 		trasladoP.setTipoFactorP(CTipoFactor.TASA);
 		trasladoP.setTasaOCuotaP(new BigDecimal(0.16).setScale(6, RoundingMode.HALF_UP));
-		trasladoP.setImporteP(totalBaseP.multiply(trasladoP.getTasaOCuotaP()).setScale(6, RoundingMode.DOWN));
+		trasladoP.setImporteP(totalImporteP);
 		trasladosP.getTrasladoP().add(trasladoP);
 		impuestosP.setTrasladosP(trasladosP);
 		newPago.setImpuestosP(impuestosP);
@@ -674,44 +764,69 @@ public class CfdiComplementoPagoV4Service {
 
 	public String getRfcEmisor(PagoDto pagoDto)throws Exception{
 		String facturaPagadaXml = pagoDto.getFacturasRelacionadas().get(0).getXml();
-		Comprobante facturaBase = utilsService.createComprabanteFromXml4(facturaPagadaXml);
-		
-		Emisor emisor = facturaBase.getEmisor();
-		
-		return emisor.getRfc();
+		if(facturaPagadaXml.contains("Version=\"4.0\"")) {
+			Comprobante facturaBase = utilsService.createComprabanteFromXml4(facturaPagadaXml);			
+			Emisor emisor = facturaBase.getEmisor();			
+			return emisor.getRfc();
+		} else if(facturaPagadaXml.contains("Version=\"3.3\"")) {
+			mx.gob.sat.cfd._3.Comprobante facturaBase33 = utilsService.createComplementoFromXml(facturaPagadaXml);
+			mx.gob.sat.cfd._3.Comprobante.Emisor emisor = facturaBase33.getEmisor();
+			return emisor.getRfc();
+		}
+		return null;		
 	}
 	
 	public String getRfcEmiorMultiPago(List<PagoDto> pagos) throws Exception {
 		String facturaPagadaXml = pagos.get(0).getFacturasRelacionadas().get(0).getXml();
-		Comprobante facturaBase = utilsService.createComprabanteFromXml4(facturaPagadaXml);
-		Emisor emisor = facturaBase.getEmisor();
-		return emisor.getRfc();
+		if(facturaPagadaXml.contains("Version=\"4.0\"")) {
+			Comprobante facturaBase = utilsService.createComprabanteFromXml4(facturaPagadaXml);			
+			Emisor emisor = facturaBase.getEmisor();			
+			return emisor.getRfc();
+		} else if(facturaPagadaXml.contains("Version=\"3.3\"")) {
+			mx.gob.sat.cfd._3.Comprobante facturaBase33 = utilsService.createComplementoFromXml(facturaPagadaXml);
+			mx.gob.sat.cfd._3.Comprobante.Emisor emisor = facturaBase33.getEmisor();
+			return emisor.getRfc();
+		}
+		return null;	
 	}
 	
 	public String getSSerie(PagoDto pagoDto)throws Exception{
 		String facturaPagadaXml = pagoDto.getFacturasRelacionadas().get(0).getXml();
-		Comprobante facturaBase = utilsService.createComprabanteFromXml4(facturaPagadaXml);
-//		facturaBase.getSerie();
-//		
-//		
-//		Emisor emisor = facturaBase.getEmisor();
-		
-		return facturaBase.getSerie();
+		if(facturaPagadaXml.contains("Version=\"4.0\"")) {
+			Comprobante facturaBase = utilsService.createComprabanteFromXml4(facturaPagadaXml);			
+			return facturaBase.getSerie();
+		} else if(facturaPagadaXml.contains("Version=\"3.3\"")) {
+			mx.gob.sat.cfd._3.Comprobante facturaBase33 = utilsService.createComplementoFromXml(facturaPagadaXml);
+			return facturaBase33.getSerie();
+		}
+		return null;
 	}
 	
 	public String getSSerieMultiPago(List<PagoDto> pagos) throws Exception {
 		String facturaPagadaXml = pagos.get(0).getFacturasRelacionadas().get(0).getXml();
-		Comprobante facturaBase = utilsService.createComprabanteFromXml4(facturaPagadaXml);
-//		Emisor emisor = facturaBase.getEmisor();
-		return facturaBase.getSerie();
+		if(facturaPagadaXml.contains("Version=\"4.0\"")) {
+			Comprobante facturaBase = utilsService.createComprabanteFromXml4(facturaPagadaXml);			
+			return facturaBase.getSerie();
+		} else if(facturaPagadaXml.contains("Version=\"3.3\"")) {
+			mx.gob.sat.cfd._3.Comprobante facturaBase33 = utilsService.createComplementoFromXml(facturaPagadaXml);
+			return facturaBase33.getSerie();
+		}
+		return null;
 	}
 	
 	public boolean getFechaRegistro(PagoDto pagoDto)throws Exception{
 		boolean statusJenner = false;
 		String facturaPagadaXml = pagoDto.getFacturasRelacionadas().get(0).getXml();
-		Comprobante facturaBase = utilsService.createComprabanteFromXml4(facturaPagadaXml);
+		XMLGregorianCalendar fecEmision = null;
+		if(facturaPagadaXml.contains("Version=\"4.0\"")) {
+			Comprobante facturaBase = utilsService.createComprabanteFromXml4(facturaPagadaXml);			
+			fecEmision = facturaBase.getFecha();
+		} else if(facturaPagadaXml.contains("Version=\"3.3\"")) {
+			mx.gob.sat.cfd._3.Comprobante facturaBase33 = utilsService.createComplementoFromXml(facturaPagadaXml);
+			fecEmision = facturaBase33.getFecha();
+		}
+		
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-		XMLGregorianCalendar fecEmision = facturaBase.getFecha();
 		
 		Date dateFac = fecEmision.toGregorianCalendar().getTime();
 		log.info("dateFac:"+dateFac);
@@ -734,9 +849,15 @@ public class CfdiComplementoPagoV4Service {
 		boolean statusJenner = false;
 	
 		String facturaPagadaXml = pagos.get(0).getFacturasRelacionadas().get(0).getXml();
-		Comprobante facturaBase = utilsService.createComprabanteFromXml4(facturaPagadaXml);
+		XMLGregorianCalendar fecEmision = null;
+		if(facturaPagadaXml.contains("Version=\"4.0\"")) {
+			Comprobante facturaBase = utilsService.createComprabanteFromXml4(facturaPagadaXml);			
+			fecEmision = facturaBase.getFecha();
+		} else if(facturaPagadaXml.contains("Version=\"3.3\"")) {
+			mx.gob.sat.cfd._3.Comprobante facturaBase33 = utilsService.createComplementoFromXml(facturaPagadaXml);
+			fecEmision = facturaBase33.getFecha();
+		}
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-		XMLGregorianCalendar fecEmision = facturaBase.getFecha();
 		
 		Date dateFac = fecEmision.toGregorianCalendar().getTime();
 		
@@ -770,10 +891,19 @@ public class CfdiComplementoPagoV4Service {
 		/**
 		 * Datos Cliente
 		 */
+		Comprobante facturaBase40 = null;
+		mx.gob.sat.cfd._3.Comprobante facturaBase33 = null;
 		String facturaPagadaXml = pagoDto.getFacturasRelacionadas().get(0).getXml();
-		Comprobante facturaBase = utilsService.createComprabanteFromXml4(facturaPagadaXml);
-		TFacturaCreditoDto facturaBaseDto = consultaService.getTFacturaCreditoDtoBySerieAndFolio(facturaBase.getSerie(),
-				Integer.parseInt(facturaBase.getFolio()));
+		TFacturaCreditoDto facturaBaseDto = null;
+		if(facturaPagadaXml.contains("Version=\"4.0\"")) {
+			facturaBase40 = utilsService.createComprabanteFromXml4(facturaPagadaXml);
+			facturaBaseDto = consultaService.getTFacturaCreditoDtoBySerieAndFolio(facturaBase40.getSerie(),
+					Integer.parseInt(facturaBase40.getFolio()));
+		} else if(facturaPagadaXml.contains("Version=\"3.3\"")) {
+			facturaBase33 = utilsService.createComplementoFromXml(facturaPagadaXml);
+			facturaBaseDto = consultaService.getTFacturaCreditoDtoBySerieAndFolio(facturaBase33.getSerie(),
+					Integer.parseInt(facturaBase33.getFolio()));
+		}
 		tFacturaCPagos.setIdCliente(facturaBaseDto.getIdCliente());
 		tFacturaCPagos.setIdDatoFiscal(facturaBaseDto.getIdDatoFiscal());
 		
