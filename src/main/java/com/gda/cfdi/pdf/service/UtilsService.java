@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import mx.gob.sat.addenda.AddendaEmpresa;
 import mx.gob.sat.cfd._3.Comprobante;
 import mx.gob.sat.cfd.pagos.Pagos;
 import mx.gob.sat.timbrefiscaldigital.TimbreFiscalDigital;
@@ -73,6 +74,10 @@ private static final Logger log = LoggerFactory.getLogger(UtilsService.class);
 		List<Class<?>> classesMarshall = new ArrayList<Class<?>>();
 		if (xml.toLowerCase().contains("<tfd:TimbreFiscalDigital".toLowerCase())) {
 			classesMarshall.add(TimbreFiscalDigital.class);
+		}
+		if (xml.toLowerCase().contains("<ae:AddendaEmpresa".toLowerCase())) {
+			
+			classesMarshall.add(AddendaEmpresa.class);
 		}
 		classesMarshall.add(mx.gob.sat.cfd._4.Comprobante.class);
 		classesMarshall.add(mx.gob.sat.pagos20.Pagos.class);

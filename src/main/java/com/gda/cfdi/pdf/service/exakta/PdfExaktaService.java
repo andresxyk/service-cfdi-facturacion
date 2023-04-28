@@ -87,7 +87,7 @@ public class PdfExaktaService {
 	      byte [] bytes = Files.readAllBytes(file.toPath());
 
 	      b64 = Base64.getEncoder().encodeToString(bytes);
-	      file.delete();
+//	      file.delete();
 	    } catch (Exception e) {
 	      e.printStackTrace();
 	    }
