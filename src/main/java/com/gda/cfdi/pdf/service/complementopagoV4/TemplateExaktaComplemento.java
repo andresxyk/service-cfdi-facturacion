@@ -99,8 +99,8 @@ public class TemplateExaktaComplemento  extends PdfPageEventHelper{
 			
 //			String strDomicFiscalEmis = comprobante.getEmisor().getR; 
 			String strNomOrdPac = "comprobante.getConsecutivo()"+" "+"comprobante.getNombrepaciente()";
-			String strCadenaTimbre = "CADENA ORIGINAL DEL COMPLEMENTO DE CERTIFICACION DIGITAL SAT:" + complementoDatos.getsCadenaOriginal() + " "
-					+ "Sello Digital del SAT: "+timbreFiscalDigital.getSelloSAT()+" CERTIFICADO SAT: "+ timbreFiscalDigital.getNoCertificadoSAT();
+			String strCadenaTimbre = "CADENA ORIGINAL DEL COMPLEMENTO DE CERTIFICACION DIGITAL SAT:" + complementoDatos.getsCadenaOriginal() 
+					+ "\r\nSello Digital del SAT: "+timbreFiscalDigital.getSelloSAT()+" CERTIFICADO SAT: "+ timbreFiscalDigital.getNoCertificadoSAT();
 
 			String uuid = timbreFiscalDigital.getUUID();
 			String sello =  timbreFiscalDigital.getSelloSAT();

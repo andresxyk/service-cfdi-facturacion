@@ -99,9 +99,9 @@ public class TemplateOlabComplemento  extends PdfPageEventHelper{
 			
 //			String strDomicFiscalEmis = comprobante.getEmisor().getR; 
 			String strNomOrdPac = "comprobante.getConsecutivo()"+" "+"comprobante.getNombrepaciente()";
-			String strCadenaTimbre = "CADENA ORIGINAL DEL COMPLEMENTO DE CERTIFICACION DIGITAL SAT:" + complementoDatos.getsCadenaOriginal() + " "
-					+ "Sello Digital del SAT: "+timbreFiscalDigital.getSelloSAT()+" CERTIFICADO SAT: "+ timbreFiscalDigital.getNoCertificadoSAT();
-
+			String strCadenaTimbre = "CADENA ORIGINAL DEL COMPLEMENTO DE CERTIFICACION DIGITAL SAT:" + complementoDatos.getsCadenaOriginal()
+					+ "\r\nSello Digital del SAT: "+timbreFiscalDigital.getSelloSAT()+" CERTIFICADO SAT: "+ timbreFiscalDigital.getNoCertificadoSAT();
+			log.info(strCadenaTimbre);
 			String uuid = timbreFiscalDigital.getUUID();
 			String sello =  timbreFiscalDigital.getSelloSAT();
 //			String sello1 = timbreFiscalDigital.getSelloSAT();
@@ -160,7 +160,7 @@ public class TemplateOlabComplemento  extends PdfPageEventHelper{
 			Font fuenteContenidoTab = new Font(Font.FontFamily.HELVETICA,7,Font.NORMAL,BaseColor.BLACK);
 			Font fuenteContenidoImporTab = new Font(Font.FontFamily.HELVETICA,7,Font.BOLD,BaseColor.BLACK);
 			Font fuenteTimbrado = new Font(Font.FontFamily.HELVETICA,4,Font.NORMAL,BaseColor.BLACK);
-			Font fuenteTimbradoImpor = new Font(Font.FontFamily.HELVETICA,4,Font.BOLD,BaseColor.BLACK);
+			Font fuenteTimbradoImpor = new Font(Font.FontFamily.HELVETICA,4,Font.NORMAL,BaseColor.BLACK);
 			
 			
 			
@@ -640,10 +640,10 @@ public class TemplateOlabComplemento  extends PdfPageEventHelper{
 	            pcTituloRelacionCFDI.setHorizontalAlignment(Element.ALIGN_LEFT);
 	            PdfPCell pcTituloCFDIRelacionado = new PdfPCell(new Paragraph("  ",fuenteImportPie));
 	            pcTituloCFDIRelacionado.setHorizontalAlignment(Element.ALIGN_RIGHT);
-	            PdfPCell pcTimbre = new PdfPCell(new Paragraph(strCadenaTimbre,fuenteTimbrado));
-	            pcTimbre.setMinimumHeight(35);
+	            PdfPCell pcTimbre = new PdfPCell(new Paragraph(strCadenaTimbre,fuenteTimbradoImpor));
+//	            pcTimbre.setMinimumHeight(35);
 	            pcTimbre.setHorizontalAlignment(Element.ALIGN_LEFT);
-	            pcTimbre.setColspan(2);        
+	            pcTimbre.setColspan(2);
 	          //uuidRelacionado
 	            PdfPCell uuidRelacionados = new PdfPCell(new Paragraph("CFDI Relacionado: "+uuidRelacionado+" Tipo de Relación: "+tipoRelacionado,fuenteTimbradoImpor));
 	            uuidRelacionados.setHorizontalAlignment(Element.ALIGN_LEFT);

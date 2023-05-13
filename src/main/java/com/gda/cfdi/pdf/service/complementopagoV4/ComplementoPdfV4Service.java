@@ -295,8 +295,22 @@ public class ComplementoPdfV4Service {
 					/*
 					 * Dcomentos relacionados
 					 */
-					
+					int limit = 7;
+					int contPagos = 0;
 					for (int i = 0 ; i < pago.getDoctoRelacionado().size(); i++) {
+						
+						if (limit == contPagos) {
+							PdfContentByte canvas = writerSwiss.getDirectContent();
+							tabDatosComplemento.writeSelectedRows(0, -1, 35f, 475f, canvas);
+							tabDatosComplemento = new PdfPTable(9);
+							PdfContentByte canvasMontos = writerSwiss.getDirectContent();
+							tabDetalleMontosTotales.writeSelectedRows(0, -1, 35f, 528f, canvas);
+							tabDetalleMontos.writeSelectedRows(0, -1, 35f, 170f, canvasMontos);
+							reporteSwisslab.newPage();
+							reporteSwisslab.add(tabDatosFactura);
+							contPagos = 0;
+						}
+						
 						Pago.DoctoRelacionado docRelacionado = pago.getDoctoRelacionado().get(i);
 						Pago.DoctoRelacionado.ImpuestosDR.TrasladosDR.TrasladoDR trasladoDR = pago.getDoctoRelacionado().get(i).getImpuestosDR().getTrasladosDR().getTrasladoDR().get(0);
 						PdfPCell espacioBlanco = new PdfPCell(new Paragraph(" ", fuenteContenidoTab));
@@ -411,6 +425,7 @@ public class ComplementoPdfV4Service {
 							countPage = i;
 						}
 						logger.info("tabDatosComplemento:::");
+						contPagos++;
 					}
 					if((countPage  % 25) != 0){
 					PdfContentByte canvas = writerSwiss.getDirectContent();
@@ -674,8 +689,20 @@ public class ComplementoPdfV4Service {
 					/*
 					 * Dcomentos relacionados
 					 */
-					
+					int limit = 7;
+					int contPagos = 0;
 					for (int i = 0 ; i < pago.getDoctoRelacionado().size(); i++) {
+						if(limit == contPagos) {
+							PdfContentByte canvas = writerSwiss.getDirectContent();
+							tabDatosComplemento.writeSelectedRows(0, -1, 35f, 475f, canvas);
+							tabDatosComplemento = new PdfPTable(9);
+							PdfContentByte canvasMontos = writerSwiss.getDirectContent();
+							tabDetalleMontosTotales.writeSelectedRows(0, -1, 35f, 528f, canvas);
+							tabDetalleMontos.writeSelectedRows(0, -1, 35f, 170f, canvasMontos);
+							reporteSwisslab.newPage();
+							reporteSwisslab.add(tabDatosFactura);
+							contPagos = 0;
+						}						
 						Pago.DoctoRelacionado docRelacionado = pago.getDoctoRelacionado().get(i);
 						Pago.DoctoRelacionado.ImpuestosDR.TrasladosDR.TrasladoDR trasladoDR = pago.getDoctoRelacionado().get(i).getImpuestosDR().getTrasladosDR().getTrasladoDR().get(0);
 						PdfPCell espacioBlanco = new PdfPCell(new Paragraph(" ", fuenteContenidoTab));
@@ -790,6 +817,7 @@ public class ComplementoPdfV4Service {
 							countPage = i;
 						}
 						logger.info("tabDatosComplemento:::");
+						contPagos++;
 					}
 					if((countPage  % 25) != 0){
 					PdfContentByte canvas = writerSwiss.getDirectContent();
@@ -1052,8 +1080,22 @@ public class ComplementoPdfV4Service {
 					/*
 					 * Dcomentos relacionados
 					 */
-					
+					int limit = 7;
+					int contPagos = 0;
 					for (int i = 0 ; i < pago.getDoctoRelacionado().size(); i++) {
+						
+						if (limit == contPagos) {
+							PdfContentByte canvas = writerSwiss.getDirectContent();
+							tabDatosComplemento.writeSelectedRows(0, -1, 35f, 475f, canvas);
+							tabDatosComplemento = new PdfPTable(9);
+							PdfContentByte canvasMontos = writerSwiss.getDirectContent();
+							tabDetalleMontosTotales.writeSelectedRows(0, -1, 35f, 528f, canvas);
+							tabDetalleMontos.writeSelectedRows(0, -1, 35f, 170f, canvasMontos);
+							reporteSwisslab.newPage();
+							reporteSwisslab.add(tabDetalleMontos);
+							contPagos = 0;
+						}
+						
 						Pago.DoctoRelacionado docRelacionado = pago.getDoctoRelacionado().get(i);
 						Pago.DoctoRelacionado.ImpuestosDR.TrasladosDR.TrasladoDR trasladoDR = pago.getDoctoRelacionado().get(i).getImpuestosDR().getTrasladosDR().getTrasladoDR().get(0);
 						PdfPCell espacioBlanco = new PdfPCell(new Paragraph(" ", fuenteContenidoTab));
@@ -1160,7 +1202,7 @@ public class ComplementoPdfV4Service {
 						tabDetalleMontosTotales.writeSelectedRows(0, -1, 35f, 528f, canvas);
 						tabDetalleMontos.writeSelectedRows(0, -1, 35f, 170f, canvasMontos);
 						reporteSwisslab.newPage();
-						reporteSwisslab.add(tabDatosFactura);
+						reporteSwisslab.add(tabDetalleMontos);
 						}if(i == 0 &&  pago.getDoctoRelacionado().size() == 1) {
 							PdfContentByte canvas = writerSwiss.getDirectContent();
 							tabDatosComplemento.writeSelectedRows(0, -1, 35f, 475f, canvas);
@@ -1168,6 +1210,7 @@ public class ComplementoPdfV4Service {
 							countPage = i;
 						}
 						logger.info("tabDatosComplemento:::");
+						contPagos++;
 					}
 					if((countPage  % 25) != 0){
 					PdfContentByte canvas = writerSwiss.getDirectContent();
@@ -1813,8 +1856,22 @@ public class ComplementoPdfV4Service {
 					/*
 					 * Dcomentos relacionados
 					 */
-					
+					int limit = 7;
+					int contPagos = 0;
 					for (int i = 0 ; i < pago.getDoctoRelacionado().size(); i++) {
+						if(limit == contPagos) {
+							PdfContentByte canvas = writerSwiss.getDirectContent();
+							tabDatosComplemento.writeSelectedRows(0, -1, 35f, 475f, canvas);
+							tabDatosComplemento = new PdfPTable(9);
+							PdfContentByte canvasMontos = writerSwiss.getDirectContent();
+							tabDetalleMontosTotales.writeSelectedRows(0, -1, 35f, 528f, canvas);
+							tabDetalleMontos.writeSelectedRows(0, -1, 35f, 170f, canvasMontos);
+							reporteSwisslab.newPage();
+							reporteSwisslab.add(tabDatosFactura);
+							contPagos = 0;
+						}
+						
+						
 						Pago.DoctoRelacionado docRelacionado = pago.getDoctoRelacionado().get(i);
 						Pago.DoctoRelacionado.ImpuestosDR.TrasladosDR.TrasladoDR trasladoDR = pago.getDoctoRelacionado().get(i).getImpuestosDR().getTrasladosDR().getTrasladoDR().get(0);
 						PdfPCell espacioBlanco = new PdfPCell(new Paragraph(" ", fuenteContenidoTab));
@@ -1929,6 +1986,7 @@ public class ComplementoPdfV4Service {
 							countPage = i;
 						}
 						logger.info("tabDatosComplemento:::");
+						contPagos++;
 					}
 					if((countPage  % 25) != 0){
 					PdfContentByte canvas = writerSwiss.getDirectContent();
@@ -2193,8 +2251,20 @@ public class ComplementoPdfV4Service {
 					/*
 					 * Dcomentos relacionados
 					 */
-					
+					int limit = 7;
+					int contPagos = 0;
 					for (int i = 0 ; i < pago.getDoctoRelacionado().size(); i++) {
+						if(limit == contPagos) {
+							PdfContentByte canvas = writerSwiss.getDirectContent();
+							tabDatosComplemento.writeSelectedRows(0, -1, 35f, 475f, canvas);
+							tabDatosComplemento = new PdfPTable(9);
+							PdfContentByte canvasMontos = writerSwiss.getDirectContent();
+							tabDetalleMontosTotales.writeSelectedRows(0, -1, 35f, 528f, canvas);
+							tabDetalleMontos.writeSelectedRows(0, -1, 35f, 170f, canvasMontos);
+							reporteSwisslab.newPage();
+							reporteSwisslab.add(tabDatosFactura);
+							contPagos = 0;
+						}
 						Pago.DoctoRelacionado docRelacionado = pago.getDoctoRelacionado().get(i);
 						Pago.DoctoRelacionado.ImpuestosDR.TrasladosDR.TrasladoDR trasladoDR = pago.getDoctoRelacionado().get(i).getImpuestosDR().getTrasladosDR().getTrasladoDR().get(0);
 						PdfPCell espacioBlanco = new PdfPCell(new Paragraph(" ", fuenteContenidoTab));
@@ -2309,6 +2379,7 @@ public class ComplementoPdfV4Service {
 							countPage = i;
 						}
 						logger.info("tabDatosComplemento:::");
+						contPagos++;
 					}
 					if((countPage  % 25) != 0){
 					PdfContentByte canvas = writerSwiss.getDirectContent();
@@ -2575,8 +2646,20 @@ public class ComplementoPdfV4Service {
 					/*
 					 * Dcomentos relacionados
 					 */
-					
+					int limit = 7;
+					int contPagos = 0;
 					for (int i = 0 ; i < pago.getDoctoRelacionado().size(); i++) {
+						if(limit == contPagos) {
+							PdfContentByte canvas = writerSwiss.getDirectContent();
+							tabDatosComplemento.writeSelectedRows(0, -1, 35f, 475f, canvas);
+							tabDatosComplemento = new PdfPTable(9);
+							PdfContentByte canvasMontos = writerSwiss.getDirectContent();
+							tabDetalleMontosTotales.writeSelectedRows(0, -1, 35f, 528f, canvas);
+							tabDetalleMontos.writeSelectedRows(0, -1, 35f, 170f, canvasMontos);
+							reporteSwisslab.newPage();
+							reporteSwisslab.add(tabDatosFactura);
+							contPagos = 0;
+						}
 						Pago.DoctoRelacionado docRelacionado = pago.getDoctoRelacionado().get(i);
 						Pago.DoctoRelacionado.ImpuestosDR.TrasladosDR.TrasladoDR trasladoDR = pago.getDoctoRelacionado().get(i).getImpuestosDR().getTrasladosDR().getTrasladoDR().get(0);
 						PdfPCell espacioBlanco = new PdfPCell(new Paragraph(" ", fuenteContenidoTab));
@@ -2691,6 +2774,7 @@ public class ComplementoPdfV4Service {
 							countPage = i;
 						}
 						logger.info("tabDatosComplemento:::");
+						contPagos++;
 					}
 					if((countPage  % 25) != 0){
 					PdfContentByte canvas = writerSwiss.getDirectContent();

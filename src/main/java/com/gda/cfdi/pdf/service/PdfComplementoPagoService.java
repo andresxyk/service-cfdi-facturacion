@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.gda.cfdi.pdf.dto.ComplementoDatosDto;
 import com.gda.cfdi.pdf.dto.TFacturaDto;
 import com.gda.cfdi.pdf.service.complementopagoV4.ComplementoPdfV4Service;
+import com.gda.cfdi.pdf.utils.GeneralUtil;
 import com.itextpdf.text.DocumentException;
 
 import mx.gob.sat.cfd._3.Comprobante;
@@ -28,19 +29,18 @@ public class PdfComplementoPagoService {
 	private static final Logger log = LoggerFactory.getLogger(PdfComplementoPagoService.class);
 	
 	@Autowired
-	private Environment env;
-	
+	private Environment env;	
 	@Autowired
-	private ConsultaService consultaService;
-		
+	private ConsultaService consultaService;		
 	@Autowired
-	private UtilsService utilsService;
-	
+	private UtilsService utilsService;	
 	@Autowired
-	private ComplementoPdfService complementoPdfBo;
-	
+	private ComplementoPdfService complementoPdfBo;	
 	@Autowired
 	private ComplementoPdfV4Service complementoPdfV4Service;
+	@Autowired
+	private GeneralUtil generalUtil;
+	
 	
 	public String generarPdfOrden(Integer kfactura, Boolean bReturnBase64) throws Exception {
 		try {
@@ -201,6 +201,10 @@ public class PdfComplementoPagoService {
 						List<ComplementoDatosDto> complementoDatos = consultaService.findComplementoDatosById(comprobante.getEmisor().getRfc(), comprobante.getSerie(), comprobante.getFolio());
 						if (complementoDatos.size() > 0 && complementoDatos != null) {
 							ComplementoDatosDto complementoDato = complementoDatos.get(0);
+							TimbreFiscalDigital tfd = generalUtil.getTimbreFiscalDigital(comprobante);
+							String xmlTfd = generalUtil.getXMLTimbreFiscalDigital(tfd);
+							complementoDato.setsCadenaOriginal(generalUtil.generarCadenaOriginalTFD(xmlTfd));
+							
 							switch (comprobante.getEmisor().getRfc()) {
 							case "SWI1201268J8":// Swisslab
 								log.info("Swisslab");
