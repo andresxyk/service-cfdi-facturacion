@@ -265,7 +265,7 @@ public class CfdiSerieBRfcV4Service {
 		DatosFiscales datoFiscal = consultaService
 				.obtenerDatosFiscalesByCConvenioAndBconvenio(tFacturaEntity.getKdatofiscal(), convenioKdato);
 		TDatoFiscalDto datoFiscalDto = consultaService.getTDatoFiscalById(datoFiscal.getKdatofiscal());
-		receptor.setNombre(utilsService.darFormatoCFDI(datoFiscal.getSrazonsocial()));
+		receptor.setNombre(datoFiscal.getSrazonsocial());
 		receptor.setRfc(datoFiscal.getSrfc());
 		
 		log.info("cusoCfdi--->>>   " + usoCFDI);
