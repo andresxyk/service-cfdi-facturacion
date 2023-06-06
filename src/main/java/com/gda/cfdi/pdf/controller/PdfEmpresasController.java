@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gda.cfdi.pdf.bean.InformacionPdfBean;
 import com.gda.cfdi.pdf.exception.ResponseErrorDto;
 import com.gda.cfdi.pdf.service.exakta.PdfExaktaService;
 
@@ -23,9 +24,9 @@ public class PdfEmpresasController {
 	private PdfExaktaService pdfService;
 	
 	@PostMapping("/pdf-exakta")
-	public ResponseEntity<?> getXmlOrden(@RequestBody String xml){
+	public ResponseEntity<?> getXmlOrden(@RequestBody InformacionPdfBean cfdiBean){
 		try {			
-			return new ResponseEntity<String>(pdfService.generarPdfExaktaV40(xml), HttpStatus.OK);
+			return new ResponseEntity<String>(pdfService.generarPdfExaktaV40(cfdiBean), HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			ResponseErrorDto dto = new ResponseErrorDto();

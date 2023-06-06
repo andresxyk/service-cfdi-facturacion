@@ -93,7 +93,7 @@ public class TemplateExaktaEmpresa extends PdfPageEventHelper{
 			
 			
 			String strDomicFiscalEmis = infoPDF.getDirFiscalEmisor();
-			String strNomOrdPac = infoPDF.getConsecutivo()+" "+infoPDF.getNombrePaciente();
+			String strNomOrdPac = infoPDF.getNombrePaciente();
 			String strCadenaTimbre = "CADENA ORIGINAL DEL COMPLEMENTO DE CERTIFICACION DIGITAL SAT:"+infoPDF.getCadenaOriginal()+" "
 					+ "Sello Digital del SAT: "+timbreFiscalDigital.getSelloSAT()+" CERTIFICADO SAT: "+ timbreFiscalDigital.getNoCertificadoSAT();
 			String uuid = timbreFiscalDigital.getUUID();

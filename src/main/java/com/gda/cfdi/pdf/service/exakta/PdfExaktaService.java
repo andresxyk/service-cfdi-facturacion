@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import com.gda.cfdi.pdf.bean.InformacionPdfBean;
 import com.gda.cfdi.pdf.dto.ComplementoDatosDto;
 import com.gda.cfdi.pdf.dto.PdfInfoDto;
 import com.gda.cfdi.pdf.service.ConsultaService;
@@ -41,17 +42,17 @@ public class PdfExaktaService {
 	@Autowired
 	private ComplementoPdfV4Service complementoPdfV4Service;
 	
-	public String generarPdfExaktaV40(String xml) throws DocumentException, IOException, Exception {
+	public String generarPdfExaktaV40(InformacionPdfBean cfdiBean) throws DocumentException, IOException, Exception {
 		String ruta = "";
-		System.out.println(xml);
-		if(!xml.isEmpty() && xml.trim().length()>5) {
-			Comprobante comprobante = utilsService.createComprobanteFromXml(xml);
+		System.out.println(cfdiBean.getXml());
+		if(!cfdiBean.getXml().isEmpty() && cfdiBean.getXml().trim().length()>5) {
+			Comprobante comprobante = utilsService.createComprobanteFromXml(cfdiBean.getXml());
 			if(comprobante.getTipoDeComprobante() == CTipoDeComprobante.I || 
 					comprobante.getTipoDeComprobante() == CTipoDeComprobante.E) {
 				PdfInfoDto infoPDF = new PdfInfoDto();
 				infoPDF.setKfactura(0);
 				infoPDF.setComplementoConcepto(false);
-				if(xml.contains("PorCuentadeTerceros")){
+				if(cfdiBean.getXml().contains("PorCuentadeTerceros")){
 					infoPDF.setComplementoConcepto(true);
 				}
 				log.info("cfdi:ComplementoConcepto:"+infoPDF.getComplementoConcepto());
@@ -60,7 +61,11 @@ public class PdfExaktaService {
 				
 				infoPDF.setDirFiscalEmisor("");
 				infoPDF.setConsecutivo(0);
-				infoPDF.setNombrePaciente("");
+				if(cfdiBean.getInformacionAdicionalBean()!=null) {
+					infoPDF.setNombrePaciente(cfdiBean.getInformacionAdicionalBean().getNombrepaciente()!=null ? cfdiBean.getInformacionAdicionalBean().getNombrepaciente() : "");
+				}else {
+					infoPDF.setNombrePaciente("");
+				}
 				String strMetodoPago = consultaService.getConceptoMetodoPago(comprobante.getMetodoPago().value());
 				infoPDF.setDescripcionMetodoPago(strMetodoPago);
 				String descripcionusocfdi = consultaService.getUsoCfdi(comprobante.getReceptor().getUsoCFDI().value());
@@ -87,7 +92,7 @@ public class PdfExaktaService {
 	      byte [] bytes = Files.readAllBytes(file.toPath());
 
 	      b64 = Base64.getEncoder().encodeToString(bytes);
-//	      file.delete();
+	      file.delete();
 	    } catch (Exception e) {
 	      e.printStackTrace();
 	    }

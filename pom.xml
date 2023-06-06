@@ -75,7 +75,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
-		<finalName>facturacion_pdf_1.0.31032023</finalName>
+		<finalName>facturacion_pdf_1.0.25052023</finalName>
 	</build>
 
 </project>
