@@ -190,6 +190,8 @@ public class PdfSerieAOrdenService {
 					}
 					else if (cmarca == 19) {
 						centidadlegal = 19;
+					} else if (cmarca == 21) {
+						centidadlegal = 21;
 					}
 					
 					String dirEmisorSucursal = "";
@@ -241,6 +243,11 @@ public class PdfSerieAOrdenService {
 						inicioNom = "FacturacionElectronica_AFN";
 						folioFactura = utilsService.formatoFolio(Integer.parseInt(comprobante.getFolio()), 6);
 						ruta = cfdiPdfServiceV4.CrearPdfMarcaFamilyLabsNorte(infoPdf, kfactura, inicioNom+folioFactura, isRetencion, comprobante, bDirFiscal);
+						break;
+					case 21:// AsesoresSur
+						inicioNom = "FacturacionElectronica_AAS";
+						folioFactura = utilsService.formatoFolio(Integer.parseInt(comprobante.getFolio()), 6);
+						ruta = cfdiPdfServiceV4.CrearPdfMarcaAsesoresSur(infoPdf, kfactura, inicioNom+folioFactura, isRetencion, comprobante, bDirFiscal);
 						break;
 					default:
 						break;

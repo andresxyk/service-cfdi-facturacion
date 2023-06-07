@@ -49,4 +49,10 @@ public interface CreacionPDFV4Service {
 	String CrearPdfMarcaFamilyLabsNorte(PdfInfoDto infoPDF, Integer kfactura, String nombreArchivo, boolean retencion,
 			Comprobante comprobante, boolean bDirFiscal, Environment env)
 			throws DocumentException, SocketException, IOException;
+
+
+
+	String CrearPdfMarcaAsesoresSur(PdfInfoDto infoPDF, Integer kfactura, String nombreArchivo, boolean retencion,
+			Comprobante comprobante, boolean bDirFiscal, Environment env)
+			throws DocumentException, SocketException, IOException;
 }

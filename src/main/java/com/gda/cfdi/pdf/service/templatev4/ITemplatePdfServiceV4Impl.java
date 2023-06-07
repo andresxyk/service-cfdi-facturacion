@@ -29,4 +29,7 @@ public interface ITemplatePdfServiceV4Impl {
 	String CrearPdfMarcaExaktaEmpresa(Comprobante comprobante, PdfInfoDto infoPDF, Environment env)
 			throws DocumentException, IOException, Exception;
 
+	String CrearPdfMarcaAsesoresSur(Comprobante comprobante, PdfInfoDto infoPDF, Environment env)
+			throws DocumentException, IOException;
+
 }

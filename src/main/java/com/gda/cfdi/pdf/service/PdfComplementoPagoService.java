@@ -71,6 +71,9 @@ public class PdfComplementoPagoService {
 					if (comprobante.getEmisor().getRfc().equals("LAB020416Q67")) {
 						cmarca = 19;
 					}
+					if (comprobante.getEmisor().getRfc().equals("AEL9703115B0")) {
+						cmarca = 21;
+					}
 					
 					
 					sserie = this.getSerieFacturaRelacionada(comprobante);
@@ -124,6 +127,12 @@ public class PdfComplementoPagoService {
 								break;
 							case "LAB020416Q67":// FamilyLabsNorte
 								log.info("FamilyLabsNorte");
+								inicioNom = "FacturacionElectronica_ACC";
+								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
+								ruta = complementoPdfBo.crearPdfMarcaFamilyLabsNorte(comprobante, complementoDato, inicioNom + folioFactura, sserie);
+								break;
+							case "AEL9703115B0":// AsesoresSur
+								log.info("AsesoresSur");
 								inicioNom = "FacturacionElectronica_ACC";
 								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
 								ruta = complementoPdfBo.crearPdfMarcaFamilyLabsNorte(comprobante, complementoDato, inicioNom + folioFactura, sserie);
@@ -192,6 +201,9 @@ public class PdfComplementoPagoService {
 					if (comprobante.getEmisor().getRfc().equals("LAB020416Q67")) {
 						cmarca = 19;
 					}
+					if (comprobante.getEmisor().getRfc().equals("AEL9703115B0")) {
+						cmarca = 21;
+					}
 					
 					
 					sserie = this.getSerieFacturaRelacionadaV4(comprobante);
@@ -253,6 +265,12 @@ public class PdfComplementoPagoService {
 								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
 								ruta = complementoPdfV4Service.crearPdfMarcaFamilyLabsNorte(comprobante, complementoDato, inicioNom + folioFactura, sserie);
 								break;
+							case "AEL9703115B0":// AsesoresSur
+								log.info("AsesoresSur");
+								inicioNom = "FacturacionElectronica_ACC";
+								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
+								ruta = complementoPdfV4Service.crearPdfMarcaAsesoresSur(comprobante, complementoDato, inicioNom + folioFactura);
+								break;
 							default:
 								break;
 							}
@@ -273,7 +291,7 @@ public class PdfComplementoPagoService {
 					byte [] bytes = Files.readAllBytes(file.toPath());
 					
 					b64 = Base64.getEncoder().encodeToString(bytes);
-//		      file.delete();
+//					file.delete();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

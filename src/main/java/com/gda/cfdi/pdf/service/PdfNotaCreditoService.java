@@ -258,6 +258,8 @@ public class PdfNotaCreditoService {
 						
 					} else if (cmarca == 19) {
 						carpeta = "FamilyLabsNorte";
+					} else if (cmarca == 21) {
+						carpeta = "AsesoresSur";
 					}
 					
 					if (cmarca == 15) {
@@ -309,7 +311,12 @@ public class PdfNotaCreditoService {
 						break;
 					case 19:
 						log.info("FamilyLabsNorte*****");
-						ruta = creacionPDFV4.CrearPdfMarcaSwiss(infoPDF, creditoEntityDto.getUfoliofactura(), nobreArchivo,
+						ruta = creacionPDFV4.CrearPdfMarcaFamilyLabsNorte(infoPDF, creditoEntityDto.getUfoliofactura(), nobreArchivo,
+								bRetencion, comprobante, bDirFiscal, env);
+						break;
+					case 21:
+						log.info("AsesoresSur*****");
+						ruta = creacionPDFV4.CrearPdfMarcaAsesoresSur(infoPDF, creditoEntityDto.getUfoliofactura(), nobreArchivo,
 								bRetencion, comprobante, bDirFiscal, env);
 						break;
 					default:

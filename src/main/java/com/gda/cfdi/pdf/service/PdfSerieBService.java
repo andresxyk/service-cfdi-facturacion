@@ -278,6 +278,10 @@ private static final Logger log = LoggerFactory.getLogger(PdfSerieBService.class
 						carpeta = "FamilyLabsNorte";
 						inicioNom = "FacturacionElectronica_AFN";
 						folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 6);
+					}else if (cmarca == 21) {
+						carpeta = "AsesoresSur";
+						inicioNom = "FacturacionElectronica_AAS";
+						folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 6);
 					}
 					
 					String nobreArchivo = inicioNom + folioFactura;
@@ -324,6 +328,11 @@ private static final Logger log = LoggerFactory.getLogger(PdfSerieBService.class
 					case 19:
 						log.info("FamilyLabsNorte*****");
 						ruta = creacionPDFV4.CrearPdfMarcaFamilyLabsNorte(infoPDF, facturaDto.getFolio(), nobreArchivo,
+								bRetencion, comprobante, bDirFiscal, env);
+						break;
+					case 21:
+						log.info("AsesoresSur*****");
+						ruta = creacionPDFV4.CrearPdfMarcaAsesoresSur(infoPDF, facturaDto.getFolio(), nobreArchivo,
 								bRetencion, comprobante, bDirFiscal, env);
 						break;
 					default:
