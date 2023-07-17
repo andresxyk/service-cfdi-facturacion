@@ -277,7 +277,8 @@ public class CfdiComplementoPagoV4Service {
 			 */
 			Receptor receptor = new Receptor();
 			TDatoFiscalDto datoFiscalDto = consultaService.getTDatoFiscalById(pagos.get(0).getFacturasRelacionadas().get(0).getKdatofiscal());
-			receptor.setNombre(utilsService.darFormatoCFDI(datoFiscalDto.getSrazonsocial()));
+//			receptor.setNombre(utilsService.darFormatoCFDI(datoFiscalDto.getSrazonsocial()));
+			receptor.setNombre(datoFiscalDto.getSrazonsocial());
 			receptor.setRfc(datoFiscalDto.getSrfc());
 			receptor.setRegimenFiscalReceptor(datoFiscalDto.getSclaveregimenfiscal());
 			receptor.setDomicilioFiscalReceptor(datoFiscalDto.getCpostalcliente());
@@ -314,7 +315,8 @@ public class CfdiComplementoPagoV4Service {
 			 */
 			Receptor receptor = new Receptor();
 			TDatoFiscalDto datoFiscalDto = consultaService.getTDatoFiscalById(pagos.get(0).getFacturasRelacionadas().get(0).getKdatofiscal());
-			receptor.setNombre(utilsService.darFormatoCFDI(datoFiscalDto.getSrazonsocial()));
+//			receptor.setNombre(utilsService.darFormatoCFDI(datoFiscalDto.getSrazonsocial()));
+			receptor.setNombre(datoFiscalDto.getSrazonsocial());
 			receptor.setRfc(datoFiscalDto.getSrfc());
 			receptor.setRegimenFiscalReceptor(datoFiscalDto.getSclaveregimenfiscal());
 			receptor.setDomicilioFiscalReceptor(datoFiscalDto.getCpostalcliente());

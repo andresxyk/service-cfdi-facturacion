@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.gda.cfdi.controller.CfdiController;
 import com.gda.cfdi.dto.CClaveProductoServicioSatDto;
@@ -223,7 +224,9 @@ public class Cfdi4Service {
 				
 				// Receptor
 				Receptor receptor = of.createComprobanteReceptor();
-				receptor.setNombre(datoFiscalDto.getSrazonsocial());  
+				String nombre = datoFiscalDto.getSrazonsocial();
+
+				receptor.setNombre(datoFiscalDto.getSrazonsocial());  				
 				log.info("Nombre:::-----    "+receptor.getNombre());
 				receptor.setRfc(datoFiscalDto.getSrfc());
 				log.info("cusoCfdi--->>>   " + cusoCfdi);
@@ -548,7 +551,7 @@ public class Cfdi4Service {
 			System.out.println("Error de codificacion: " + e.getMessage());
 			e.printStackTrace();
 		}
-		log.info("Obtener sellos ");
+		log.info("Obtener sellos");
 		selloCFDI = generarSello(datosMarcaDto, new String(output1));
 //		selloCFDI = generarSello("12345678a", new String(output1));
 		
@@ -591,6 +594,7 @@ public class Cfdi4Service {
 	}	
 	
 	public String createXmlFromComprobante(Comprobante comprobante) throws JAXBException {
+		log.info("comprobante inicio" + comprobante);
 		String xml;
 		JAXBContext jaxbContext;
 		List<Class<?>> classesMarshall = new ArrayList<Class<?>>();
@@ -615,9 +619,17 @@ public class Cfdi4Service {
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
 				"http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd");
+		
 		StringWriter sw = new StringWriter();
+		
 		marshaller.marshal(comprobante, sw);
+		
+		log.info("sw final"+sw.toString());
 		xml = sw.toString();
+		xml = StringUtils.replace(xml, "'", "&apos;").replace( "&amp;apos;", "&apos;");
+
+		log.info("comprobante nombre final"+comprobante.getReceptor().getNombre());
+		log.info("xml final"+xml);
 		return xml;
 	}
 	
