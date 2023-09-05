@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import mx.gob.sat.addenda.AddendaEmpresa;
 import mx.gob.sat.cfd._4.Comprobante;
@@ -60,6 +61,9 @@ public class UtilsCfdi4Service {
 		StringWriter sw = new StringWriter();
 		marshaller.marshal(comprobante, sw);
 		xml = sw.toString();
+		xml = StringUtils.replace(xml, "'", "&apos;").replace( "&amp;apos;", "&apos;");
+
+		log.info("log de prueba 1");
 		return xml;
 	}
 	
@@ -87,7 +91,7 @@ public class UtilsCfdi4Service {
 		StringWriter sw = new StringWriter();
 		marshaller.marshal(comprobante, sw);
 		xml = sw.toString();
-
+		xml = StringUtils.replace(xml, "'", "&apos;").replace( "&amp;apos;", "&apos;");
 		return xml;
 	}	
 	
