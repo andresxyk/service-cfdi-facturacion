@@ -241,8 +241,10 @@ public class Cfdi4Service {
 					receptor.setUsoCFDI(CUsoCFDI.D_02);
 					break;
 				case 22:
-//									case 44:
 					receptor.setUsoCFDI(CUsoCFDI.P_01);
+					break;
+				case 24:
+					receptor.setUsoCFDI(CUsoCFDI.S_01);
 					break;
 				default:
 					break;
