@@ -1,10 +1,14 @@
 package com.gda.cfdi.service.empresa;
 
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +18,15 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gda.cfdi.dto.DatosMarcaDto;
+import com.gda.cfdi.dto.empresa.DocumentoTimbrado;
+import com.gda.cfdi.dto.empresa.TimbradoCfdiDto;
 import com.gda.cfdi.service.UtilsCfdi4Service;
 import com.gda.cfdi.service.UtilsService;
+import com.gda.cfdi.utils.CTipoFactorDeserializer;
+import com.gda.cfdi.utils.CUsoCfdiDeserializer;
+import com.gda.cfdi.utils.XMLGregorianCalendarDeserializer;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import facturacion.domain.dto.AddendaDto;
 import mx.gob.sat.addenda.AddendaEmpresa;
@@ -32,12 +42,15 @@ import mx.gob.sat.cfd._4.Comprobante.InformacionGlobal;
 import mx.gob.sat.cfd._4.Comprobante.Receptor;
 import mx.gob.sat.cfd._4.ObjectFactory;
 import mx.gob.sat.pagos20.Pagos;
+import mx.gob.sat.pagos20.Pagos.Pago;
 import mx.gob.sat.pagos20.Pagos.Pago.DoctoRelacionado.ImpuestosDR;
 import mx.gob.sat.pagos20.Pagos.Pago.DoctoRelacionado.ImpuestosDR.TrasladosDR;
 import mx.gob.sat.pagos20.Pagos.Pago.DoctoRelacionado.ImpuestosDR.TrasladosDR.TrasladoDR;
 import mx.gob.sat.pagos20.Pagos.Pago.ImpuestosP;
 import mx.gob.sat.pagos20.Pagos.Pago.ImpuestosP.TrasladosP;
 import mx.gob.sat.pagos20.Pagos.Pago.ImpuestosP.TrasladosP.TrasladoP;
+import mx.gob.sat.sitio_internet.cfd.catalogos.CTipoFactor;
+import mx.gob.sat.sitio_internet.cfd.catalogos.CUsoCFDI;
 
 @Service("empresaCfdiService")
 public class EmpresaCfdiService {
@@ -83,6 +96,51 @@ public class EmpresaCfdiService {
 			log.error(e.getMessage());
 			throw e;
 		}
+	}
+	
+	public TimbradoCfdiDto getxmlCfdiEmpresa(TimbradoCfdiDto timbradoCfdiDto) throws Exception {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+		String jsonCfdi = gson.toJson(timbradoCfdiDto.getCfdi());
+		log.info(jsonCfdi);
+		gson = new GsonBuilder()
+                .registerTypeAdapter(XMLGregorianCalendar.class, new XMLGregorianCalendarDeserializer())
+                .registerTypeAdapter(CUsoCFDI.class, new CUsoCfdiDeserializer())
+                .registerTypeAdapter(CTipoFactor.class, new CTipoFactorDeserializer())
+                .create();
+				
+		Comprobante comprobante = gson.fromJson(jsonCfdi, Comprobante.class);
+		
+		DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosCfdiPorRfcEmisor(comprobante.getEmisor().getRfc());
+		comprobante.setNoCertificado(datosMarcaDto.getNumeroCertificado());
+		Boolean bPago = false;		
+		if(comprobante.getComplemento()!=null) {
+			List<Object> listComplementos = comprobante.getComplemento().getAny();
+			for (Object object : listComplementos) {
+				if (object instanceof Pagos) {
+					bPago = true;
+				}
+			}			
+		}
+		String xml = !bPago ? utilsCfdi4Service.createXmlFromComprobante(comprobante) : utilsCfdi4Service.createXmlFromComplementoPago(comprobante);
+		comprobante.setCertificado(utilsService.getCertificadoB64(datosMarcaDto.getRutaCer()));
+		String cadenaOriginal = utilsService.createCadenaOriginal(xml, datosMarcaDto.getRutaCadenaOriginal());
+		comprobante.setSello(utilsService.createSello(cadenaOriginal, datosMarcaDto.getRutaKey(), datosMarcaDto.getPasword()));
+//		com.gda.cfdi.dto.empresa.Pagos pagos = timbradoCfdiDto.getCfdi().getComplemento().getPagos();
+//		String jsonPagos = gson.toJson(pagos);
+//		Pagos pagosCfdi = gson.fromJson(jsonPagos, Pagos.class);
+//		comprobante.getComplemento().getAny().add(pagosCfdi);
+		
+//		String jsonComprobante = gson.toJson(comprobante);
+//		log.info(jsonComprobante);
+		
+		String xmlOriginalSello =  !bPago ? utilsCfdi4Service.createXmlFromComprobante(comprobante) : utilsCfdi4Service.createXmlFromComplementoPago(comprobante);
+		
+		if(timbradoCfdiDto.getDocumentoTimbrado()==null)
+			timbradoCfdiDto.setDocumentoTimbrado(new DocumentoTimbrado());
+			
+		timbradoCfdiDto.getDocumentoTimbrado().setXmlsintimbrar(xmlOriginalSello);
+		
+		return timbradoCfdiDto;
 	}
 	
 	public String getXmlCfdi(Comprobante comprobante)  throws Exception {

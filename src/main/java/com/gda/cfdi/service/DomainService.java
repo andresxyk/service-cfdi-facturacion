@@ -115,6 +115,71 @@ public class DomainService {
 			razonSocialMarca = env.getProperty("razon.social.familylabsnorte");
 			numeroCertificado = env.getProperty("numero.certificado.familylabsnorte");
 			break;	
+		case "AEL9703115B0":
+			log.info("**** Asesores del Sur *****");
+			rutaKey = env.getProperty("path.file.key.asesoressur");
+			rutaCer = env.getProperty("path.file.cer.asesoressur");		
+			pasword = env.getProperty("password.cer.asesoressur");	
+			rfcMarca = env.getProperty("rfc.marca.asesoressur");	
+			razonSocialMarca = env.getProperty("razon.social.asesoressur");
+			numeroCertificado = env.getProperty("numero.certificado.asesoressur");
+			break;	
+		case "LBA840320GC8":
+			log.info("**** Exakta Laboartorio *****");
+			rutaKey = env.getProperty("path.file.key.exakta.lab");
+			rutaCer = env.getProperty("path.file.cer.exakta.lab");		
+			pasword = env.getProperty("password.cer.exakta.lab");	
+			rfcMarca = env.getProperty("rfc.marca.exakta.lab");	
+			razonSocialMarca = env.getProperty("razon.social.exakta.lab");
+			numeroCertificado = env.getProperty("numero.certificado.exakta.lab");
+			break;
+		case "IME0103012D3":
+			log.info("**** Exakta Imagen *****");
+			rutaKey = env.getProperty("path.file.key.exakta.imagen");
+			rutaCer = env.getProperty("path.file.cer.exakta.imagen");		
+			pasword = env.getProperty("password.cer.exakta.imagen");	
+			rfcMarca = env.getProperty("rfc.marca.exakta.imagen");	 
+			razonSocialMarca = env.getProperty("razon.social.exakta.imagen");
+			numeroCertificado = env.getProperty("numero.certificado.exakta.imagen");
+			break;
+		case "BIO7603164H0":
+			log.info("**** Moreira *****");
+			rutaKey = env.getProperty("path.file.key.moreira");
+			rutaCer = env.getProperty("path.file.cer.moreira");		
+			pasword = env.getProperty("password.cer.moreira");	
+			rfcMarca = env.getProperty("rfc.marca.moreira");	
+			razonSocialMarca = env.getProperty("razon.social.moreira");
+			numeroCertificado = env.getProperty("numero.certificado.moreira");
+			break;	
+		case "RFCPOLAB0000":
+			log.info("**** Polab *****");
+			rutaKey = env.getProperty("path.file.key.polab");
+			rutaCer = env.getProperty("path.file.cer.polab");		
+			pasword = env.getProperty("password.cer.polab");	
+			rfcMarca = env.getProperty("rfc.marca.polab");	
+			razonSocialMarca = env.getProperty("razon.social.polab");
+			numeroCertificado = env.getProperty("numero.certificado.polab");
+			break;	
+		case "BRE9205181I1":
+			log.info("**** Biomedica Referencia *****");
+			rutaKey = env.getProperty("path.file.key.referencia");
+			rutaCer = env.getProperty("path.file.cer.referencia");		
+			pasword = env.getProperty("password.cer.referencia");	
+			rfcMarca = env.getProperty("rfc.marca.referencia");	
+			razonSocialMarca = env.getProperty("razon.social.referencia");
+			numeroCertificado = env.getProperty("numero.certificado.referencia");
+			break;
+		case "RFCPROMEDIC0":
+			log.info("**** Promedic *****");
+			rutaKey = env.getProperty("path.file.key.promedic");
+			rutaCer = env.getProperty("path.file.cer.promedic");		
+			pasword = env.getProperty("password.cer.promedic");	
+			rfcMarca = env.getProperty("rfc.marca.promedic");	
+			razonSocialMarca = env.getProperty("razon.social.promedic");
+			numeroCertificado = env.getProperty("numero.certificado.promedic");
+			break;
+			
+			
 		default:
 			break;
 		}

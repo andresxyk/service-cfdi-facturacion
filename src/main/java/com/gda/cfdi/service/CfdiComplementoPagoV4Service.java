@@ -300,13 +300,14 @@ public class CfdiComplementoPagoV4Service {
 				comprobante.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
 			}
 			
-			comprobante.setNoCertificado(factura40Base.getNoCertificado());
-			if(factura40Base.getNoCertificado().equals("00001000000404009726")){
-				comprobante.setNoCertificado("00001000000505145362");
-			}
-			if(factura40Base.getNoCertificado().equals("00001000000406347874")){
-				comprobante.setNoCertificado("00001000000507423256");
-			}
+			DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosRfcEmisor(emisor.getRfc(), 4);
+			comprobante.setNoCertificado(datosMarcaDto.getNumeroCertificado());
+//			if(factura40Base.getNoCertificado().equals("00001000000404009726")){
+//				comprobante.setNoCertificado("00001000000505145362");
+//			}
+//			if(factura40Base.getNoCertificado().equals("00001000000406347874")){
+//				comprobante.setNoCertificado("00001000000507423256");
+//			}
 			
 		} else if(facturaPagadaXml.contains("Version=\"3.3\"")) {
 			mx.gob.sat.cfd._3.Comprobante factura33Base = utilsService.createComplementoPagoFromXml(facturaPagadaXml);
@@ -341,13 +342,13 @@ public class CfdiComplementoPagoV4Service {
 				comprobante.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
 			}
 			
-			comprobante.setNoCertificado(factura33Base.getNoCertificado());
-			if(factura33Base.getNoCertificado().equals("00001000000404009726")){
-				comprobante.setNoCertificado("00001000000505145362");
-			}
-			if(factura33Base.getNoCertificado().equals("00001000000406347874")){
-				comprobante.setNoCertificado("00001000000507423256");
-			}
+			comprobante.setNoCertificado(datosMarcaDto.getNumeroCertificado());
+//			if(factura33Base.getNoCertificado().equals("00001000000404009726")){
+//				comprobante.setNoCertificado("00001000000505145362");
+//			}
+//			if(factura33Base.getNoCertificado().equals("00001000000406347874")){
+//				comprobante.setNoCertificado("00001000000507423256");
+//			}
 		}
 		
 		if(pagoPadre.getSuddi()!=null && pagoPadre.getSuddi() != ""){	
@@ -543,13 +544,14 @@ public class CfdiComplementoPagoV4Service {
 				comprobante.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
 			}
 			
-			comprobante.setNoCertificado(factura40Base.getNoCertificado());
-			if(factura40Base.getNoCertificado().equals("00001000000404009726")){
-				comprobante.setNoCertificado("00001000000505145362");
-			}
-			if(factura40Base.getNoCertificado().equals("00001000000406347874")){
-				comprobante.setNoCertificado("00001000000507423256");
-			}
+			DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosRfcEmisor(emisor.getRfc(), 4);
+			comprobante.setNoCertificado(datosMarcaDto.getNumeroCertificado());
+//			if(factura40Base.getNoCertificado().equals("00001000000404009726")){
+//				comprobante.setNoCertificado("00001000000505145362");
+//			}
+//			if(factura40Base.getNoCertificado().equals("00001000000406347874")){
+//				comprobante.setNoCertificado("00001000000507423256");
+//			}
 			
 		} else if(facturaPagadaXml.contains("Version=\"3.3\"")) {
 			mx.gob.sat.cfd._3.Comprobante factura33Base = utilsService.createComplementoPagoFromXml(facturaPagadaXml);
@@ -583,13 +585,14 @@ public class CfdiComplementoPagoV4Service {
 				comprobante.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
 			}
 			
-			comprobante.setNoCertificado(factura33Base.getNoCertificado());
-			if(factura33Base.getNoCertificado().equals("00001000000404009726")){
-				comprobante.setNoCertificado("00001000000505145362");
-			}
-			if(factura33Base.getNoCertificado().equals("00001000000406347874")){
-				comprobante.setNoCertificado("00001000000507423256");
-			}
+			
+			comprobante.setNoCertificado(datosMarcaDto.getNumeroCertificado());
+//			if(factura33Base.getNoCertificado().equals("00001000000404009726")){
+//				comprobante.setNoCertificado("00001000000505145362");
+//			}
+//			if(factura33Base.getNoCertificado().equals("00001000000406347874")){
+//				comprobante.setNoCertificado("00001000000507423256");
+//			}
 		}
 			
 		if(pagoDto.getSuddi()!=null && pagoDto.getSuddi() != ""){		

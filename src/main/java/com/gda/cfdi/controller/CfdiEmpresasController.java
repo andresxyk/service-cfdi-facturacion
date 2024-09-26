@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gda.cfdi.dto.empresa.TimbradoCfdiDto;
 import com.gda.cfdi.exception.ResponseErrorDto;
 import com.gda.cfdi.service.empresa.EmpresaCfdiService;
 import com.gda.cfdi.service.exakta.ExaktaCfdiService;
@@ -76,6 +77,19 @@ public class CfdiEmpresasController {
 	public ResponseEntity<?> getXmlCfdi(@RequestBody AddendaDto addendaDto){
 		try {
 			return new ResponseEntity<String>(empresaCfdiService.getXmlAddendaCfdi(addendaDto), HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			ResponseErrorDto dto = new ResponseErrorDto();
+			dto.setCodigo("error");
+			dto.setDescripcion(e.getMessage());
+			return new ResponseEntity<ResponseErrorDto>(dto, HttpStatus.BAD_REQUEST);
+		}
+	}	
+	
+	@RequestMapping(path = "/xml-cfdi-empresa", method = RequestMethod.POST)
+	public ResponseEntity<?> getXmlCfdiEmpresa(@RequestBody TimbradoCfdiDto timbradoCfdiDto){
+		try {
+			return new ResponseEntity<TimbradoCfdiDto>(empresaCfdiService.getxmlCfdiEmpresa(timbradoCfdiDto), HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			ResponseErrorDto dto = new ResponseErrorDto();

@@ -231,8 +231,11 @@ public class CfdiSerieAv4Service {
 			cfdi33.setLugarExpedicion("64040");
 		} else if (cmarca == 15) {
 			cfdi33.setLugarExpedicion("31203");
-
+		}else if (cmarca == 20) {
+			cfdi33.setLugarExpedicion("72197");
 		}
+		
+		
 		cfdi33.setFormaPago(formaPago);
 		if (metodoPago.equals("PPD")) {
 			cfdi33.setMetodoPago(CMetodoPago.PPD);
@@ -477,7 +480,39 @@ public class CfdiSerieAv4Service {
 				sserie = "AZ";
 				centidadlegal = "5";
 			}
+		} else if (cmarca == 20) {
+			ssucursal = "EMPRESAS EXAKTA";
+			csucursal = "1021";
+			sserie = "AJK";
+			centidadlegal = "20";
+		} else if (cmarca == 21) {
+			ssucursal = "EMPRESAS ASESORES DEL SUR";
+			csucursal = "1022";
+			sserie = "AAS";
+			centidadlegal = "21";
+		} else if (cmarca == 16) {
+			ssucursal = "EMPRESAS MOREIRA";
+			csucursal = "1026";
+			sserie = "AMO";
+			centidadlegal = "18";
+		} else if (cmarca == 22) {
+			ssucursal = "EMPRESAS POLAB";
+			csucursal = "1023";
+			sserie = "APO";
+			centidadlegal = "22";
+		} else if (cmarca == 25) {
+			ssucursal = "EMPRESAS BIOMEDICA";
+			csucursal = "1024";
+			sserie = "ABR";
+			centidadlegal = "25";
+		} else if (cmarca == 26) {
+			ssucursal = "EMPRESAS PROMEDIC";
+			csucursal = "1025";
+			sserie = "APR";
+			centidadlegal = "26";
 		}
+		
+		
 		log.info("getConsultaInsertSeriA::   " + subTotal + " :::convenio   " + convenio);
 		String query = "SELECT \r\n"
 				+ "'INSERT INTO t_factura VALUES(t_factura_sequence.nextval,'||(SELECT kdatofiscal FROM c_convenio_dato_fiscal WHERE cconvenio = "

@@ -58,9 +58,11 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 			 String descuentos, String notaDescuento,  boolean isRetencion,  Integer marca, String descripcionFactura) throws Exception {
 		
 		String sserie = marca.equals(1)?"A":marca.equals(4)?"AZ":marca.equals(5)?"AS":marca.equals(15)?"ASL":
-			marca.equals(7)?"AJP":marca.equals(8)?"AJL":null;
+			marca.equals(7)?"AJP":marca.equals(8)?"AJL":marca.equals(19)?"AFN":marca.equals(20)?"AJK":marca.equals(21)?"AAS":
+				marca.equals(16)?"AMO":marca.equals(22)?"APO":marca.equals(25)?"ABR":marca.equals(26)?"APR":null;
 		Integer csucursal = marca.equals(1)?1003:marca.equals(4)?1012:marca.equals(5)?1013:marca.equals(15)?1017:
-			marca.equals(7)?1014:marca.equals(8)?1015:null;
+			marca.equals(7)?1014:marca.equals(8)?1015:marca.equals(19)?1020:marca.equals(20)?1021:
+			marca.equals(21)?1022:marca.equals(16)?1026:marca.equals(22)?1023:marca.equals(25)?1024:marca.equals(26)?1025:null;
 		
 		DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosMarca(marca);
 		
