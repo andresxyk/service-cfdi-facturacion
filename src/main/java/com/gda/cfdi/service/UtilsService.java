@@ -81,7 +81,7 @@ public class UtilsService {
 		String rfcFamilyLabsNorte = env.getProperty("password.cer.familylabsnorte");
 		String rfcAsesoresSur = env.getProperty("rfc.marca.asesoressur");
 		
-		String rfcExakta = env.getProperty("rfc.marca.exakta");
+		String rfcExakta = env.getProperty("rfc.marca.exakta.lab");
 		String rfcMoreira = env.getProperty("rfc.marca.moreira");
 		String rfcPolab = env.getProperty("rfc.marca.polab");
 		String rfcReferencia = env.getProperty("rfc.marca.referencia");
@@ -1364,9 +1364,10 @@ public class UtilsService {
 		String rfcSwisslab = env.getProperty("rfc.marca.swisslab");
 		String rfcJennerPrado = env.getProperty("rfc.marca.prado");
 		String rfcJennerLean = env.getProperty("rfc.marca.lean");
-		String rfcFamilyLabsNorte = env.getProperty("rfc.marca.familylabsnorte");String rfcAsesoresSur = env.getProperty("rfc.marca.asesoressur");
+		String rfcFamilyLabsNorte = env.getProperty("rfc.marca.familylabsnorte");
+		String rfcAsesoresSur = env.getProperty("rfc.marca.asesoressur");
 		
-		String rfcExakta = env.getProperty("rfc.marca.exakta");
+		String rfcExakta = env.getProperty("rfc.marca.exakta.lab");
 		String rfcMoreira = env.getProperty("rfc.marca.moreira");
 		String rfcPolab = env.getProperty("rfc.marca.polab");
 		String rfcReferencia = env.getProperty("rfc.marca.referencia");
@@ -1414,7 +1415,7 @@ public class UtilsService {
 		}
 		if (rfc.equals(rfcExakta)) {
 			facturaSello.setMarca(20);
-			dynamicKeyProperty = "exakta";
+			dynamicKeyProperty = "exakta.lab";
 		}
 		if (rfc.equals(rfcMoreira)) {
 			facturaSello.setMarca(16);
@@ -1462,7 +1463,7 @@ public class UtilsService {
 		String rfcFamilyLabsNorte = env.getProperty("rfc.marca.familylabsnorte");
 		String rfcAsesoresSur = env.getProperty("rfc.marca.asesoressur");
 		
-		String rfcExakta = env.getProperty("rfc.marca.exakta");
+		String rfcExakta = env.getProperty("rfc.marca.exakta.lab");
 		String rfcMoreira = env.getProperty("rfc.marca.moreira");
 		String rfcPolab = env.getProperty("rfc.marca.polab");
 		String rfcReferencia = env.getProperty("rfc.marca.referencia");
@@ -1510,7 +1511,7 @@ public class UtilsService {
 		}
 		if (rfc.equals(rfcExakta)) {
 			facturaSello.setMarca(20);
-			dynamicKeyProperty = "exakta";
+			dynamicKeyProperty = "exakta.lab";
 		}
 		if (rfc.equals(rfcMoreira)) {
 			facturaSello.setMarca(16);

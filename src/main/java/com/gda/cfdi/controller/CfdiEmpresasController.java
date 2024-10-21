@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gda.cfdi.dto.empresa.TimbradoCfdiDto;
 import com.gda.cfdi.exception.ResponseErrorDto;
 import com.gda.cfdi.service.empresa.EmpresaCfdiService;
+import com.gda.cfdi.service.empresa.MoreriraService;
 import com.gda.cfdi.service.exakta.ExaktaCfdiService;
 //import com.gda.cfdi.service.referencia.ReferenciaCfdiService;
 import com.gda.cfdi.service.referencia.ReferenciaCfdiService;
@@ -33,6 +34,8 @@ public class CfdiEmpresasController {
 	private ExaktaCfdiService exaktaCfdiService;
 	@Autowired
 	private EmpresaCfdiService empresaCfdiService;
+	@Autowired
+	private MoreriraService moreriraService;
 	
 	@RequestMapping(path = "/cfdi-biomedica", method = RequestMethod.POST)
 	public ResponseEntity<?> getCfdiBiomedica(@RequestBody GenerarCFDI40 generarCFDI40){
@@ -51,6 +54,20 @@ public class CfdiEmpresasController {
 	public ResponseEntity<?> getCfdiExakta(@RequestBody String cfdiPlano){
 		try {
 			return new ResponseEntity<String>(exaktaCfdiService.generarCfdi(cfdiPlano), HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			ResponseErrorDto dto = new ResponseErrorDto();
+			dto.setCodigo("error");
+			dto.setDescripcion(e.getMessage());
+			return new ResponseEntity<ResponseErrorDto>(dto, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	
+	@RequestMapping(path = "/cfdi-moreira", method = RequestMethod.POST)
+	public ResponseEntity<?> getCfdiMoreira(@RequestBody String cfdi){
+		try {
+			return new ResponseEntity<String>(moreriraService.generarCfdi(cfdi), HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			ResponseErrorDto dto = new ResponseErrorDto();

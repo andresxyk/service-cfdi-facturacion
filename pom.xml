@@ -94,6 +94,11 @@
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+		    <groupId>org.springdoc</groupId>
+		    <artifactId>springdoc-openapi-ui</artifactId>
+		    <version>1.5.13</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -103,7 +108,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
-		<finalName>facturacion_cfdi_1.0.23092024</finalName>
+		<finalName>facturacion_cfdi_1.0.30092024</finalName>
 	</build>
 
 </project>
