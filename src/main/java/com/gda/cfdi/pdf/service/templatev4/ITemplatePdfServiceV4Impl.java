@@ -32,4 +32,22 @@ public interface ITemplatePdfServiceV4Impl {
 	String CrearPdfMarcaAsesoresSur(Comprobante comprobante, PdfInfoDto infoPDF, Environment env)
 			throws DocumentException, IOException;
 
+	String CrearPdfEmpresaGenerico(Comprobante comprobante, PdfInfoDto infoPDF, Environment env)
+			throws DocumentException, IOException, Exception;
+
+	String CrearPdfMarcaExakta(Comprobante comprobante, PdfInfoDto infoPDF, Environment env)
+			throws DocumentException, IOException;
+
+	String CrearPdfMarcaMoreira(Comprobante comprobante, PdfInfoDto infoPDF, Environment env)
+			throws DocumentException, IOException;
+
+	String CrearPdfMarcaPolab(Comprobante comprobante, PdfInfoDto infoPDF, Environment env)
+			throws DocumentException, IOException;
+
+	String CrearPdfMarcaBiomedica(Comprobante comprobante, PdfInfoDto infoPDF, Environment env)
+			throws DocumentException, IOException;
+
+	String CrearPdfMarcaPromedic(Comprobante comprobante, PdfInfoDto infoPDF, Environment env)
+			throws DocumentException, IOException;
+
 }

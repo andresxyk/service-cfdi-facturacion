@@ -46,10 +46,12 @@ public class PdfContadoService {
 	public String generarPdfContadoV40(TFacturaDto facturaDto, Integer cmarca, Integer csucursal) throws DocumentException, IOException, Exception {
 		ArrayList<Integer> arrPrado = new ArrayList<Integer>(Arrays.asList(117,118,126,127,128,129,130,132,134,138,139,140,141,142,143,196,198,199,200));
 		ArrayList<Integer> arrLean = new ArrayList<Integer>(Arrays.asList(115,116,119,120,121,122,123,124,125,131,133,135,136,137,177,146,197));
+		ArrayList<Integer> arrExaktaLab = new ArrayList<Integer>(Arrays.asList(348,349,350,351,352,353,354,355,357,358,359,360,361,363,364,367,368,369,370,371,372,362,366,373,440));
+		ArrayList<Integer> arrExaktaImg = new ArrayList<Integer>(Arrays.asList(356));
 		String xml = facturaDto.getXmlTimbrado();
 		String ruta = "";
 		System.out.println(xml);
-		if(facturaDto!=null) {
+		if(facturaDto!=null) { 
 			if(!xml.isEmpty() && xml.trim().length()>5) {
 				Comprobante comprobante = utilsService.createComprobanteFromXml(xml);
 				PdfInfoDto infoPDF = new PdfInfoDto();
@@ -98,6 +100,22 @@ public class PdfContadoService {
 					centidadlegal = 19;
 				}else if (cmarca == 21) {
 					centidadlegal = 21;
+				}else if (cmarca == 20) {					
+//					if(arrExaktaLab.contains(csucursal)){
+//						System.out.println("**** Laboratorio *****");
+//						centidadlegal = 20;				
+//					}else if(arrExaktaImg.contains(csucursal)){
+//						System.out.println("**** Imagen *****");
+//					}
+					centidadlegal = 20;	
+				}else if (cmarca == 16) {
+					centidadlegal = 18;
+				}else if (cmarca == 22) {
+					centidadlegal = 22;
+				}else if (cmarca == 25) {
+					centidadlegal = 25;
+				}else if (cmarca == 26) {
+					centidadlegal = 26;
 				}
 				
 				String dirEmisorSucursal = consultaService.getDireccionFiscalEmisor(centidadlegal);
@@ -142,6 +160,26 @@ public class PdfContadoService {
 					case 21:
 						log.info("AsesoresSur*****");
 						ruta = iTemplatePdfServiceV4.CrearPdfMarcaAsesoresSur(comprobante, infoPDF,env);
+						break;
+					case 20:
+						log.info("Exakta*****");
+						ruta = iTemplatePdfServiceV4.CrearPdfMarcaExakta(comprobante, infoPDF,env);
+						break;
+					case 16:
+						log.info("Moreira*****");
+						ruta = iTemplatePdfServiceV4.CrearPdfMarcaMoreira(comprobante, infoPDF,env);
+						break;
+					case 22:
+						log.info("Polab*****");
+						ruta = iTemplatePdfServiceV4.CrearPdfMarcaPolab(comprobante, infoPDF,env);
+						break;
+					case 25:
+						log.info("Biomedica*****");
+						ruta = iTemplatePdfServiceV4.CrearPdfMarcaBiomedica(comprobante, infoPDF,env);
+						break;
+					case 26:
+						log.info("Promedic*****");
+						ruta = iTemplatePdfServiceV4.CrearPdfMarcaPromedic(comprobante, infoPDF,env);
 						break;
 					default:
 						break;

@@ -1178,6 +1178,1363 @@ public class CfdiPdfV4Service {
 	}
 	
 	
+	public String CrearPdfMarcaExakta(PdfInfoDto infoPdf,Integer kfactura, String nombreArchivo, boolean retencion, Comprobante comprobante33, boolean bDirFiscal) throws DocumentException, SocketException, IOException{
+		String ruta = "";
+		PdfPTable tabDetalleMontos = new PdfPTable(3);
+		PdfPTable tabDatosFactura  = null;
+		if(retencion){
+			tabDatosFactura = new PdfPTable(8);
+		}else{
+			tabDatosFactura = new PdfPTable(7);			
+		}
+		PdfWriter writerPdf = null;
+		float[] medidaCeldas = {2.3f,0.7f,0.5f};
+		BaseColor colorFondoContenidoFact = WebColors.getRGBColor("#F4F4F9");
+		Font fuenteContenidoTab = new Font(Font.FontFamily.HELVETICA,7,Font.NORMAL,BaseColor.BLACK);
+		Font fuenteContenidoImporTab = new Font(Font.FontFamily.HELVETICA,7,Font.BOLD,BaseColor.BLACK);
+		
+		DecimalFormat df = new DecimalFormat("###,###,###.00");
+		String strMontoSubTotal = df.format(comprobante33.getSubTotal()); 
+		String strMontoImpuesto = df.format(comprobante33.getImpuestos().getTotalImpuestosTrasladados());
+		String strMontoTotal = df.format(comprobante33.getTotal());
+		
+		
+		
+		Document documentReportePdf = new Document(PageSize.A4, 36, 36, 260,136);
+		FileOutputStream ficheroPdf = null;
+		try {			
+			ruta = env.getProperty("path.file.ordenes.pdf.exakta")+nombreArchivo+".pdf";
+			ficheroPdf = new FileOutputStream(ruta);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		try {
+			writerPdf = PdfWriter.getInstance(documentReportePdf, ficheroPdf);
+			writerPdf.setPageEvent(new TemplateExakta(infoPdf,comprobante33,retencion,bDirFiscal,env));
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		documentReportePdf.open();	
+		documentReportePdf.newPage();
+		
+		String mntRetenido = "";
+		if(retencion){
+			mntRetenido = df.format(comprobante33.getImpuestos().getTotalImpuestosRetenidos());
+		}
+		
+		PdfPCell pcMonedaPeso = new PdfPCell(new Paragraph("Moneda MXN ", fuenteContenidoImporTab));
+		PdfPCell pcImpuRetenido = new PdfPCell(new Paragraph("Impuesto retenido (IVA):",fuenteContenidoImporTab));
+		PdfPCell pcMontoRetenido = new PdfPCell(new Paragraph(mntRetenido,fuenteContenidoImporTab));
+		
+	    PdfPCell pcSubTotal = new PdfPCell(new Paragraph("Subtotal: ",fuenteContenidoImporTab));
+	    PdfPCell pcMontoSubTotal = new PdfPCell(new Paragraph(strMontoSubTotal,fuenteContenidoImporTab));	    
+//	    PdfPCell pcFormaPago = new PdfPCell(new Paragraph("Forma de pago  99 Por Definir",fuenteContenidoImporTab));
+	    PdfPCell pcFormaPago = new PdfPCell(new Paragraph("Forma de pago "+comprobante33.getFormaPago(),fuenteContenidoImporTab));
+	    PdfPCell pcImpuesto = new PdfPCell(new Paragraph("Impuesto trasladado (IVA)",fuenteContenidoImporTab));
+	    PdfPCell pcMontoImpuesto = new PdfPCell(new Paragraph(strMontoImpuesto,fuenteContenidoImporTab));
+	    //PdfPCell pcMetodo = new PdfPCell(new Paragraph("M�todo de pago PPD Pago En Parcialidades O Diferido",fuenteContenidoImporTab));
+	    PdfPCell pcMetodo = new PdfPCell(new Paragraph("Método de pago "+infoPdf.getSmetodoPago(),fuenteContenidoImporTab));
+	    PdfPCell pcTotal = new PdfPCell(new Paragraph("Total: ",fuenteContenidoImporTab));
+	    PdfPCell pcMontoTotal = new PdfPCell(new Paragraph(strMontoTotal,fuenteContenidoImporTab));
+//	    Qulqi qulqi = new Qulqi();
+//		qulqi.setDecimalPartVisible(true);
+//		qulqi.setCoin(Qulqi$COIN.peso_mexicano);
+//		qulqi.setFloating(Qulqi$FLOATING.POINT);
+		
+//		System.out.println(qulqi.showMeTheMoney(strMontoTotal));
+//	    PdfPCell pcMontoLetra = new PdfPCell(new Paragraph(qulqi.showMeTheMoney(strMontoTotal),fuenteContenidoImporTab));
+//	    pcMonedaPeso.setPaddingTop(8);
+//        pcMonedaPeso.setIndent(8);
+		strMontoTotal = comprobante33.getTotal().toString();
+//		System.out.println(Character.toUpperCase(qulqi.showMeTheMoney(strMontoTotal).charAt(0)) + qulqi.showMeTheMoney(strMontoTotal).substring(1,qulqi.showMeTheMoney(strMontoTotal).length()));		
+//		String strMontoTotalLetra = Character.toUpperCase(qulqi.showMeTheMoney(strMontoTotal).charAt(0)) + qulqi.showMeTheMoney(strMontoTotal).substring(1,qulqi.showMeTheMoney(strMontoTotal).length());
+		String strMontoTotalLetra = montoConLetra(strMontoTotal);
+	    PdfPCell pcMontoLetra = new PdfPCell(new Paragraph(strMontoTotalLetra,fuenteContenidoImporTab));
+	    pcMonedaPeso.setPaddingTop(8);
+        pcMonedaPeso.setIndent(8);
+        
+        if(retencion){
+        	pcSubTotal.setPaddingTop(8);
+        	pcMontoSubTotal.setPaddingTop(8);
+        }
+        
+        pcFormaPago.setIndent(8);
+        
+        pcMetodo.setIndent(8);
+            
+        pcMontoLetra.setIndent(8);
+        pcMontoLetra.setPaddingBottom(8);
+        pcMontoTotal.setPaddingBottom(8);
+        pcTotal.setPaddingBottom(8);
+        
+	    pcMonedaPeso.setBackgroundColor(colorFondoContenidoFact);
+	    pcSubTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcImpuRetenido.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoRetenido.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoSubTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcFormaPago.setBackgroundColor(colorFondoContenidoFact);
+	    pcImpuesto.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoImpuesto.setBackgroundColor(colorFondoContenidoFact);
+	    pcMetodo.setBackgroundColor(colorFondoContenidoFact);
+	    pcTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoLetra.setBackgroundColor(colorFondoContenidoFact);
+	    
+	    pcMonedaPeso.setBorder(Rectangle.UNDEFINED);
+	    pcSubTotal.setBorder(Rectangle.UNDEFINED);
+	    pcImpuRetenido.setBorder(Rectangle.UNDEFINED);
+	    pcMontoRetenido.setBorder(Rectangle.UNDEFINED);
+	    pcMontoSubTotal.setBorder(Rectangle.UNDEFINED);
+	    pcFormaPago.setBorder(Rectangle.UNDEFINED);
+	    pcImpuesto.setBorder(Rectangle.UNDEFINED);
+	    pcMontoImpuesto.setBorder(Rectangle.UNDEFINED);
+	    pcMetodo.setBorder(Rectangle.UNDEFINED);
+	    pcTotal.setBorder(Rectangle.UNDEFINED);
+	    pcMontoTotal.setBorder(Rectangle.UNDEFINED);
+	    pcMontoLetra.setBorder(Rectangle.UNDEFINED);
+	    
+	    pcMontoSubTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoRetenido.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoImpuesto.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoLetra.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    
+	    if(retencion){
+	    	tabDetalleMontos.addCell(pcMonedaPeso);
+	    	tabDetalleMontos.addCell(pcSubTotal);
+	    	tabDetalleMontos.addCell(pcMontoSubTotal);
+	    	
+	    	tabDetalleMontos.addCell(pcFormaPago);
+	    	tabDetalleMontos.addCell(pcImpuesto);
+	    	tabDetalleMontos.addCell(pcMontoImpuesto);
+	    	
+	    	tabDetalleMontos.addCell(pcMetodo);
+	    	tabDetalleMontos.addCell(pcImpuRetenido);
+	    	tabDetalleMontos.addCell(pcMontoRetenido);
+	    	
+	    	tabDetalleMontos.addCell(pcMontoLetra);
+	    	tabDetalleMontos.addCell(pcTotal);
+	    	tabDetalleMontos.addCell(pcMontoTotal);	   
+	    }else{
+	    	pcMonedaPeso.setColspan(3);
+	    	
+	    	tabDetalleMontos.addCell(pcMonedaPeso);
+	    	
+	    	tabDetalleMontos.addCell(pcFormaPago);
+	    	tabDetalleMontos.addCell(pcSubTotal);
+	    	tabDetalleMontos.addCell(pcMontoSubTotal);
+	    	
+	    	tabDetalleMontos.addCell(pcMetodo);
+	    	tabDetalleMontos.addCell(pcImpuesto);
+	    	tabDetalleMontos.addCell(pcMontoImpuesto);
+	    	
+	    	tabDetalleMontos.addCell(pcMontoLetra);
+	    	tabDetalleMontos.addCell(pcTotal);
+	    	tabDetalleMontos.addCell(pcMontoTotal);	    	
+	    }
+	    tabDetalleMontos.setWidthPercentage(101);
+	    tabDetalleMontos.setHorizontalAlignment(0);
+	    tabDetalleMontos.setWidths(medidaCeldas);
+	    tabDetalleMontos.setHeaderRows(2);
+	    tabDetalleMontos.setFooterRows(2);
+	    tabDetalleMontos.setTotalWidth(530);
+		
+		int cont = 0;
+		int bandera = 0;
+		int tamanioCOncepto = comprobante33.getConceptos().getConcepto().size();
+		
+		List<Concepto> listConceptos = comprobante33.getConceptos().getConcepto();
+		for (Concepto concepto : listConceptos) {
+			PdfPCell espacioBlanco = new PdfPCell(new Paragraph(" ", fuenteContenidoTab));
+			PdfPCell ClavePro = new PdfPCell(new Paragraph(concepto.getClaveProdServ(), fuenteContenidoTab));
+		    PdfPCell Codigo = new PdfPCell(new Paragraph(concepto.getNoIdentificacion(),fuenteContenidoTab));
+		    int intCantidad = new Double(concepto.getCantidad().toString()).intValue();
+		    PdfPCell Cantidad = new PdfPCell(new Paragraph( Integer.toString(intCantidad) ,fuenteContenidoTab));
+//		    PdfPCell ClaveUnidad = new PdfPCell(new Paragraph(infConcepto.getClaveUnidad(),fuenteContenidoTab));
+		    PdfPCell ClaveUnidad = new PdfPCell(new Paragraph(concepto.getClaveUnidad(),fuenteContenidoTab));
+		    PdfPCell ValorUni = new PdfPCell(new Paragraph(concepto.getValorUnitario().toString(),fuenteContenidoTab));
+		    
+	        PdfPCell Descuento = new PdfPCell(new Paragraph(df.format(concepto.getImpuestos().getTraslados().getTraslado().get(0).getImporte()),fuenteContenidoTab));
+	        //infConcepto.getImpuestos().getTraslados().getTraslado().get(cont).getImporte().toString()
+	        PdfPCell Importe = new PdfPCell(new Paragraph(concepto.getImpuestos().getTraslados().getTraslado().get(0).getBase().toString(),fuenteContenidoTab));
+	        PdfPCell montoRetencion = null;
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	montoRetencion = new PdfPCell(new Paragraph(df.format(concepto.getImpuestos().getRetenciones().getRetencion()
+	        			.get(0).getImporte()),fuenteContenidoTab));
+	        }
+	        
+	        ClavePro.setBorder(Rectangle.UNDEFINED);
+	        Codigo.setBorder(Rectangle.UNDEFINED);
+	        Cantidad.setBorder(Rectangle.UNDEFINED);
+	        ClaveUnidad.setBorder(Rectangle.UNDEFINED);
+	        ValorUni.setBorder(Rectangle.UNDEFINED);
+	        Descuento.setBorder(Rectangle.UNDEFINED);
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	montoRetencion.setBorder(Rectangle.UNDEFINED);
+	        }
+	        Importe.setBorder(Rectangle.UNDEFINED);
+	        espacioBlanco.setBorder(Rectangle.UNDEFINED);
+	        ClavePro.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        Codigo.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        Cantidad.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        ClaveUnidad.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        ValorUni.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        Descuento.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	montoRetencion.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	        }
+	        Importe.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        PdfPCell pcDescripcion = new PdfPCell(new Paragraph(concepto.getDescripcion(),fuenteContenidoImporTab));
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	pcDescripcion.setColspan(8);
+	        }else{
+	        	pcDescripcion.setColspan(7);	        	
+	        }
+	        pcDescripcion.setBorder(Rectangle.UNDEFINED);
+
+//	        if ((bandera%9) == 0 && cont !=0) {
+//	        	tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+		        
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+		        
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//	        }
+//	        else{
+	        	tabDatosFactura.addCell(ClavePro);
+		        tabDatosFactura.addCell(Codigo);
+		        tabDatosFactura.addCell(Cantidad);
+		        tabDatosFactura.addCell(ClaveUnidad);
+		        tabDatosFactura.addCell(ValorUni);
+		        tabDatosFactura.addCell(Descuento);
+		        if(concepto.getImpuestos().getRetenciones()!=null){
+		        	tabDatosFactura.addCell(montoRetencion);
+		        }
+		        tabDatosFactura.addCell(Importe);
+		        tabDatosFactura.addCell(pcDescripcion);
+//	        }
+	        cont++;
+	        bandera++;
+		}
+		   tabDatosFactura.setWidthPercentage(101);
+		   tabDatosFactura.setHorizontalAlignment(0);
+		   documentReportePdf.add(tabDatosFactura);
+	    if (tamanioCOncepto == bandera) {
+        	PdfContentByte canvas = writerPdf.getDirectContent();
+        	tabDetalleMontos.writeSelectedRows(0, -1, 35f, 200f,canvas);
+		}
+	    documentReportePdf.close();
+		
+		return ruta;
+	}
+	
+	
+	public String CrearPdfMarcaMoreira(PdfInfoDto infoPdf,Integer kfactura, String nombreArchivo, boolean retencion, Comprobante comprobante33, boolean bDirFiscal) throws DocumentException, SocketException, IOException{
+		String ruta = "";
+		PdfPTable tabDetalleMontos = new PdfPTable(3);
+		PdfPTable tabDatosFactura  = null;
+		if(retencion){
+			tabDatosFactura = new PdfPTable(8);
+		}else{
+			tabDatosFactura = new PdfPTable(7);			
+		}
+		PdfWriter writerPdf = null;
+		float[] medidaCeldas = {2.3f,0.7f,0.5f};
+		BaseColor colorFondoContenidoFact = WebColors.getRGBColor("#F4F4F9");
+		Font fuenteContenidoTab = new Font(Font.FontFamily.HELVETICA,7,Font.NORMAL,BaseColor.BLACK);
+		Font fuenteContenidoImporTab = new Font(Font.FontFamily.HELVETICA,7,Font.BOLD,BaseColor.BLACK);
+		
+		DecimalFormat df = new DecimalFormat("###,###,###.00");
+		String strMontoSubTotal = df.format(comprobante33.getSubTotal()); 
+		String strMontoImpuesto = df.format(comprobante33.getImpuestos().getTotalImpuestosTrasladados());
+		String strMontoTotal = df.format(comprobante33.getTotal());
+		
+		
+		
+		Document documentReportePdf = new Document(PageSize.A4, 36, 36, 260,136);
+		FileOutputStream ficheroPdf = null;
+		try {			
+			ruta = env.getProperty("path.file.ordenes.pdf.moreira")+nombreArchivo+".pdf";
+			ficheroPdf = new FileOutputStream(ruta);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		try {
+			writerPdf = PdfWriter.getInstance(documentReportePdf, ficheroPdf);
+			writerPdf.setPageEvent(new TemplateMoreira(infoPdf,comprobante33,retencion,bDirFiscal,env));
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		documentReportePdf.open();	
+		documentReportePdf.newPage();
+		
+		String mntRetenido = "";
+		if(retencion){
+			mntRetenido = df.format(comprobante33.getImpuestos().getTotalImpuestosRetenidos());
+		}
+		
+		PdfPCell pcMonedaPeso = new PdfPCell(new Paragraph("Moneda MXN ", fuenteContenidoImporTab));
+		PdfPCell pcImpuRetenido = new PdfPCell(new Paragraph("Impuesto retenido (IVA):",fuenteContenidoImporTab));
+		PdfPCell pcMontoRetenido = new PdfPCell(new Paragraph(mntRetenido,fuenteContenidoImporTab));
+		
+	    PdfPCell pcSubTotal = new PdfPCell(new Paragraph("Subtotal: ",fuenteContenidoImporTab));
+	    PdfPCell pcMontoSubTotal = new PdfPCell(new Paragraph(strMontoSubTotal,fuenteContenidoImporTab));	    
+//	    PdfPCell pcFormaPago = new PdfPCell(new Paragraph("Forma de pago  99 Por Definir",fuenteContenidoImporTab));
+	    PdfPCell pcFormaPago = new PdfPCell(new Paragraph("Forma de pago "+comprobante33.getFormaPago(),fuenteContenidoImporTab));
+	    PdfPCell pcImpuesto = new PdfPCell(new Paragraph("Impuesto trasladado (IVA)",fuenteContenidoImporTab));
+	    PdfPCell pcMontoImpuesto = new PdfPCell(new Paragraph(strMontoImpuesto,fuenteContenidoImporTab));
+	    //PdfPCell pcMetodo = new PdfPCell(new Paragraph("M�todo de pago PPD Pago En Parcialidades O Diferido",fuenteContenidoImporTab));
+	    PdfPCell pcMetodo = new PdfPCell(new Paragraph("Método de pago "+infoPdf.getSmetodoPago(),fuenteContenidoImporTab));
+	    PdfPCell pcTotal = new PdfPCell(new Paragraph("Total: ",fuenteContenidoImporTab));
+	    PdfPCell pcMontoTotal = new PdfPCell(new Paragraph(strMontoTotal,fuenteContenidoImporTab));
+//	    Qulqi qulqi = new Qulqi();
+//		qulqi.setDecimalPartVisible(true);
+//		qulqi.setCoin(Qulqi$COIN.peso_mexicano);
+//		qulqi.setFloating(Qulqi$FLOATING.POINT);
+		
+//		System.out.println(qulqi.showMeTheMoney(strMontoTotal));
+//	    PdfPCell pcMontoLetra = new PdfPCell(new Paragraph(qulqi.showMeTheMoney(strMontoTotal),fuenteContenidoImporTab));
+//	    pcMonedaPeso.setPaddingTop(8);
+//        pcMonedaPeso.setIndent(8);
+		strMontoTotal = comprobante33.getTotal().toString();
+//		System.out.println(Character.toUpperCase(qulqi.showMeTheMoney(strMontoTotal).charAt(0)) + qulqi.showMeTheMoney(strMontoTotal).substring(1,qulqi.showMeTheMoney(strMontoTotal).length()));		
+//		String strMontoTotalLetra = Character.toUpperCase(qulqi.showMeTheMoney(strMontoTotal).charAt(0)) + qulqi.showMeTheMoney(strMontoTotal).substring(1,qulqi.showMeTheMoney(strMontoTotal).length());
+		String strMontoTotalLetra = montoConLetra(strMontoTotal);
+	    PdfPCell pcMontoLetra = new PdfPCell(new Paragraph(strMontoTotalLetra,fuenteContenidoImporTab));
+	    pcMonedaPeso.setPaddingTop(8);
+        pcMonedaPeso.setIndent(8);
+        
+        if(retencion){
+        	pcSubTotal.setPaddingTop(8);
+        	pcMontoSubTotal.setPaddingTop(8);
+        }
+        
+        pcFormaPago.setIndent(8);
+        
+        pcMetodo.setIndent(8);
+            
+        pcMontoLetra.setIndent(8);
+        pcMontoLetra.setPaddingBottom(8);
+        pcMontoTotal.setPaddingBottom(8);
+        pcTotal.setPaddingBottom(8);
+        
+	    pcMonedaPeso.setBackgroundColor(colorFondoContenidoFact);
+	    pcSubTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcImpuRetenido.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoRetenido.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoSubTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcFormaPago.setBackgroundColor(colorFondoContenidoFact);
+	    pcImpuesto.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoImpuesto.setBackgroundColor(colorFondoContenidoFact);
+	    pcMetodo.setBackgroundColor(colorFondoContenidoFact);
+	    pcTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoLetra.setBackgroundColor(colorFondoContenidoFact);
+	    
+	    pcMonedaPeso.setBorder(Rectangle.UNDEFINED);
+	    pcSubTotal.setBorder(Rectangle.UNDEFINED);
+	    pcImpuRetenido.setBorder(Rectangle.UNDEFINED);
+	    pcMontoRetenido.setBorder(Rectangle.UNDEFINED);
+	    pcMontoSubTotal.setBorder(Rectangle.UNDEFINED);
+	    pcFormaPago.setBorder(Rectangle.UNDEFINED);
+	    pcImpuesto.setBorder(Rectangle.UNDEFINED);
+	    pcMontoImpuesto.setBorder(Rectangle.UNDEFINED);
+	    pcMetodo.setBorder(Rectangle.UNDEFINED);
+	    pcTotal.setBorder(Rectangle.UNDEFINED);
+	    pcMontoTotal.setBorder(Rectangle.UNDEFINED);
+	    pcMontoLetra.setBorder(Rectangle.UNDEFINED);
+	    
+	    pcMontoSubTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoRetenido.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoImpuesto.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoLetra.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    
+	    if(retencion){
+	    	tabDetalleMontos.addCell(pcMonedaPeso);
+	    	tabDetalleMontos.addCell(pcSubTotal);
+	    	tabDetalleMontos.addCell(pcMontoSubTotal);
+	    	
+	    	tabDetalleMontos.addCell(pcFormaPago);
+	    	tabDetalleMontos.addCell(pcImpuesto);
+	    	tabDetalleMontos.addCell(pcMontoImpuesto);
+	    	
+	    	tabDetalleMontos.addCell(pcMetodo);
+	    	tabDetalleMontos.addCell(pcImpuRetenido);
+	    	tabDetalleMontos.addCell(pcMontoRetenido);
+	    	
+	    	tabDetalleMontos.addCell(pcMontoLetra);
+	    	tabDetalleMontos.addCell(pcTotal);
+	    	tabDetalleMontos.addCell(pcMontoTotal);	   
+	    }else{
+	    	pcMonedaPeso.setColspan(3);
+	    	
+	    	tabDetalleMontos.addCell(pcMonedaPeso);
+	    	
+	    	tabDetalleMontos.addCell(pcFormaPago);
+	    	tabDetalleMontos.addCell(pcSubTotal);
+	    	tabDetalleMontos.addCell(pcMontoSubTotal);
+	    	
+	    	tabDetalleMontos.addCell(pcMetodo);
+	    	tabDetalleMontos.addCell(pcImpuesto);
+	    	tabDetalleMontos.addCell(pcMontoImpuesto);
+	    	
+	    	tabDetalleMontos.addCell(pcMontoLetra);
+	    	tabDetalleMontos.addCell(pcTotal);
+	    	tabDetalleMontos.addCell(pcMontoTotal);	    	
+	    }
+	    tabDetalleMontos.setWidthPercentage(101);
+	    tabDetalleMontos.setHorizontalAlignment(0);
+	    tabDetalleMontos.setWidths(medidaCeldas);
+	    tabDetalleMontos.setHeaderRows(2);
+	    tabDetalleMontos.setFooterRows(2);
+	    tabDetalleMontos.setTotalWidth(530);
+		
+		int cont = 0;
+		int bandera = 0;
+		int tamanioCOncepto = comprobante33.getConceptos().getConcepto().size();
+		
+		List<Concepto> listConceptos = comprobante33.getConceptos().getConcepto();
+		for (Concepto concepto : listConceptos) {
+			PdfPCell espacioBlanco = new PdfPCell(new Paragraph(" ", fuenteContenidoTab));
+			PdfPCell ClavePro = new PdfPCell(new Paragraph(concepto.getClaveProdServ(), fuenteContenidoTab));
+		    PdfPCell Codigo = new PdfPCell(new Paragraph(concepto.getNoIdentificacion(),fuenteContenidoTab));
+		    int intCantidad = new Double(concepto.getCantidad().toString()).intValue();
+		    PdfPCell Cantidad = new PdfPCell(new Paragraph( Integer.toString(intCantidad) ,fuenteContenidoTab));
+//		    PdfPCell ClaveUnidad = new PdfPCell(new Paragraph(infConcepto.getClaveUnidad(),fuenteContenidoTab));
+		    PdfPCell ClaveUnidad = new PdfPCell(new Paragraph(concepto.getClaveUnidad(),fuenteContenidoTab));
+		    PdfPCell ValorUni = new PdfPCell(new Paragraph(concepto.getValorUnitario().toString(),fuenteContenidoTab));
+		    
+	        PdfPCell Descuento = new PdfPCell(new Paragraph(df.format(concepto.getImpuestos().getTraslados().getTraslado().get(0).getImporte()),fuenteContenidoTab));
+	        //infConcepto.getImpuestos().getTraslados().getTraslado().get(cont).getImporte().toString()
+	        PdfPCell Importe = new PdfPCell(new Paragraph(concepto.getImpuestos().getTraslados().getTraslado().get(0).getBase().toString(),fuenteContenidoTab));
+	        PdfPCell montoRetencion = null;
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	montoRetencion = new PdfPCell(new Paragraph(df.format(concepto.getImpuestos().getRetenciones().getRetencion()
+	        			.get(0).getImporte()),fuenteContenidoTab));
+	        }
+	        
+	        ClavePro.setBorder(Rectangle.UNDEFINED);
+	        Codigo.setBorder(Rectangle.UNDEFINED);
+	        Cantidad.setBorder(Rectangle.UNDEFINED);
+	        ClaveUnidad.setBorder(Rectangle.UNDEFINED);
+	        ValorUni.setBorder(Rectangle.UNDEFINED);
+	        Descuento.setBorder(Rectangle.UNDEFINED);
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	montoRetencion.setBorder(Rectangle.UNDEFINED);
+	        }
+	        Importe.setBorder(Rectangle.UNDEFINED);
+	        espacioBlanco.setBorder(Rectangle.UNDEFINED);
+	        ClavePro.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        Codigo.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        Cantidad.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        ClaveUnidad.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        ValorUni.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        Descuento.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	montoRetencion.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	        }
+	        Importe.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        PdfPCell pcDescripcion = new PdfPCell(new Paragraph(concepto.getDescripcion(),fuenteContenidoImporTab));
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	pcDescripcion.setColspan(8);
+	        }else{
+	        	pcDescripcion.setColspan(7);	        	
+	        }
+	        pcDescripcion.setBorder(Rectangle.UNDEFINED);
+
+//	        if ((bandera%9) == 0 && cont !=0) {
+//	        	tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+		        
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+		        
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//	        }
+//	        else{
+	        	tabDatosFactura.addCell(ClavePro);
+		        tabDatosFactura.addCell(Codigo);
+		        tabDatosFactura.addCell(Cantidad);
+		        tabDatosFactura.addCell(ClaveUnidad);
+		        tabDatosFactura.addCell(ValorUni);
+		        tabDatosFactura.addCell(Descuento);
+		        if(concepto.getImpuestos().getRetenciones()!=null){
+		        	tabDatosFactura.addCell(montoRetencion);
+		        }
+		        tabDatosFactura.addCell(Importe);
+		        tabDatosFactura.addCell(pcDescripcion);
+//	        }
+	        cont++;
+	        bandera++;
+		}
+		   tabDatosFactura.setWidthPercentage(101);
+		   tabDatosFactura.setHorizontalAlignment(0);
+		   documentReportePdf.add(tabDatosFactura);
+	    if (tamanioCOncepto == bandera) {
+        	PdfContentByte canvas = writerPdf.getDirectContent();
+        	tabDetalleMontos.writeSelectedRows(0, -1, 35f, 200f,canvas);
+		}
+	    documentReportePdf.close();
+		
+		return ruta;
+	}
+	
+	public String CrearPdfMarcaPolab(PdfInfoDto infoPdf,Integer kfactura, String nombreArchivo, boolean retencion, Comprobante comprobante33, boolean bDirFiscal) throws DocumentException, SocketException, IOException{
+		String ruta = "";
+		PdfPTable tabDetalleMontos = new PdfPTable(3);
+		PdfPTable tabDatosFactura  = null;
+		if(retencion){
+			tabDatosFactura = new PdfPTable(8);
+		}else{
+			tabDatosFactura = new PdfPTable(7);			
+		}
+		PdfWriter writerPdf = null;
+		float[] medidaCeldas = {2.3f,0.7f,0.5f};
+		BaseColor colorFondoContenidoFact = WebColors.getRGBColor("#F4F4F9");
+		Font fuenteContenidoTab = new Font(Font.FontFamily.HELVETICA,7,Font.NORMAL,BaseColor.BLACK);
+		Font fuenteContenidoImporTab = new Font(Font.FontFamily.HELVETICA,7,Font.BOLD,BaseColor.BLACK);
+		
+		DecimalFormat df = new DecimalFormat("###,###,###.00");
+		String strMontoSubTotal = df.format(comprobante33.getSubTotal()); 
+		String strMontoImpuesto = df.format(comprobante33.getImpuestos().getTotalImpuestosTrasladados());
+		String strMontoTotal = df.format(comprobante33.getTotal());
+		
+		
+		
+		Document documentReportePdf = new Document(PageSize.A4, 36, 36, 260,136);
+		FileOutputStream ficheroPdf = null;
+		try {			
+			ruta = env.getProperty("path.file.ordenes.pdf.polab")+nombreArchivo+".pdf";
+			ficheroPdf = new FileOutputStream(ruta);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		try {
+			writerPdf = PdfWriter.getInstance(documentReportePdf, ficheroPdf);
+			writerPdf.setPageEvent(new TemplatePolab(infoPdf,comprobante33,retencion,bDirFiscal,env));
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		documentReportePdf.open();	
+		documentReportePdf.newPage();
+		
+		String mntRetenido = "";
+		if(retencion){
+			mntRetenido = df.format(comprobante33.getImpuestos().getTotalImpuestosRetenidos());
+		}
+		
+		PdfPCell pcMonedaPeso = new PdfPCell(new Paragraph("Moneda MXN ", fuenteContenidoImporTab));
+		PdfPCell pcImpuRetenido = new PdfPCell(new Paragraph("Impuesto retenido (IVA):",fuenteContenidoImporTab));
+		PdfPCell pcMontoRetenido = new PdfPCell(new Paragraph(mntRetenido,fuenteContenidoImporTab));
+		
+	    PdfPCell pcSubTotal = new PdfPCell(new Paragraph("Subtotal: ",fuenteContenidoImporTab));
+	    PdfPCell pcMontoSubTotal = new PdfPCell(new Paragraph(strMontoSubTotal,fuenteContenidoImporTab));	    
+//	    PdfPCell pcFormaPago = new PdfPCell(new Paragraph("Forma de pago  99 Por Definir",fuenteContenidoImporTab));
+	    PdfPCell pcFormaPago = new PdfPCell(new Paragraph("Forma de pago "+comprobante33.getFormaPago(),fuenteContenidoImporTab));
+	    PdfPCell pcImpuesto = new PdfPCell(new Paragraph("Impuesto trasladado (IVA)",fuenteContenidoImporTab));
+	    PdfPCell pcMontoImpuesto = new PdfPCell(new Paragraph(strMontoImpuesto,fuenteContenidoImporTab));
+	    //PdfPCell pcMetodo = new PdfPCell(new Paragraph("M�todo de pago PPD Pago En Parcialidades O Diferido",fuenteContenidoImporTab));
+	    PdfPCell pcMetodo = new PdfPCell(new Paragraph("Método de pago "+infoPdf.getSmetodoPago(),fuenteContenidoImporTab));
+	    PdfPCell pcTotal = new PdfPCell(new Paragraph("Total: ",fuenteContenidoImporTab));
+	    PdfPCell pcMontoTotal = new PdfPCell(new Paragraph(strMontoTotal,fuenteContenidoImporTab));
+//	    Qulqi qulqi = new Qulqi();
+//		qulqi.setDecimalPartVisible(true);
+//		qulqi.setCoin(Qulqi$COIN.peso_mexicano);
+//		qulqi.setFloating(Qulqi$FLOATING.POINT);
+		
+//		System.out.println(qulqi.showMeTheMoney(strMontoTotal));
+//	    PdfPCell pcMontoLetra = new PdfPCell(new Paragraph(qulqi.showMeTheMoney(strMontoTotal),fuenteContenidoImporTab));
+//	    pcMonedaPeso.setPaddingTop(8);
+//        pcMonedaPeso.setIndent(8);
+		strMontoTotal = comprobante33.getTotal().toString();
+//		System.out.println(Character.toUpperCase(qulqi.showMeTheMoney(strMontoTotal).charAt(0)) + qulqi.showMeTheMoney(strMontoTotal).substring(1,qulqi.showMeTheMoney(strMontoTotal).length()));		
+//		String strMontoTotalLetra = Character.toUpperCase(qulqi.showMeTheMoney(strMontoTotal).charAt(0)) + qulqi.showMeTheMoney(strMontoTotal).substring(1,qulqi.showMeTheMoney(strMontoTotal).length());
+		String strMontoTotalLetra = montoConLetra(strMontoTotal);
+	    PdfPCell pcMontoLetra = new PdfPCell(new Paragraph(strMontoTotalLetra,fuenteContenidoImporTab));
+	    pcMonedaPeso.setPaddingTop(8);
+        pcMonedaPeso.setIndent(8);
+        
+        if(retencion){
+        	pcSubTotal.setPaddingTop(8);
+        	pcMontoSubTotal.setPaddingTop(8);
+        }
+        
+        pcFormaPago.setIndent(8);
+        
+        pcMetodo.setIndent(8);
+            
+        pcMontoLetra.setIndent(8);
+        pcMontoLetra.setPaddingBottom(8);
+        pcMontoTotal.setPaddingBottom(8);
+        pcTotal.setPaddingBottom(8);
+        
+	    pcMonedaPeso.setBackgroundColor(colorFondoContenidoFact);
+	    pcSubTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcImpuRetenido.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoRetenido.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoSubTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcFormaPago.setBackgroundColor(colorFondoContenidoFact);
+	    pcImpuesto.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoImpuesto.setBackgroundColor(colorFondoContenidoFact);
+	    pcMetodo.setBackgroundColor(colorFondoContenidoFact);
+	    pcTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoLetra.setBackgroundColor(colorFondoContenidoFact);
+	    
+	    pcMonedaPeso.setBorder(Rectangle.UNDEFINED);
+	    pcSubTotal.setBorder(Rectangle.UNDEFINED);
+	    pcImpuRetenido.setBorder(Rectangle.UNDEFINED);
+	    pcMontoRetenido.setBorder(Rectangle.UNDEFINED);
+	    pcMontoSubTotal.setBorder(Rectangle.UNDEFINED);
+	    pcFormaPago.setBorder(Rectangle.UNDEFINED);
+	    pcImpuesto.setBorder(Rectangle.UNDEFINED);
+	    pcMontoImpuesto.setBorder(Rectangle.UNDEFINED);
+	    pcMetodo.setBorder(Rectangle.UNDEFINED);
+	    pcTotal.setBorder(Rectangle.UNDEFINED);
+	    pcMontoTotal.setBorder(Rectangle.UNDEFINED);
+	    pcMontoLetra.setBorder(Rectangle.UNDEFINED);
+	    
+	    pcMontoSubTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoRetenido.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoImpuesto.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoLetra.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    
+	    if(retencion){
+	    	tabDetalleMontos.addCell(pcMonedaPeso);
+	    	tabDetalleMontos.addCell(pcSubTotal);
+	    	tabDetalleMontos.addCell(pcMontoSubTotal);
+	    	
+	    	tabDetalleMontos.addCell(pcFormaPago);
+	    	tabDetalleMontos.addCell(pcImpuesto);
+	    	tabDetalleMontos.addCell(pcMontoImpuesto);
+	    	
+	    	tabDetalleMontos.addCell(pcMetodo);
+	    	tabDetalleMontos.addCell(pcImpuRetenido);
+	    	tabDetalleMontos.addCell(pcMontoRetenido);
+	    	
+	    	tabDetalleMontos.addCell(pcMontoLetra);
+	    	tabDetalleMontos.addCell(pcTotal);
+	    	tabDetalleMontos.addCell(pcMontoTotal);	   
+	    }else{
+	    	pcMonedaPeso.setColspan(3);
+	    	
+	    	tabDetalleMontos.addCell(pcMonedaPeso);
+	    	
+	    	tabDetalleMontos.addCell(pcFormaPago);
+	    	tabDetalleMontos.addCell(pcSubTotal);
+	    	tabDetalleMontos.addCell(pcMontoSubTotal);
+	    	
+	    	tabDetalleMontos.addCell(pcMetodo);
+	    	tabDetalleMontos.addCell(pcImpuesto);
+	    	tabDetalleMontos.addCell(pcMontoImpuesto);
+	    	
+	    	tabDetalleMontos.addCell(pcMontoLetra);
+	    	tabDetalleMontos.addCell(pcTotal);
+	    	tabDetalleMontos.addCell(pcMontoTotal);	    	
+	    }
+	    tabDetalleMontos.setWidthPercentage(101);
+	    tabDetalleMontos.setHorizontalAlignment(0);
+	    tabDetalleMontos.setWidths(medidaCeldas);
+	    tabDetalleMontos.setHeaderRows(2);
+	    tabDetalleMontos.setFooterRows(2);
+	    tabDetalleMontos.setTotalWidth(530);
+		
+		int cont = 0;
+		int bandera = 0;
+		int tamanioCOncepto = comprobante33.getConceptos().getConcepto().size();
+		
+		List<Concepto> listConceptos = comprobante33.getConceptos().getConcepto();
+		for (Concepto concepto : listConceptos) {
+			PdfPCell espacioBlanco = new PdfPCell(new Paragraph(" ", fuenteContenidoTab));
+			PdfPCell ClavePro = new PdfPCell(new Paragraph(concepto.getClaveProdServ(), fuenteContenidoTab));
+		    PdfPCell Codigo = new PdfPCell(new Paragraph(concepto.getNoIdentificacion(),fuenteContenidoTab));
+		    int intCantidad = new Double(concepto.getCantidad().toString()).intValue();
+		    PdfPCell Cantidad = new PdfPCell(new Paragraph( Integer.toString(intCantidad) ,fuenteContenidoTab));
+//		    PdfPCell ClaveUnidad = new PdfPCell(new Paragraph(infConcepto.getClaveUnidad(),fuenteContenidoTab));
+		    PdfPCell ClaveUnidad = new PdfPCell(new Paragraph(concepto.getClaveUnidad(),fuenteContenidoTab));
+		    PdfPCell ValorUni = new PdfPCell(new Paragraph(concepto.getValorUnitario().toString(),fuenteContenidoTab));
+		    
+	        PdfPCell Descuento = new PdfPCell(new Paragraph(df.format(concepto.getImpuestos().getTraslados().getTraslado().get(0).getImporte()),fuenteContenidoTab));
+	        //infConcepto.getImpuestos().getTraslados().getTraslado().get(cont).getImporte().toString()
+	        PdfPCell Importe = new PdfPCell(new Paragraph(concepto.getImpuestos().getTraslados().getTraslado().get(0).getBase().toString(),fuenteContenidoTab));
+	        PdfPCell montoRetencion = null;
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	montoRetencion = new PdfPCell(new Paragraph(df.format(concepto.getImpuestos().getRetenciones().getRetencion()
+	        			.get(0).getImporte()),fuenteContenidoTab));
+	        }
+	        
+	        ClavePro.setBorder(Rectangle.UNDEFINED);
+	        Codigo.setBorder(Rectangle.UNDEFINED);
+	        Cantidad.setBorder(Rectangle.UNDEFINED);
+	        ClaveUnidad.setBorder(Rectangle.UNDEFINED);
+	        ValorUni.setBorder(Rectangle.UNDEFINED);
+	        Descuento.setBorder(Rectangle.UNDEFINED);
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	montoRetencion.setBorder(Rectangle.UNDEFINED);
+	        }
+	        Importe.setBorder(Rectangle.UNDEFINED);
+	        espacioBlanco.setBorder(Rectangle.UNDEFINED);
+	        ClavePro.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        Codigo.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        Cantidad.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        ClaveUnidad.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        ValorUni.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        Descuento.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	montoRetencion.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	        }
+	        Importe.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        PdfPCell pcDescripcion = new PdfPCell(new Paragraph(concepto.getDescripcion(),fuenteContenidoImporTab));
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	pcDescripcion.setColspan(8);
+	        }else{
+	        	pcDescripcion.setColspan(7);	        	
+	        }
+	        pcDescripcion.setBorder(Rectangle.UNDEFINED);
+
+//	        if ((bandera%9) == 0 && cont !=0) {
+//	        	tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+		        
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+		        
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//	        }
+//	        else{
+	        	tabDatosFactura.addCell(ClavePro);
+		        tabDatosFactura.addCell(Codigo);
+		        tabDatosFactura.addCell(Cantidad);
+		        tabDatosFactura.addCell(ClaveUnidad);
+		        tabDatosFactura.addCell(ValorUni);
+		        tabDatosFactura.addCell(Descuento);
+		        if(concepto.getImpuestos().getRetenciones()!=null){
+		        	tabDatosFactura.addCell(montoRetencion);
+		        }
+		        tabDatosFactura.addCell(Importe);
+		        tabDatosFactura.addCell(pcDescripcion);
+//	        }
+	        cont++;
+	        bandera++;
+		}
+		   tabDatosFactura.setWidthPercentage(101);
+		   tabDatosFactura.setHorizontalAlignment(0);
+		   documentReportePdf.add(tabDatosFactura);
+	    if (tamanioCOncepto == bandera) {
+        	PdfContentByte canvas = writerPdf.getDirectContent();
+        	tabDetalleMontos.writeSelectedRows(0, -1, 35f, 200f,canvas);
+		}
+	    documentReportePdf.close();
+		
+		return ruta;
+	}
+	
+	
+	public String CrearPdfMarcaBiomedica(PdfInfoDto infoPdf,Integer kfactura, String nombreArchivo, boolean retencion, Comprobante comprobante33, boolean bDirFiscal) throws DocumentException, SocketException, IOException{
+		String ruta = "";
+		PdfPTable tabDetalleMontos = new PdfPTable(3);
+		PdfPTable tabDatosFactura  = null;
+		if(retencion){
+			tabDatosFactura = new PdfPTable(8);
+		}else{
+			tabDatosFactura = new PdfPTable(7);			
+		}
+		PdfWriter writerPdf = null;
+		float[] medidaCeldas = {2.3f,0.7f,0.5f};
+		BaseColor colorFondoContenidoFact = WebColors.getRGBColor("#F4F4F9");
+		Font fuenteContenidoTab = new Font(Font.FontFamily.HELVETICA,7,Font.NORMAL,BaseColor.BLACK);
+		Font fuenteContenidoImporTab = new Font(Font.FontFamily.HELVETICA,7,Font.BOLD,BaseColor.BLACK);
+		
+		DecimalFormat df = new DecimalFormat("###,###,###.00");
+		String strMontoSubTotal = df.format(comprobante33.getSubTotal()); 
+		String strMontoImpuesto = df.format(comprobante33.getImpuestos().getTotalImpuestosTrasladados());
+		String strMontoTotal = df.format(comprobante33.getTotal());
+		
+		
+		
+		Document documentReportePdf = new Document(PageSize.A4, 36, 36, 260,136);
+		FileOutputStream ficheroPdf = null;
+		try {			
+			ruta = env.getProperty("path.file.ordenes.pdf.referencia")+nombreArchivo+".pdf";
+			ficheroPdf = new FileOutputStream(ruta);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		try {
+			writerPdf = PdfWriter.getInstance(documentReportePdf, ficheroPdf);
+			writerPdf.setPageEvent(new TemplateBiomedica(infoPdf,comprobante33,retencion,bDirFiscal,env));
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		documentReportePdf.open();	
+		documentReportePdf.newPage();
+		
+		String mntRetenido = "";
+		if(retencion){
+			mntRetenido = df.format(comprobante33.getImpuestos().getTotalImpuestosRetenidos());
+		}
+		
+		PdfPCell pcMonedaPeso = new PdfPCell(new Paragraph("Moneda MXN ", fuenteContenidoImporTab));
+		PdfPCell pcImpuRetenido = new PdfPCell(new Paragraph("Impuesto retenido (IVA):",fuenteContenidoImporTab));
+		PdfPCell pcMontoRetenido = new PdfPCell(new Paragraph(mntRetenido,fuenteContenidoImporTab));
+		
+	    PdfPCell pcSubTotal = new PdfPCell(new Paragraph("Subtotal: ",fuenteContenidoImporTab));
+	    PdfPCell pcMontoSubTotal = new PdfPCell(new Paragraph(strMontoSubTotal,fuenteContenidoImporTab));	    
+//	    PdfPCell pcFormaPago = new PdfPCell(new Paragraph("Forma de pago  99 Por Definir",fuenteContenidoImporTab));
+	    PdfPCell pcFormaPago = new PdfPCell(new Paragraph("Forma de pago "+comprobante33.getFormaPago(),fuenteContenidoImporTab));
+	    PdfPCell pcImpuesto = new PdfPCell(new Paragraph("Impuesto trasladado (IVA)",fuenteContenidoImporTab));
+	    PdfPCell pcMontoImpuesto = new PdfPCell(new Paragraph(strMontoImpuesto,fuenteContenidoImporTab));
+	    //PdfPCell pcMetodo = new PdfPCell(new Paragraph("M�todo de pago PPD Pago En Parcialidades O Diferido",fuenteContenidoImporTab));
+	    PdfPCell pcMetodo = new PdfPCell(new Paragraph("Método de pago "+infoPdf.getSmetodoPago(),fuenteContenidoImporTab));
+	    PdfPCell pcTotal = new PdfPCell(new Paragraph("Total: ",fuenteContenidoImporTab));
+	    PdfPCell pcMontoTotal = new PdfPCell(new Paragraph(strMontoTotal,fuenteContenidoImporTab));
+//	    Qulqi qulqi = new Qulqi();
+//		qulqi.setDecimalPartVisible(true);
+//		qulqi.setCoin(Qulqi$COIN.peso_mexicano);
+//		qulqi.setFloating(Qulqi$FLOATING.POINT);
+		
+//		System.out.println(qulqi.showMeTheMoney(strMontoTotal));
+//	    PdfPCell pcMontoLetra = new PdfPCell(new Paragraph(qulqi.showMeTheMoney(strMontoTotal),fuenteContenidoImporTab));
+//	    pcMonedaPeso.setPaddingTop(8);
+//        pcMonedaPeso.setIndent(8);
+		strMontoTotal = comprobante33.getTotal().toString();
+//		System.out.println(Character.toUpperCase(qulqi.showMeTheMoney(strMontoTotal).charAt(0)) + qulqi.showMeTheMoney(strMontoTotal).substring(1,qulqi.showMeTheMoney(strMontoTotal).length()));		
+//		String strMontoTotalLetra = Character.toUpperCase(qulqi.showMeTheMoney(strMontoTotal).charAt(0)) + qulqi.showMeTheMoney(strMontoTotal).substring(1,qulqi.showMeTheMoney(strMontoTotal).length());
+		String strMontoTotalLetra = montoConLetra(strMontoTotal);
+	    PdfPCell pcMontoLetra = new PdfPCell(new Paragraph(strMontoTotalLetra,fuenteContenidoImporTab));
+	    pcMonedaPeso.setPaddingTop(8);
+        pcMonedaPeso.setIndent(8);
+        
+        if(retencion){
+        	pcSubTotal.setPaddingTop(8);
+        	pcMontoSubTotal.setPaddingTop(8);
+        }
+        
+        pcFormaPago.setIndent(8);
+        
+        pcMetodo.setIndent(8);
+            
+        pcMontoLetra.setIndent(8);
+        pcMontoLetra.setPaddingBottom(8);
+        pcMontoTotal.setPaddingBottom(8);
+        pcTotal.setPaddingBottom(8);
+        
+	    pcMonedaPeso.setBackgroundColor(colorFondoContenidoFact);
+	    pcSubTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcImpuRetenido.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoRetenido.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoSubTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcFormaPago.setBackgroundColor(colorFondoContenidoFact);
+	    pcImpuesto.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoImpuesto.setBackgroundColor(colorFondoContenidoFact);
+	    pcMetodo.setBackgroundColor(colorFondoContenidoFact);
+	    pcTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoLetra.setBackgroundColor(colorFondoContenidoFact);
+	    
+	    pcMonedaPeso.setBorder(Rectangle.UNDEFINED);
+	    pcSubTotal.setBorder(Rectangle.UNDEFINED);
+	    pcImpuRetenido.setBorder(Rectangle.UNDEFINED);
+	    pcMontoRetenido.setBorder(Rectangle.UNDEFINED);
+	    pcMontoSubTotal.setBorder(Rectangle.UNDEFINED);
+	    pcFormaPago.setBorder(Rectangle.UNDEFINED);
+	    pcImpuesto.setBorder(Rectangle.UNDEFINED);
+	    pcMontoImpuesto.setBorder(Rectangle.UNDEFINED);
+	    pcMetodo.setBorder(Rectangle.UNDEFINED);
+	    pcTotal.setBorder(Rectangle.UNDEFINED);
+	    pcMontoTotal.setBorder(Rectangle.UNDEFINED);
+	    pcMontoLetra.setBorder(Rectangle.UNDEFINED);
+	    
+	    pcMontoSubTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoRetenido.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoImpuesto.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoLetra.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    
+	    if(retencion){
+	    	tabDetalleMontos.addCell(pcMonedaPeso);
+	    	tabDetalleMontos.addCell(pcSubTotal);
+	    	tabDetalleMontos.addCell(pcMontoSubTotal);
+	    	
+	    	tabDetalleMontos.addCell(pcFormaPago);
+	    	tabDetalleMontos.addCell(pcImpuesto);
+	    	tabDetalleMontos.addCell(pcMontoImpuesto);
+	    	
+	    	tabDetalleMontos.addCell(pcMetodo);
+	    	tabDetalleMontos.addCell(pcImpuRetenido);
+	    	tabDetalleMontos.addCell(pcMontoRetenido);
+	    	
+	    	tabDetalleMontos.addCell(pcMontoLetra);
+	    	tabDetalleMontos.addCell(pcTotal);
+	    	tabDetalleMontos.addCell(pcMontoTotal);	   
+	    }else{
+	    	pcMonedaPeso.setColspan(3);
+	    	
+	    	tabDetalleMontos.addCell(pcMonedaPeso);
+	    	
+	    	tabDetalleMontos.addCell(pcFormaPago);
+	    	tabDetalleMontos.addCell(pcSubTotal);
+	    	tabDetalleMontos.addCell(pcMontoSubTotal);
+	    	
+	    	tabDetalleMontos.addCell(pcMetodo);
+	    	tabDetalleMontos.addCell(pcImpuesto);
+	    	tabDetalleMontos.addCell(pcMontoImpuesto);
+	    	
+	    	tabDetalleMontos.addCell(pcMontoLetra);
+	    	tabDetalleMontos.addCell(pcTotal);
+	    	tabDetalleMontos.addCell(pcMontoTotal);	    	
+	    }
+	    tabDetalleMontos.setWidthPercentage(101);
+	    tabDetalleMontos.setHorizontalAlignment(0);
+	    tabDetalleMontos.setWidths(medidaCeldas);
+	    tabDetalleMontos.setHeaderRows(2);
+	    tabDetalleMontos.setFooterRows(2);
+	    tabDetalleMontos.setTotalWidth(530);
+		
+		int cont = 0;
+		int bandera = 0;
+		int tamanioCOncepto = comprobante33.getConceptos().getConcepto().size();
+		
+		List<Concepto> listConceptos = comprobante33.getConceptos().getConcepto();
+		for (Concepto concepto : listConceptos) {
+			PdfPCell espacioBlanco = new PdfPCell(new Paragraph(" ", fuenteContenidoTab));
+			PdfPCell ClavePro = new PdfPCell(new Paragraph(concepto.getClaveProdServ(), fuenteContenidoTab));
+		    PdfPCell Codigo = new PdfPCell(new Paragraph(concepto.getNoIdentificacion(),fuenteContenidoTab));
+		    int intCantidad = new Double(concepto.getCantidad().toString()).intValue();
+		    PdfPCell Cantidad = new PdfPCell(new Paragraph( Integer.toString(intCantidad) ,fuenteContenidoTab));
+//		    PdfPCell ClaveUnidad = new PdfPCell(new Paragraph(infConcepto.getClaveUnidad(),fuenteContenidoTab));
+		    PdfPCell ClaveUnidad = new PdfPCell(new Paragraph(concepto.getClaveUnidad(),fuenteContenidoTab));
+		    PdfPCell ValorUni = new PdfPCell(new Paragraph(concepto.getValorUnitario().toString(),fuenteContenidoTab));
+		    
+	        PdfPCell Descuento = new PdfPCell(new Paragraph(df.format(concepto.getImpuestos().getTraslados().getTraslado().get(0).getImporte()),fuenteContenidoTab));
+	        //infConcepto.getImpuestos().getTraslados().getTraslado().get(cont).getImporte().toString()
+	        PdfPCell Importe = new PdfPCell(new Paragraph(concepto.getImpuestos().getTraslados().getTraslado().get(0).getBase().toString(),fuenteContenidoTab));
+	        PdfPCell montoRetencion = null;
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	montoRetencion = new PdfPCell(new Paragraph(df.format(concepto.getImpuestos().getRetenciones().getRetencion()
+	        			.get(0).getImporte()),fuenteContenidoTab));
+	        }
+	        
+	        ClavePro.setBorder(Rectangle.UNDEFINED);
+	        Codigo.setBorder(Rectangle.UNDEFINED);
+	        Cantidad.setBorder(Rectangle.UNDEFINED);
+	        ClaveUnidad.setBorder(Rectangle.UNDEFINED);
+	        ValorUni.setBorder(Rectangle.UNDEFINED);
+	        Descuento.setBorder(Rectangle.UNDEFINED);
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	montoRetencion.setBorder(Rectangle.UNDEFINED);
+	        }
+	        Importe.setBorder(Rectangle.UNDEFINED);
+	        espacioBlanco.setBorder(Rectangle.UNDEFINED);
+	        ClavePro.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        Codigo.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        Cantidad.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        ClaveUnidad.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        ValorUni.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        Descuento.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	montoRetencion.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	        }
+	        Importe.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        PdfPCell pcDescripcion = new PdfPCell(new Paragraph(concepto.getDescripcion(),fuenteContenidoImporTab));
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	pcDescripcion.setColspan(8);
+	        }else{
+	        	pcDescripcion.setColspan(7);	        	
+	        }
+	        pcDescripcion.setBorder(Rectangle.UNDEFINED);
+
+//	        if ((bandera%9) == 0 && cont !=0) {
+//	        	tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+		        
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+		        
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//	        }
+//	        else{
+	        	tabDatosFactura.addCell(ClavePro);
+		        tabDatosFactura.addCell(Codigo);
+		        tabDatosFactura.addCell(Cantidad);
+		        tabDatosFactura.addCell(ClaveUnidad);
+		        tabDatosFactura.addCell(ValorUni);
+		        tabDatosFactura.addCell(Descuento);
+		        if(concepto.getImpuestos().getRetenciones()!=null){
+		        	tabDatosFactura.addCell(montoRetencion);
+		        }
+		        tabDatosFactura.addCell(Importe);
+		        tabDatosFactura.addCell(pcDescripcion);
+//	        }
+	        cont++;
+	        bandera++;
+		}
+		   tabDatosFactura.setWidthPercentage(101);
+		   tabDatosFactura.setHorizontalAlignment(0);
+		   documentReportePdf.add(tabDatosFactura);
+	    if (tamanioCOncepto == bandera) {
+        	PdfContentByte canvas = writerPdf.getDirectContent();
+        	tabDetalleMontos.writeSelectedRows(0, -1, 35f, 200f,canvas);
+		}
+	    documentReportePdf.close();
+		
+		return ruta;
+	}
+	
+	public String CrearPdfMarcaPromedic(PdfInfoDto infoPdf,Integer kfactura, String nombreArchivo, boolean retencion, Comprobante comprobante33, boolean bDirFiscal) throws DocumentException, SocketException, IOException{
+		String ruta = "";
+		PdfPTable tabDetalleMontos = new PdfPTable(3);
+		PdfPTable tabDatosFactura  = null;
+		if(retencion){
+			tabDatosFactura = new PdfPTable(8);
+		}else{
+			tabDatosFactura = new PdfPTable(7);			
+		}
+		PdfWriter writerPdf = null;
+		float[] medidaCeldas = {2.3f,0.7f,0.5f};
+		BaseColor colorFondoContenidoFact = WebColors.getRGBColor("#F4F4F9");
+		Font fuenteContenidoTab = new Font(Font.FontFamily.HELVETICA,7,Font.NORMAL,BaseColor.BLACK);
+		Font fuenteContenidoImporTab = new Font(Font.FontFamily.HELVETICA,7,Font.BOLD,BaseColor.BLACK);
+		
+		DecimalFormat df = new DecimalFormat("###,###,###.00");
+		String strMontoSubTotal = df.format(comprobante33.getSubTotal()); 
+		String strMontoImpuesto = df.format(comprobante33.getImpuestos().getTotalImpuestosTrasladados());
+		String strMontoTotal = df.format(comprobante33.getTotal());
+		
+		
+		
+		Document documentReportePdf = new Document(PageSize.A4, 36, 36, 260,136);
+		FileOutputStream ficheroPdf = null;
+		try {			
+			ruta = env.getProperty("path.file.ordenes.pdf.promedic")+nombreArchivo+".pdf";
+			ficheroPdf = new FileOutputStream(ruta);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		try {
+			writerPdf = PdfWriter.getInstance(documentReportePdf, ficheroPdf);
+			writerPdf.setPageEvent(new TemplatePromedic(infoPdf,comprobante33,retencion,bDirFiscal,env));
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		documentReportePdf.open();	
+		documentReportePdf.newPage();
+		
+		String mntRetenido = "";
+		if(retencion){
+			mntRetenido = df.format(comprobante33.getImpuestos().getTotalImpuestosRetenidos());
+		}
+		
+		PdfPCell pcMonedaPeso = new PdfPCell(new Paragraph("Moneda MXN ", fuenteContenidoImporTab));
+		PdfPCell pcImpuRetenido = new PdfPCell(new Paragraph("Impuesto retenido (IVA):",fuenteContenidoImporTab));
+		PdfPCell pcMontoRetenido = new PdfPCell(new Paragraph(mntRetenido,fuenteContenidoImporTab));
+		
+	    PdfPCell pcSubTotal = new PdfPCell(new Paragraph("Subtotal: ",fuenteContenidoImporTab));
+	    PdfPCell pcMontoSubTotal = new PdfPCell(new Paragraph(strMontoSubTotal,fuenteContenidoImporTab));	    
+//	    PdfPCell pcFormaPago = new PdfPCell(new Paragraph("Forma de pago  99 Por Definir",fuenteContenidoImporTab));
+	    PdfPCell pcFormaPago = new PdfPCell(new Paragraph("Forma de pago "+comprobante33.getFormaPago(),fuenteContenidoImporTab));
+	    PdfPCell pcImpuesto = new PdfPCell(new Paragraph("Impuesto trasladado (IVA)",fuenteContenidoImporTab));
+	    PdfPCell pcMontoImpuesto = new PdfPCell(new Paragraph(strMontoImpuesto,fuenteContenidoImporTab));
+	    //PdfPCell pcMetodo = new PdfPCell(new Paragraph("M�todo de pago PPD Pago En Parcialidades O Diferido",fuenteContenidoImporTab));
+	    PdfPCell pcMetodo = new PdfPCell(new Paragraph("Método de pago "+infoPdf.getSmetodoPago(),fuenteContenidoImporTab));
+	    PdfPCell pcTotal = new PdfPCell(new Paragraph("Total: ",fuenteContenidoImporTab));
+	    PdfPCell pcMontoTotal = new PdfPCell(new Paragraph(strMontoTotal,fuenteContenidoImporTab));
+//	    Qulqi qulqi = new Qulqi();
+//		qulqi.setDecimalPartVisible(true);
+//		qulqi.setCoin(Qulqi$COIN.peso_mexicano);
+//		qulqi.setFloating(Qulqi$FLOATING.POINT);
+		
+//		System.out.println(qulqi.showMeTheMoney(strMontoTotal));
+//	    PdfPCell pcMontoLetra = new PdfPCell(new Paragraph(qulqi.showMeTheMoney(strMontoTotal),fuenteContenidoImporTab));
+//	    pcMonedaPeso.setPaddingTop(8);
+//        pcMonedaPeso.setIndent(8);
+		strMontoTotal = comprobante33.getTotal().toString();
+//		System.out.println(Character.toUpperCase(qulqi.showMeTheMoney(strMontoTotal).charAt(0)) + qulqi.showMeTheMoney(strMontoTotal).substring(1,qulqi.showMeTheMoney(strMontoTotal).length()));		
+//		String strMontoTotalLetra = Character.toUpperCase(qulqi.showMeTheMoney(strMontoTotal).charAt(0)) + qulqi.showMeTheMoney(strMontoTotal).substring(1,qulqi.showMeTheMoney(strMontoTotal).length());
+		String strMontoTotalLetra = montoConLetra(strMontoTotal);
+	    PdfPCell pcMontoLetra = new PdfPCell(new Paragraph(strMontoTotalLetra,fuenteContenidoImporTab));
+	    pcMonedaPeso.setPaddingTop(8);
+        pcMonedaPeso.setIndent(8);
+        
+        if(retencion){
+        	pcSubTotal.setPaddingTop(8);
+        	pcMontoSubTotal.setPaddingTop(8);
+        }
+        
+        pcFormaPago.setIndent(8);
+        
+        pcMetodo.setIndent(8);
+            
+        pcMontoLetra.setIndent(8);
+        pcMontoLetra.setPaddingBottom(8);
+        pcMontoTotal.setPaddingBottom(8);
+        pcTotal.setPaddingBottom(8);
+        
+	    pcMonedaPeso.setBackgroundColor(colorFondoContenidoFact);
+	    pcSubTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcImpuRetenido.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoRetenido.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoSubTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcFormaPago.setBackgroundColor(colorFondoContenidoFact);
+	    pcImpuesto.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoImpuesto.setBackgroundColor(colorFondoContenidoFact);
+	    pcMetodo.setBackgroundColor(colorFondoContenidoFact);
+	    pcTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoTotal.setBackgroundColor(colorFondoContenidoFact);
+	    pcMontoLetra.setBackgroundColor(colorFondoContenidoFact);
+	    
+	    pcMonedaPeso.setBorder(Rectangle.UNDEFINED);
+	    pcSubTotal.setBorder(Rectangle.UNDEFINED);
+	    pcImpuRetenido.setBorder(Rectangle.UNDEFINED);
+	    pcMontoRetenido.setBorder(Rectangle.UNDEFINED);
+	    pcMontoSubTotal.setBorder(Rectangle.UNDEFINED);
+	    pcFormaPago.setBorder(Rectangle.UNDEFINED);
+	    pcImpuesto.setBorder(Rectangle.UNDEFINED);
+	    pcMontoImpuesto.setBorder(Rectangle.UNDEFINED);
+	    pcMetodo.setBorder(Rectangle.UNDEFINED);
+	    pcTotal.setBorder(Rectangle.UNDEFINED);
+	    pcMontoTotal.setBorder(Rectangle.UNDEFINED);
+	    pcMontoLetra.setBorder(Rectangle.UNDEFINED);
+	    
+	    pcMontoSubTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoRetenido.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoImpuesto.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	    pcMontoLetra.setHorizontalAlignment(Element.ALIGN_LEFT);
+	    
+	    if(retencion){
+	    	tabDetalleMontos.addCell(pcMonedaPeso);
+	    	tabDetalleMontos.addCell(pcSubTotal);
+	    	tabDetalleMontos.addCell(pcMontoSubTotal);
+	    	
+	    	tabDetalleMontos.addCell(pcFormaPago);
+	    	tabDetalleMontos.addCell(pcImpuesto);
+	    	tabDetalleMontos.addCell(pcMontoImpuesto);
+	    	
+	    	tabDetalleMontos.addCell(pcMetodo);
+	    	tabDetalleMontos.addCell(pcImpuRetenido);
+	    	tabDetalleMontos.addCell(pcMontoRetenido);
+	    	
+	    	tabDetalleMontos.addCell(pcMontoLetra);
+	    	tabDetalleMontos.addCell(pcTotal);
+	    	tabDetalleMontos.addCell(pcMontoTotal);	   
+	    }else{
+	    	pcMonedaPeso.setColspan(3);
+	    	
+	    	tabDetalleMontos.addCell(pcMonedaPeso);
+	    	
+	    	tabDetalleMontos.addCell(pcFormaPago);
+	    	tabDetalleMontos.addCell(pcSubTotal);
+	    	tabDetalleMontos.addCell(pcMontoSubTotal);
+	    	
+	    	tabDetalleMontos.addCell(pcMetodo);
+	    	tabDetalleMontos.addCell(pcImpuesto);
+	    	tabDetalleMontos.addCell(pcMontoImpuesto);
+	    	
+	    	tabDetalleMontos.addCell(pcMontoLetra);
+	    	tabDetalleMontos.addCell(pcTotal);
+	    	tabDetalleMontos.addCell(pcMontoTotal);	    	
+	    }
+	    tabDetalleMontos.setWidthPercentage(101);
+	    tabDetalleMontos.setHorizontalAlignment(0);
+	    tabDetalleMontos.setWidths(medidaCeldas);
+	    tabDetalleMontos.setHeaderRows(2);
+	    tabDetalleMontos.setFooterRows(2);
+	    tabDetalleMontos.setTotalWidth(530);
+		
+		int cont = 0;
+		int bandera = 0;
+		int tamanioCOncepto = comprobante33.getConceptos().getConcepto().size();
+		
+		List<Concepto> listConceptos = comprobante33.getConceptos().getConcepto();
+		for (Concepto concepto : listConceptos) {
+			PdfPCell espacioBlanco = new PdfPCell(new Paragraph(" ", fuenteContenidoTab));
+			PdfPCell ClavePro = new PdfPCell(new Paragraph(concepto.getClaveProdServ(), fuenteContenidoTab));
+		    PdfPCell Codigo = new PdfPCell(new Paragraph(concepto.getNoIdentificacion(),fuenteContenidoTab));
+		    int intCantidad = new Double(concepto.getCantidad().toString()).intValue();
+		    PdfPCell Cantidad = new PdfPCell(new Paragraph( Integer.toString(intCantidad) ,fuenteContenidoTab));
+//		    PdfPCell ClaveUnidad = new PdfPCell(new Paragraph(infConcepto.getClaveUnidad(),fuenteContenidoTab));
+		    PdfPCell ClaveUnidad = new PdfPCell(new Paragraph(concepto.getClaveUnidad(),fuenteContenidoTab));
+		    PdfPCell ValorUni = new PdfPCell(new Paragraph(concepto.getValorUnitario().toString(),fuenteContenidoTab));
+		    
+	        PdfPCell Descuento = new PdfPCell(new Paragraph(df.format(concepto.getImpuestos().getTraslados().getTraslado().get(0).getImporte()),fuenteContenidoTab));
+	        //infConcepto.getImpuestos().getTraslados().getTraslado().get(cont).getImporte().toString()
+	        PdfPCell Importe = new PdfPCell(new Paragraph(concepto.getImpuestos().getTraslados().getTraslado().get(0).getBase().toString(),fuenteContenidoTab));
+	        PdfPCell montoRetencion = null;
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	montoRetencion = new PdfPCell(new Paragraph(df.format(concepto.getImpuestos().getRetenciones().getRetencion()
+	        			.get(0).getImporte()),fuenteContenidoTab));
+	        }
+	        
+	        ClavePro.setBorder(Rectangle.UNDEFINED);
+	        Codigo.setBorder(Rectangle.UNDEFINED);
+	        Cantidad.setBorder(Rectangle.UNDEFINED);
+	        ClaveUnidad.setBorder(Rectangle.UNDEFINED);
+	        ValorUni.setBorder(Rectangle.UNDEFINED);
+	        Descuento.setBorder(Rectangle.UNDEFINED);
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	montoRetencion.setBorder(Rectangle.UNDEFINED);
+	        }
+	        Importe.setBorder(Rectangle.UNDEFINED);
+	        espacioBlanco.setBorder(Rectangle.UNDEFINED);
+	        ClavePro.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        Codigo.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        Cantidad.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        ClaveUnidad.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        ValorUni.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        Descuento.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	montoRetencion.setHorizontalAlignment(Element.ALIGN_RIGHT);
+	        }
+	        Importe.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        PdfPCell pcDescripcion = new PdfPCell(new Paragraph(concepto.getDescripcion(),fuenteContenidoImporTab));
+	        if(concepto.getImpuestos().getRetenciones()!=null){
+	        	pcDescripcion.setColspan(8);
+	        }else{
+	        	pcDescripcion.setColspan(7);	        	
+	        }
+	        pcDescripcion.setBorder(Rectangle.UNDEFINED);
+
+//	        if ((bandera%9) == 0 && cont !=0) {
+//	        	tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+		        
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+		        
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//		        tabDatosFactura.addCell(espacioBlanco);
+//	        }
+//	        else{
+	        	tabDatosFactura.addCell(ClavePro);
+		        tabDatosFactura.addCell(Codigo);
+		        tabDatosFactura.addCell(Cantidad);
+		        tabDatosFactura.addCell(ClaveUnidad);
+		        tabDatosFactura.addCell(ValorUni);
+		        tabDatosFactura.addCell(Descuento);
+		        if(concepto.getImpuestos().getRetenciones()!=null){
+		        	tabDatosFactura.addCell(montoRetencion);
+		        }
+		        tabDatosFactura.addCell(Importe);
+		        tabDatosFactura.addCell(pcDescripcion);
+//	        }
+	        cont++;
+	        bandera++;
+		}
+		   tabDatosFactura.setWidthPercentage(101);
+		   tabDatosFactura.setHorizontalAlignment(0);
+		   documentReportePdf.add(tabDatosFactura);
+	    if (tamanioCOncepto == bandera) {
+        	PdfContentByte canvas = writerPdf.getDirectContent();
+        	tabDetalleMontos.writeSelectedRows(0, -1, 35f, 200f,canvas);
+		}
+	    documentReportePdf.close();
+		
+		return ruta;
+	}
+	
 	public String CrearPdfMarcaAsesoresSur(PdfInfoDto infoPdf,Integer kfactura, String nombreArchivo, boolean retencion, Comprobante comprobante33, boolean bDirFiscal) throws DocumentException, SocketException, IOException{
 		String ruta = "";
 		PdfPTable tabDetalleMontos = new PdfPTable(3);

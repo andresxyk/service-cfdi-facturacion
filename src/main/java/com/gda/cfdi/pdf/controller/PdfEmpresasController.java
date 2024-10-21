@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gda.cfdi.pdf.bean.InformacionPdfBean;
+import com.gda.cfdi.pdf.dto.empresa.TimbradoCfdiDto;
 import com.gda.cfdi.pdf.exception.ResponseErrorDto;
+import com.gda.cfdi.pdf.service.empresa.PdfEmpresaService;
 import com.gda.cfdi.pdf.service.exakta.PdfExaktaService;
 
 @RestController
@@ -22,11 +24,28 @@ public class PdfEmpresasController {
 	
 	@Autowired
 	private PdfExaktaService pdfService;
+	@Autowired
+	private PdfEmpresaService pdfEmpresaService;
 	
 	@PostMapping("/pdf-exakta")
 	public ResponseEntity<?> getXmlOrden(@RequestBody InformacionPdfBean cfdiBean){
 		try {			
 			return new ResponseEntity<String>(pdfService.generarPdfExaktaV40(cfdiBean), HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			ResponseErrorDto dto = new ResponseErrorDto();
+			dto.setCodigo("error");
+			dto.setDescripcion(e.getMessage());
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@PostMapping("/pdf-empresa")
+	public ResponseEntity<?> getPdfEmpresa(@RequestBody TimbradoCfdiDto timbradoCfdiDto){
+		try {
+			String pdfBase64 = pdfEmpresaService.generarPdfEmpresa(timbradoCfdiDto);
+			timbradoCfdiDto.getDocumentoTimbrado().setPdf(pdfBase64);
+			return new ResponseEntity<TimbradoCfdiDto>(timbradoCfdiDto, HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			ResponseErrorDto dto = new ResponseErrorDto();
