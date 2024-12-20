@@ -287,6 +287,30 @@ private static final Logger log = LoggerFactory.getLogger(PdfService.class);
 						carpeta = "FamilyLabsNorte";
 						inicioNom = "FacturacionElectronica_AFN";
 						folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 6);
+					} else if (cmarca == 21) {
+						carpeta = "AsesoresSur";
+						inicioNom = "FacturacionElectronica_AAS";
+						folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 6);
+					} else if (cmarca == 20) {
+						carpeta = "Exakta";
+						inicioNom = "FacturacionElectronica_AJK";
+						folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 6);
+					} else if (cmarca == 16) {
+						carpeta = "Moreira";
+						inicioNom = "FacturacionElectronica_AIO";
+						folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 6);
+					} else if (cmarca == 22) {
+						carpeta = "Polab";
+						inicioNom = "FacturacionElectronica_AIM";
+						folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 6);
+					} else if (cmarca == 25) {
+						carpeta = "BiomedicaReferencia";
+						inicioNom = "FacturacionElectronica_AMZ";
+						folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 6);
+					} else if (cmarca == 26) {
+						carpeta = "Promedic";
+						inicioNom = "FacturacionElectronica_AIN";
+						folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 6);
 					}
 					
 					String nobreArchivo = inicioNom + folioFactura;
@@ -333,6 +357,36 @@ private static final Logger log = LoggerFactory.getLogger(PdfService.class);
 					case 19:
 						log.info("FamilyLabsNorte*****");
 						ruta = creacionPDFV4.CrearPdfMarcaFamilyLabsNorte(infoPDF, facturaDto.getFolio(), nobreArchivo,
+								bRetencion, comprobante, bDirFiscal, env);
+						break;
+					case 21:
+						log.info("AsesoresSur*****");
+						ruta = creacionPDFV4.CrearPdfMarcaAsesoresSur(infoPDF, facturaDto.getFolio(), nobreArchivo,
+								bRetencion, comprobante, bDirFiscal, env);
+						break;
+					case 20:
+						log.info("Exakta*****");
+						ruta = creacionPDFV4.CrearPdfMarcaExakta(infoPDF, facturaDto.getFolio(), nobreArchivo,
+								bRetencion, comprobante, bDirFiscal, env);
+						break;
+					case 16:
+						log.info("Moreira*****");
+						ruta = creacionPDFV4.CrearPdfMarcaMoreira(infoPDF, facturaDto.getFolio(), nobreArchivo,
+								bRetencion, comprobante, bDirFiscal, env);
+						break;
+					case 22:
+						log.info("Polab*****");
+						ruta = creacionPDFV4.CrearPdfMarcaPolab(infoPDF, facturaDto.getFolio(), nobreArchivo,
+								bRetencion, comprobante, bDirFiscal, env);
+						break;
+					case 25:
+						log.info("Biomedica*****");
+						ruta = creacionPDFV4.CrearPdfMarcaBiomedica(infoPDF, facturaDto.getFolio(), nobreArchivo,
+								bRetencion, comprobante, bDirFiscal, env);
+						break;
+					case 26:
+						log.info("Promedic*****");
+						ruta = creacionPDFV4.CrearPdfMarcaPromedic(infoPDF, facturaDto.getFolio(), nobreArchivo,
 								bRetencion, comprobante, bDirFiscal, env);
 						break;
 					default:

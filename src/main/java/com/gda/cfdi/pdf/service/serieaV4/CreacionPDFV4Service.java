@@ -49,4 +49,40 @@ public interface CreacionPDFV4Service {
 	String CrearPdfMarcaFamilyLabsNorte(PdfInfoDto infoPDF, Integer kfactura, String nombreArchivo, boolean retencion,
 			Comprobante comprobante, boolean bDirFiscal, Environment env)
 			throws DocumentException, SocketException, IOException;
+
+
+
+	String CrearPdfMarcaAsesoresSur(PdfInfoDto infoPDF, Integer kfactura, String nombreArchivo, boolean retencion,
+			Comprobante comprobante, boolean bDirFiscal, Environment env)
+			throws DocumentException, SocketException, IOException;
+
+
+
+	String CrearPdfMarcaExakta(PdfInfoDto infoPDF, Integer kfactura, String nombreArchivo, boolean retencion,
+			Comprobante comprobante, boolean bDirFiscal, Environment env)
+			throws DocumentException, SocketException, IOException;
+
+
+
+	String CrearPdfMarcaMoreira(PdfInfoDto infoPDF, Integer kfactura, String nombreArchivo, boolean retencion,
+			Comprobante comprobante, boolean bDirFiscal, Environment env)
+			throws DocumentException, SocketException, IOException;
+
+
+
+	String CrearPdfMarcaPolab(PdfInfoDto infoPDF, Integer kfactura, String nombreArchivo, boolean retencion,
+			Comprobante comprobante, boolean bDirFiscal, Environment env)
+			throws DocumentException, SocketException, IOException;
+
+
+
+	String CrearPdfMarcaBiomedica(PdfInfoDto infoPDF, Integer kfactura, String nombreArchivo, boolean retencion,
+			Comprobante comprobante, boolean bDirFiscal, Environment env)
+			throws DocumentException, SocketException, IOException;
+
+
+
+	String CrearPdfMarcaPromedic(PdfInfoDto infoPDF, Integer kfactura, String nombreArchivo, boolean retencion,
+			Comprobante comprobante, boolean bDirFiscal, Environment env)
+			throws DocumentException, SocketException, IOException;
 }

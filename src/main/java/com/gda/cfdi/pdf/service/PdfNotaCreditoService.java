@@ -258,6 +258,18 @@ public class PdfNotaCreditoService {
 						
 					} else if (cmarca == 19) {
 						carpeta = "FamilyLabsNorte";
+					} else if (cmarca == 21) {
+						carpeta = "AsesoresSur";
+					} else if (cmarca == 20) {
+						carpeta = "Exakta";
+					} else if (cmarca == 16) {
+						carpeta = "Moreira";
+					} else if (cmarca == 22) {
+						carpeta = "Polab";
+					} else if (cmarca == 25) {
+						carpeta = "BiomedicaReferencia";
+					} else if (cmarca == 26) {
+						carpeta = "Promedic";
 					}
 					
 					if (cmarca == 15) {
@@ -309,7 +321,37 @@ public class PdfNotaCreditoService {
 						break;
 					case 19:
 						log.info("FamilyLabsNorte*****");
-						ruta = creacionPDFV4.CrearPdfMarcaSwiss(infoPDF, creditoEntityDto.getUfoliofactura(), nobreArchivo,
+						ruta = creacionPDFV4.CrearPdfMarcaFamilyLabsNorte(infoPDF, creditoEntityDto.getUfoliofactura(), nobreArchivo,
+								bRetencion, comprobante, bDirFiscal, env);
+						break;
+					case 21:
+						log.info("AsesoresSur*****");
+						ruta = creacionPDFV4.CrearPdfMarcaAsesoresSur(infoPDF, creditoEntityDto.getUfoliofactura(), nobreArchivo,
+								bRetencion, comprobante, bDirFiscal, env);
+						break;
+					case 20:
+						log.info("Exakta*****");
+						ruta = creacionPDFV4.CrearPdfMarcaExakta(infoPDF, creditoEntityDto.getUfoliofactura(), nobreArchivo,
+								bRetencion, comprobante, bDirFiscal, env);
+						break;
+					case 16:
+						log.info("Moreira*****");
+						ruta = creacionPDFV4.CrearPdfMarcaMoreira(infoPDF, creditoEntityDto.getUfoliofactura(), nobreArchivo,
+								bRetencion, comprobante, bDirFiscal, env);
+						break;
+					case 22:
+						log.info("Polab*****");
+						ruta = creacionPDFV4.CrearPdfMarcaPolab(infoPDF, creditoEntityDto.getUfoliofactura(), nobreArchivo,
+								bRetencion, comprobante, bDirFiscal, env);
+						break;
+					case 25:
+						log.info("Biomedica*****");
+						ruta = creacionPDFV4.CrearPdfMarcaBiomedica(infoPDF, creditoEntityDto.getUfoliofactura(), nobreArchivo,
+								bRetencion, comprobante, bDirFiscal, env);
+						break;
+					case 26:
+						log.info("Promedic*****");
+						ruta = creacionPDFV4.CrearPdfMarcaPromedic(infoPDF, creditoEntityDto.getUfoliofactura(), nobreArchivo,
 								bRetencion, comprobante, bDirFiscal, env);
 						break;
 					default:

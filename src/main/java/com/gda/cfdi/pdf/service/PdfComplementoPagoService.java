@@ -71,6 +71,27 @@ public class PdfComplementoPagoService {
 					if (comprobante.getEmisor().getRfc().equals("LAB020416Q67")) {
 						cmarca = 19;
 					}
+					if (comprobante.getEmisor().getRfc().equals("AEL9703115B0")) {
+						cmarca = 21;
+					}
+					if (comprobante.getEmisor().getRfc().equals("LBA840320GC8")) {
+						cmarca = 20;
+					}
+					if (comprobante.getEmisor().getRfc().equals("IME0103012D3")) {
+						cmarca = 20;
+					}
+					if (comprobante.getEmisor().getRfc().equals("BIO7603164H0")) {
+						cmarca = 16;
+					}
+					if (comprobante.getEmisor().getRfc().equals("LCP980213PC7")) {
+						cmarca = 22;
+					}
+					if (comprobante.getEmisor().getRfc().equals("BRE9205181I1")) {
+						cmarca = 25;
+					}
+					if (comprobante.getEmisor().getRfc().equals("RFCPROMEDIC0")) {
+						cmarca = 26;
+					}
 					
 					
 					sserie = this.getSerieFacturaRelacionada(comprobante);
@@ -128,6 +149,13 @@ public class PdfComplementoPagoService {
 								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
 								ruta = complementoPdfBo.crearPdfMarcaFamilyLabsNorte(comprobante, complementoDato, inicioNom + folioFactura, sserie);
 								break;
+							case "AEL9703115B0":// AsesoresSur
+								log.info("AsesoresSur");
+								inicioNom = "FacturacionElectronica_ACC";
+								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
+								ruta = complementoPdfBo.crearPdfMarcaFamilyLabsNorte(comprobante, complementoDato, inicioNom + folioFactura, sserie);
+								break;
+								
 							default:
 								break;
 							}
@@ -192,7 +220,27 @@ public class PdfComplementoPagoService {
 					if (comprobante.getEmisor().getRfc().equals("LAB020416Q67")) {
 						cmarca = 19;
 					}
-					
+					if (comprobante.getEmisor().getRfc().equals("AEL9703115B0")) {
+						cmarca = 21;
+					}
+					if (comprobante.getEmisor().getRfc().equals("LBA840320GC8")) {
+						cmarca = 20;
+					}
+					if (comprobante.getEmisor().getRfc().equals("IME0103012D3")) {
+						cmarca = 20;
+					}
+					if (comprobante.getEmisor().getRfc().equals("BIO7603164H0")) {
+						cmarca = 16;
+					}
+					if (comprobante.getEmisor().getRfc().equals("LCP980213PC7")) {
+						cmarca = 22;
+					}
+					if (comprobante.getEmisor().getRfc().equals("BRE9205181I1")) {
+						cmarca = 25;
+					}
+					if (comprobante.getEmisor().getRfc().equals("RFCPROMEDIC0")) {
+						cmarca = 26;
+					}
 					
 					sserie = this.getSerieFacturaRelacionadaV4(comprobante);
 					String inicioNom = "";
@@ -253,6 +301,49 @@ public class PdfComplementoPagoService {
 								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
 								ruta = complementoPdfV4Service.crearPdfMarcaFamilyLabsNorte(comprobante, complementoDato, inicioNom + folioFactura, sserie);
 								break;
+							case "AEL9703115B0":// AsesoresSur
+								log.info("AsesoresSur");
+								inicioNom = "FacturacionElectronica_ACC";
+								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
+								ruta = complementoPdfV4Service.crearPdfMarcaAsesoresSur(comprobante, complementoDato, inicioNom + folioFactura);
+								break;
+							case "LBA840320GC8":// Exakta Laboartorio
+								log.info("Exakta");
+								inicioNom = "FacturacionElectronica_ACC";
+								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
+								ruta = complementoPdfV4Service.crearPdfMarcaExakta(comprobante, complementoDato, inicioNom + folioFactura);
+								break;
+							case "IME0103012D3":// Exakta Imagen
+								log.info("Exakta");
+								inicioNom = "FacturacionElectronica_ACC";
+								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
+								ruta = complementoPdfV4Service.crearPdfMarcaExakta(comprobante, complementoDato, inicioNom + folioFactura);
+								break;
+							case "BIO7603164H0":// Moreira
+								log.info("Moreira");
+								inicioNom = "FacturacionElectronica_ACC";
+								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
+								ruta = complementoPdfV4Service.crearPdfMarcaMoreira(comprobante, complementoDato, inicioNom + folioFactura);
+								break;
+							case "LCP980213PC7":// Polab
+								log.info("Polab");
+								inicioNom = "FacturacionElectronica_ACC";
+								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
+								ruta = complementoPdfV4Service.crearPdfMarcaPolab(comprobante, complementoDato, inicioNom + folioFactura);
+								break;
+							case "BRE9205181I1":// Biomedica
+								log.info("Biomedica");
+								inicioNom = "FacturacionElectronica_ACC";
+								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
+								ruta = complementoPdfV4Service.crearPdfMarcaBiomedica(comprobante, complementoDato, inicioNom + folioFactura);
+								break;
+							case "RFCPROMEDIC0":// Promedic
+								log.info("Promedic");
+								inicioNom = "FacturacionElectronica_ACC";
+								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
+								ruta = complementoPdfV4Service.crearPdfMarcaPromedic(comprobante, complementoDato, inicioNom + folioFactura);
+								break;
+								
 							default:
 								break;
 							}
@@ -273,7 +364,7 @@ public class PdfComplementoPagoService {
 					byte [] bytes = Files.readAllBytes(file.toPath());
 					
 					b64 = Base64.getEncoder().encodeToString(bytes);
-//		      file.delete();
+//					file.delete();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

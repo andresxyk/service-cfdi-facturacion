@@ -190,6 +190,18 @@ public class PdfSerieAOrdenService {
 					}
 					else if (cmarca == 19) {
 						centidadlegal = 19;
+					} else if (cmarca == 21) {
+						centidadlegal = 21;
+					} else if (cmarca == 20) {
+						centidadlegal = 20;
+					} else if (cmarca == 16) {
+						centidadlegal = 18;
+					} else if (cmarca == 22) {
+						centidadlegal = 22;
+					} else if (cmarca == 25) {
+						centidadlegal = 25;
+					} else if (cmarca == 26) {
+						centidadlegal = 26;
 					}
 					
 					String dirEmisorSucursal = "";
@@ -241,6 +253,36 @@ public class PdfSerieAOrdenService {
 						inicioNom = "FacturacionElectronica_AFN";
 						folioFactura = utilsService.formatoFolio(Integer.parseInt(comprobante.getFolio()), 6);
 						ruta = cfdiPdfServiceV4.CrearPdfMarcaFamilyLabsNorte(infoPdf, kfactura, inicioNom+folioFactura, isRetencion, comprobante, bDirFiscal);
+						break;
+					case 21:// AsesoresSur
+						inicioNom = "FacturacionElectronica_AAS";
+						folioFactura = utilsService.formatoFolio(Integer.parseInt(comprobante.getFolio()), 6);
+						ruta = cfdiPdfServiceV4.CrearPdfMarcaAsesoresSur(infoPdf, kfactura, inicioNom+folioFactura, isRetencion, comprobante, bDirFiscal);
+						break;
+					case 20:// Exakta
+						inicioNom = "FacturacionElectronica_AJK";
+						folioFactura = utilsService.formatoFolio(Integer.parseInt(comprobante.getFolio()), 6);
+						ruta = cfdiPdfServiceV4.CrearPdfMarcaExakta(infoPdf, kfactura, inicioNom+folioFactura, isRetencion, comprobante, bDirFiscal);
+						break;
+					case 16:// Moreira
+						inicioNom = "FacturacionElectronica_AIO";
+						folioFactura = utilsService.formatoFolio(Integer.parseInt(comprobante.getFolio()), 6);
+						ruta = cfdiPdfServiceV4.CrearPdfMarcaMoreira(infoPdf, kfactura, inicioNom+folioFactura, isRetencion, comprobante, bDirFiscal);
+						break;
+					case 22:// Polab
+						inicioNom = "FacturacionElectronica_AIM";
+						folioFactura = utilsService.formatoFolio(Integer.parseInt(comprobante.getFolio()), 6);
+						ruta = cfdiPdfServiceV4.CrearPdfMarcaPolab(infoPdf, kfactura, inicioNom+folioFactura, isRetencion, comprobante, bDirFiscal);
+						break;
+					case 25:// Biomedica
+						inicioNom = "FacturacionElectronica_AMZ";
+						folioFactura = utilsService.formatoFolio(Integer.parseInt(comprobante.getFolio()), 6);
+						ruta = cfdiPdfServiceV4.CrearPdfMarcaBiomedica(infoPdf, kfactura, inicioNom+folioFactura, isRetencion, comprobante, bDirFiscal);
+						break;
+					case 26:// Promedic
+						inicioNom = "FacturacionElectronica_AIN";
+						folioFactura = utilsService.formatoFolio(Integer.parseInt(comprobante.getFolio()), 6);
+						ruta = cfdiPdfServiceV4.CrearPdfMarcaPromedic(infoPdf, kfactura, inicioNom+folioFactura, isRetencion, comprobante, bDirFiscal);
 						break;
 					default:
 						break;
