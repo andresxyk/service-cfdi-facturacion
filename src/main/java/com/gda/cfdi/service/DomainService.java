@@ -151,7 +151,7 @@ public class DomainService {
 			razonSocialMarca = env.getProperty("razon.social.moreira");
 			numeroCertificado = env.getProperty("numero.certificado.moreira");
 			break;	
-		case "RFCPOLAB0000":
+		case "LCP980213PC7":
 			log.info("**** Polab *****");
 			rutaKey = env.getProperty("path.file.key.polab");
 			rutaCer = env.getProperty("path.file.cer.polab");		

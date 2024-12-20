@@ -229,6 +229,8 @@ public class CfdiSerieBConvenioV4Service {
 			cfdi33.setLugarExpedicion("31203");
 		} else if (cmarca == 20) {
 			cfdi33.setLugarExpedicion("72197");
+		}else {
+			cfdi33.setLugarExpedicion("57708");
 		}
 		
 		cfdi33.setFormaPago(formaPago);

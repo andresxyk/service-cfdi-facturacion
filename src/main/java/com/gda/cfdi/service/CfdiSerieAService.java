@@ -547,22 +547,22 @@ public class CfdiSerieAService {
 		} else if (cmarca == 16) {
 			ssucursal = "EMPRESAS MOREIRA";
 			csucursal = "1026";
-			sserie = "AMO";
+			sserie = "AIO";
 			centidadlegal = "18";
 		} else if (cmarca == 22) {
 			ssucursal = "EMPRESAS POLAB";
 			csucursal = "1023";
-			sserie = "APO";
+			sserie = "AIM";
 			centidadlegal = "22";
 		} else if (cmarca == 25) {
 			ssucursal = "EMPRESAS BIOMEDICA";
 			csucursal = "1024";
-			sserie = "ABR";
+			sserie = "AMZ";
 			centidadlegal = "25";
 		} else if (cmarca == 26) {
 			ssucursal = "EMPRESAS PROMEDIC";
 			csucursal = "1025";
-			sserie = "APR";
+			sserie = "AIN";
 			centidadlegal = "26";
 		}
 		

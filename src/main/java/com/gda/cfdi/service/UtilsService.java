@@ -427,7 +427,7 @@ public class UtilsService {
 	public DatosMarcaDto obtenerDatosMarca(Integer marca, Integer version){
 		String smarca = marca.equals(1)?"olab":marca.equals(4)?"azteca":marca.equals(5)?"swisslab":marca.equals(7)?
 				"prado":marca.equals(8)?"lean":marca.equals(15)?"swisslab":marca.equals(19)?"familylabsnorte":
-					marca.equals(20)?"exakta.lab":"";
+					marca.equals(20)?"exakta.lab":marca.equals(21)?"asesoressur":marca.equals(16)?"moreira":marca.equals(22)?"polab":marca.equals(25)?"referencia":"";
 		
 		String rutaCadenaOriginal = version == 3 ? env.getProperty("path.file.cadena.original") : env.getProperty("path.file.cadena.original.4");
 		String password = "";
@@ -597,7 +597,7 @@ public class UtilsService {
 			razonSocialMarca = env.getProperty("razon.social.moreira");
 			numeroCertificado = env.getProperty("numero.certificado.moreira");
 			break;	
-		case "RFCPOLAB0000":
+		case "LCP980213PC7":
 			log.info("**** Polab *****");
 			rutaKey = env.getProperty("path.file.key.polab");
 			rutaCer = env.getProperty("path.file.cer.polab");		
