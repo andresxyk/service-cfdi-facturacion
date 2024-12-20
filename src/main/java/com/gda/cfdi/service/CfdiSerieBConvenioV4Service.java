@@ -227,8 +227,12 @@ public class CfdiSerieBConvenioV4Service {
 			cfdi33.setLugarExpedicion("64040");
 		} else if (cmarca == 15) {
 			cfdi33.setLugarExpedicion("31203");
-
+		} else if (cmarca == 20) {
+			cfdi33.setLugarExpedicion("72197");
+		}else {
+			cfdi33.setLugarExpedicion("57708");
 		}
+		
 		cfdi33.setFormaPago(formaPago);
 		if (metodoPago.equals("PPD")) {
 			cfdi33.setMetodoPago(CMetodoPago.PPD);

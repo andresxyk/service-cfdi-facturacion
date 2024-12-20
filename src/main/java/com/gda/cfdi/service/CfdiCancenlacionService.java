@@ -88,6 +88,44 @@ public class CfdiCancenlacionService {
 		return requestCancelacion;
 	}
 	
+	public String generarCfdiCancelacionEmpresa(String uuid, String rfcEmisor, String uuidSustitucion, String motivo) throws Exception {
+		
+		String requestCancelacion = this.requestCancelacionEmpresa(uuid, rfcEmisor, uuidSustitucion != "" ? uuidSustitucion : null, motivo);
+		return requestCancelacion;
+	}
+	
+	private String requestCancelacionEmpresa(String uuid, String rfcEmisor, String uuidSustitucion, String motivo) throws Exception {
+		Cancelacion cancelacion = new Cancelacion();		
+		cancelacion.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+		cancelacion.setRfcEmisor(rfcEmisor);
+		Folios folios = new Folios();
+		Folio folio = new Folio();
+		folio.setUUID(uuid);
+		folio.setMotivo(motivo);
+		folio.setFolioSustitucion(uuidSustitucion);
+		folios.setFolio(folio);
+		cancelacion.setFolios(folios);
+		
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		String xml = "";
+		if(motivo.equals("01")) {
+			xml =  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><Cancelacion xmlns=\"http://cancelacfd.sat.gob.mx\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Fecha=\""
+					+ dateFormat.format(new Date()) + "\" RfcEmisor=\"" + rfcEmisor + "\">" + "<Folios>" + "<Folio UUID=\""+uuid+"\" Motivo=\""+motivo+"\" FolioSustitucion=\""+uuidSustitucion+"\">"  
+					+ "</Folio >" + "</Folios>" + "</Cancelacion>";			
+		}else {
+			xml =  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><Cancelacion xmlns=\"http://cancelacfd.sat.gob.mx\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Fecha=\""
+					+ dateFormat.format(new Date()) + "\" RfcEmisor=\"" + rfcEmisor + "\">" + "<Folios>" + "<Folio UUID=\""+uuid+"\" Motivo=\""+motivo+"\">"  
+					+ "</Folio >" + "</Folios>" + "</Cancelacion>";	
+		}
+		
+		log.info("requestCancelacionOriginal==="+xml);
+		
+		String xml1 = utilsService.createXmlFromCancelacion(cancelacion).replace("xmlns=\"http://cancelacfd.sat.gob.mx\"", "xmlns=\"http://cancelacfd.sat.gob.mx\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+		log.info("requestCancelacionOriginal==="+xml1);
+		String requestCancelacion = this.getXMLCancelacionConFirmaDigitalEmpresa(xml,rfcEmisor);
+		return requestCancelacion;
+	}
+	
 	private String requestCancelacion(String uuid, String rfcEmisor, String uuidSustitucion, String motivo) throws Exception {
 		Cancelacion cancelacion = new Cancelacion();		
 		cancelacion.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
@@ -123,6 +161,64 @@ public class CfdiCancenlacionService {
 	public String getXMLCancelacionConFirmaDigital(String xmlCancelacion, String rfcEmisor) throws Exception {
 		System.out.println("ObtenerFirmaDigial*****");
 		DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosRfcEmisor(rfcEmisor,0);
+		X509Certificate x509 = null;
+		x509 = getX509Certificate(new File(datosMarcaDto.getRutaCer()));
+		System.out.println("x509--->>>   " + x509);
+		XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
+
+		Reference ref = fac.newReference("", fac.newDigestMethod("http://www.w3.org/2000/09/xmldsig#sha1", null),
+				Collections.singletonList(
+						fac.newTransform("http://www.w3.org/2000/09/xmldsig#enveloped-signature", (XMLStructure) null)),
+				null, null);
+		System.out.println("ref:::   " + ref);
+		SignedInfo si = fac.newSignedInfo(
+				fac.newCanonicalizationMethod("http://www.w3.org/TR/2001/REC-xml-c14n-20010315", (XMLStructure) null),
+				fac.newSignatureMethod("http://www.w3.org/2000/09/xmldsig#rsa-sha1", null),
+				Collections.singletonList(ref));
+		System.out.println("si-->>>   " + si);
+
+		PrivateKey privateKey = null;
+		privateKey = getPrivateKey(new File(datosMarcaDto.getRutaKey()),datosMarcaDto.getPasword());
+		KeyInfoFactory kif = fac.getKeyInfoFactory();
+		System.out.println("kif--->>>  " + kif);
+		List<Object> x509Content = new ArrayList();
+		X509IssuerSerial issuer = kif.newX509IssuerSerial(x509.getIssuerX500Principal().getName(),
+				x509.getSerialNumber());
+		System.out.println("issuer--->>>   " + issuer);
+		x509Content.add(x509.getSubjectX500Principal().getName());
+		x509Content.add(issuer);
+		x509Content.add(x509);
+
+		X509Data xd = kif.newX509Data(x509Content);
+		System.out.println("xd-->>  " + xd);
+
+		KeyInfo ki = kif.newKeyInfo(Collections.singletonList(xd));
+		System.out.println("ki-->>>  " + ki);
+
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		Document doc = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(xmlCancelacion)));
+		System.out.println("doc-->>>   " + doc);
+		DOMSignContext dsc = new DOMSignContext(privateKey, doc.getDocumentElement());
+		System.out.println("dsc:::  " + dsc);
+		XMLSignature signature = fac.newXMLSignature(si, ki);
+		System.out.println("signature-->>>   " + signature);
+		signature.sign(dsc);
+
+		TransformerFactory tf = TransformerFactory.newInstance();
+		System.out.println("tf-->>  " + tf);
+		Transformer trans = tf.newTransformer();
+		System.out.println("trans-->>   " + trans);
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		System.out.println("output::::   " + output);
+		trans.transform(new DOMSource(doc), new StreamResult(output));
+		System.out.println("*************output.toString()--->>>>    " + output.toString());
+		return output.toString();
+	}
+	
+	public String getXMLCancelacionConFirmaDigitalEmpresa(String xmlCancelacion, String rfcEmisor) throws Exception {
+		System.out.println("ObtenerFirmaDigial*****");
+		DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosCfdiPorRfcEmisor(rfcEmisor);
 		X509Certificate x509 = null;
 		x509 = getX509Certificate(new File(datosMarcaDto.getRutaCer()));
 		System.out.println("x509--->>>   " + x509);

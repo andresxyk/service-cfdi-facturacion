@@ -33,7 +33,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web-services</artifactId>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>com.gda</groupId>
 			<artifactId>facturacion-domain-sat</artifactId>
@@ -86,7 +89,16 @@
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.springdoc</groupId>
+		    <artifactId>springdoc-openapi-ui</artifactId>
+		    <version>1.5.13</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -96,7 +108,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
-		<finalName>facturacion_cfdi_1.0.31032023</finalName>
+		<finalName>facturacion_cfdi_1.0.04122024</finalName>
 	</build>
 
 </project>

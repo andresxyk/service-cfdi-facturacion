@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import com.gda.cfdi.controller.CfdiController;
 import com.gda.cfdi.dto.CUsoCfdiDto;
 import com.gda.cfdi.dto.ControlFolioDto;
+import com.gda.cfdi.dto.DatosMarcaDto;
 import com.gda.cfdi.dto.FacturaSelloDto;
 import com.gda.cfdi.dto.MultiPagoDto;
 import com.gda.cfdi.dto.PagoDto;
@@ -457,8 +458,6 @@ public class CfdiComplementoPagoService {
 			
 			comprobante.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
 		}
-		
-		
 		
 		
 		comprobante.setNoCertificado(facturaBase.getNoCertificado());

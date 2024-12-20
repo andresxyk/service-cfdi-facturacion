@@ -138,7 +138,14 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 				cfdi40.setLugarExpedicion("64040");
 			}else if ( cmarca==15){
 				cfdi40.setLugarExpedicion("31203");	
+			}else if ( cmarca==20){
+				cfdi40.setLugarExpedicion("72197");	
+			}else {
+				cfdi40.setLugarExpedicion("57708");
 			}
+			
+			
+			
 			cfdi40.setFormaPago(formaPago);
 			
 			if(metodoPago.equals("PPD")){

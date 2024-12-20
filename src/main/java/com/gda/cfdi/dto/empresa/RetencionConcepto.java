@@ -1,0 +1,17 @@
+package com.gda.cfdi.dto.empresa;
+
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+@Data
+@Getter
+@Setter
+public class RetencionConcepto {
+	public String base;
+    public String impuesto;
+    public String tipoFactor;
+    public String tasaOCuota;
+    public String importe;
+    public String ordenador;
+}

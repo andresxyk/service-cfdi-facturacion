@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gda.cfdi.dto.empresa.TimbradoCfdiDto;
 import com.gda.cfdi.exception.ResponseErrorDto;
 import com.gda.cfdi.service.empresa.EmpresaCfdiService;
+import com.gda.cfdi.service.empresa.MoreriraService;
 import com.gda.cfdi.service.exakta.ExaktaCfdiService;
 //import com.gda.cfdi.service.referencia.ReferenciaCfdiService;
 import com.gda.cfdi.service.referencia.ReferenciaCfdiService;
@@ -32,6 +34,8 @@ public class CfdiEmpresasController {
 	private ExaktaCfdiService exaktaCfdiService;
 	@Autowired
 	private EmpresaCfdiService empresaCfdiService;
+	@Autowired
+	private MoreriraService moreriraService;
 	
 	@RequestMapping(path = "/cfdi-biomedica", method = RequestMethod.POST)
 	public ResponseEntity<?> getCfdiBiomedica(@RequestBody GenerarCFDI40 generarCFDI40){
@@ -59,6 +63,20 @@ public class CfdiEmpresasController {
 		}
 	}
 	
+	
+	@RequestMapping(path = "/cfdi-moreira", method = RequestMethod.POST)
+	public ResponseEntity<?> getCfdiMoreira(@RequestBody String cfdi){
+		try {
+			return new ResponseEntity<String>(moreriraService.generarCfdi(cfdi), HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			ResponseErrorDto dto = new ResponseErrorDto();
+			dto.setCodigo("error");
+			dto.setDescripcion(e.getMessage());
+			return new ResponseEntity<ResponseErrorDto>(dto, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@RequestMapping(path = "/xml-cfdi", method = RequestMethod.POST)
 	public ResponseEntity<?> getXmlCfdi(@RequestBody Comprobante comprobante){
 		try {
@@ -76,6 +94,19 @@ public class CfdiEmpresasController {
 	public ResponseEntity<?> getXmlCfdi(@RequestBody AddendaDto addendaDto){
 		try {
 			return new ResponseEntity<String>(empresaCfdiService.getXmlAddendaCfdi(addendaDto), HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			ResponseErrorDto dto = new ResponseErrorDto();
+			dto.setCodigo("error");
+			dto.setDescripcion(e.getMessage());
+			return new ResponseEntity<ResponseErrorDto>(dto, HttpStatus.BAD_REQUEST);
+		}
+	}	
+	
+	@RequestMapping(path = "/xml-cfdi-empresa", method = RequestMethod.POST)
+	public ResponseEntity<?> getXmlCfdiEmpresa(@RequestBody TimbradoCfdiDto timbradoCfdiDto){
+		try {
+			return new ResponseEntity<TimbradoCfdiDto>(empresaCfdiService.getxmlCfdiEmpresa(timbradoCfdiDto), HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			ResponseErrorDto dto = new ResponseErrorDto();
