@@ -141,7 +141,7 @@ public class TemplatePolab  extends PdfPageEventHelper{
 			
 			//BaseColor colorLetraEncabezadoImagen = WebColors.getRGBColor("#1F49B6");
 			BaseColor colorLetraEncabezados = WebColors.getRGBColor("#FFFFFF");
-			BaseColor colorFondoTituloFact = WebColors.getRGBColor("#1F49B6");
+			BaseColor colorFondoTituloFact = WebColors.getRGBColor("#78243C");
 			BaseColor colorFondoContenidoFact = WebColors.getRGBColor("#F4F4F9");			
 			Font fuenteDirSucur = new Font(Font.FontFamily.HELVETICA,7,Font.NORMAL,BaseColor.BLACK);
 			Font fuenteImport = new Font(Font.FontFamily.HELVETICA,7,Font.BOLD,BaseColor.BLACK);

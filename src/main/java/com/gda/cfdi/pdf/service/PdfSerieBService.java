@@ -288,19 +288,19 @@ private static final Logger log = LoggerFactory.getLogger(PdfSerieBService.class
 						folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 6);
 					}else if (cmarca == 16) {
 						carpeta = "Moreira";
-						inicioNom = "FacturacionElectronica_AMO";
+						inicioNom = "FacturacionElectronica_AIO";
 						folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 6);
 					}else if (cmarca == 22) {
 						carpeta = "Polab";
-						inicioNom = "FacturacionElectronica_APO";
+						inicioNom = "FacturacionElectronica_AIM";
 						folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 6);
 					}else if (cmarca == 25) {
 						carpeta = "BiomedicaReferencia";
-						inicioNom = "FacturacionElectronica_ABR";
+						inicioNom = "FacturacionElectronica_AMZ";
 						folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 6);
 					}else if (cmarca == 26) {
 						carpeta = "Promedic";
-						inicioNom = "FacturacionElectronica_APR";
+						inicioNom = "FacturacionElectronica_AIN";
 						folioFactura = utilsService.formatoFolio(facturaDto.getFolio(), 6);
 					}
 					

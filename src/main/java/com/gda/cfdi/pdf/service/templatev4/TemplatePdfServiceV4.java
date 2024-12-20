@@ -3620,7 +3620,7 @@ public class TemplatePdfServiceV4 implements ITemplatePdfServiceV4Impl {
 		Font fuenteContenidoImporTabWhite = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD, colorLetraBlanco);
 
 		BaseColor colorLetraEncabezados = WebColors.getRGBColor("#FFFFFF");
-		BaseColor colorFondoTituloFact = WebColors.getRGBColor("#1F49B6");
+		BaseColor colorFondoTituloFact = WebColors.getRGBColor("#78243C");
 
 		String strMontoSubTotal = comprobante.getImpuestos().getTraslados().getTraslado().get(0).getBase().toString();
 		String strMontoImpuesto = comprobante.getImpuestos().getTraslados().getTraslado().get(0).getImporte()

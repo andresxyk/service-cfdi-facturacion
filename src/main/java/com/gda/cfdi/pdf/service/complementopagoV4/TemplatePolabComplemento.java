@@ -160,8 +160,8 @@ public class TemplatePolabComplemento  extends PdfPageEventHelper{
 			
 			//BaseColor colorLetraEncabezadoImagen = WebColors.getRGBColor("#1F49B6");
 			BaseColor colorLetraEncabezados = WebColors.getRGBColor("#FFFFFF");
-			BaseColor colorFondoTituloFact = WebColors.getRGBColor("#1F49B6");
-			BaseColor colorFondoTituloFactPago = WebColors.getRGBColor("#1f84b6");
+			BaseColor colorFondoTituloFact = WebColors.getRGBColor("#78243C");
+			BaseColor colorFondoTituloFactPago = WebColors.getRGBColor("#8c4478");
 			BaseColor colorFondoContenidoFact = WebColors.getRGBColor("#F4F4F9");			
 			Font fuenteDirSucur = new Font(Font.FontFamily.HELVETICA,7,Font.NORMAL,BaseColor.BLACK);
 			Font fuenteImport = new Font(Font.FontFamily.HELVETICA,7,Font.BOLD,BaseColor.BLACK);

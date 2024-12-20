@@ -83,7 +83,7 @@ public class PdfComplementoPagoService {
 					if (comprobante.getEmisor().getRfc().equals("BIO7603164H0")) {
 						cmarca = 16;
 					}
-					if (comprobante.getEmisor().getRfc().equals("RFCPOLAB0000")) {
+					if (comprobante.getEmisor().getRfc().equals("LCP980213PC7")) {
 						cmarca = 22;
 					}
 					if (comprobante.getEmisor().getRfc().equals("BRE9205181I1")) {
@@ -232,7 +232,7 @@ public class PdfComplementoPagoService {
 					if (comprobante.getEmisor().getRfc().equals("BIO7603164H0")) {
 						cmarca = 16;
 					}
-					if (comprobante.getEmisor().getRfc().equals("RFCPOLAB0000")) {
+					if (comprobante.getEmisor().getRfc().equals("LCP980213PC7")) {
 						cmarca = 22;
 					}
 					if (comprobante.getEmisor().getRfc().equals("BRE9205181I1")) {
@@ -325,7 +325,7 @@ public class PdfComplementoPagoService {
 								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
 								ruta = complementoPdfV4Service.crearPdfMarcaMoreira(comprobante, complementoDato, inicioNom + folioFactura);
 								break;
-							case "RFCPOLAB0000":// Polab
+							case "LCP980213PC7":// Polab
 								log.info("Polab");
 								inicioNom = "FacturacionElectronica_ACC";
 								folioFactura = utilsService.formatoFolio(complementoDato.getuFolioFactura(), 6);
