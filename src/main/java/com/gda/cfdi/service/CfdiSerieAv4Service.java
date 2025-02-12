@@ -523,7 +523,7 @@ public class CfdiSerieAv4Service {
 				+ " AND cestadoregistro=31)||','||\r\n" + "(SELECT ccliente FROM c_convenio WHERE cconvenio=" + convenio
 				+ ")||'," + csucursal + ",1,'\r\n" + "||SUM (" + subTotal + "  )||',0.00,0.00,'||\r\n" + "SUM ("
 				+ subTotal + " *.16)||','||\r\n" + "SUM (" + subTotal + " *1.16)||',1,'||" + convenio
-				+ "||','' '','' ''," + centidadlegal + ",sysdate,33,sysdate,'||1||','||1||', '' '','' '','' '', ''"
+				+ "||','' '','' ''," + centidadlegal + ",sysdate,270,sysdate,'||1||','||1||', '' '','' '','' '', ''"
 				+ sserie + "'') RETURNING kfactura;' AS query1,\r\n"
 				+ "'UPDATE c_control_folio SET ufolioactual='||(SELECT SUM(ufolioactual+1) FROM c_control_folio WHERE csucursal="
 				+ csucursal + " AND cestadoregistro=31)||\r\n" + "' WHERE csucursal=" + csucursal

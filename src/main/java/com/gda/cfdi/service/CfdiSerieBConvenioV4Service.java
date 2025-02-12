@@ -421,7 +421,7 @@ public class CfdiSerieBConvenioV4Service {
 				"(SELECT ccliente FROM c_convenio WHERE cconvenio="+convenio+")||',1007,1,'\r\n" + 
 				"||SUM ( "+subTotal+"/1.16)||',0.00,0.00,'||\r\n" + 
 				"SUM ( "+subTotal+" - ("+subTotal+" /1.16))||','||\r\n" + 
-				"SUM ( "+subTotal+")||',1,'||"+convenio+"||','' '','' '',1,sysdate,33,sysdate,'||1||','||1||', '' '','' '','' '', ''B'')  RETURNING kfactura;' AS query1,\r\n" + 
+				"SUM ( "+subTotal+")||',1,'||"+convenio+"||','' '','' '',1,sysdate,270,sysdate,'||1||','||1||', '' '','' '','' '', ''B'')  RETURNING kfactura;' AS query1,\r\n" + 
 				"'UPDATE c_control_folio SET ufolioactual='||(SELECT SUM(ufolioactual+1) FROM c_control_folio WHERE csucursal=1007 AND cestadoregistro=31)||\r\n" + 
 				"' WHERE csucursal=1007 AND cestadoregistro=31;' AS query2";
 		
