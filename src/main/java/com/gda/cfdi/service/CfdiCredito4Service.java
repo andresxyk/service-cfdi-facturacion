@@ -2,6 +2,8 @@ package com.gda.cfdi.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -701,9 +703,12 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 		
 		if(tipofactura.equals(1) || tipofactura.equals(3)){
 			BigDecimal msubtotalGlobal = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			BigDecimal mivaGlobal = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 			//List<EstudioDto> listEstudios = consultaService.getListEstudiosByKfactura(dto.getIdFactura());
+			
 			for (FuncionFacturacionDto estudioDto : list) {
-				msubtotalGlobal = msubtotalGlobal.add(estudioDto.getMtotal());
+				msubtotalGlobal = msubtotalGlobal.add(estudioDto.getMsubtotal());
+				mivaGlobal = mivaGlobal.add(estudioDto.getMiva());
 			}
 			Concepto concepto = new ObjectFactory().createComprobanteConceptosConcepto();
 			concepto.setDescuento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
@@ -742,7 +747,8 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 			
 //			traslado.setBase(concepto.getImporte().subtract(concepto.getDescuento()).setScale(2, 4));
 			traslado.setBase(concepto.getImporte().setScale(2, 4));
-			traslado.setImporte(traslado.getBase().multiply(new BigDecimal(0.16)).setScale(2, BigDecimal.ROUND_HALF_UP));
+			//traslado.setImporte(traslado.getBase().multiply(new BigDecimal(0.16)).setScale(2, BigDecimal.ROUND_HALF_UP));
+			traslado.setImporte(mivaGlobal);
 			importeBaseTotal = importeBaseTotal.add(traslado.getBase().setScale(2, BigDecimal.ROUND_HALF_UP));
 			importeTotal = importeTotal.add(traslado.getImporte().setScale(2, BigDecimal.ROUND_HALF_UP));
 			traslado.setImpuesto("002");
@@ -756,7 +762,37 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 					
 		}else{
 			//List<EstudioDto> listEstudios = consultaService.getListEstudiosByKfactura(dto.getIdFactura());
-			for (FuncionFacturacionDto estudioDto : list) {
+			List<FuncionFacturacionDto> listNew = new ArrayList<>();
+			List<HashMap<String, Integer>> listHash = new ArrayList<>();
+			for (FuncionFacturacionDto ffDto : list) {
+				HashMap<String, Integer> map = new HashMap<>();
+				map.put(ffDto.getCexamen()+"||"+ffDto.getMsubtotal().toString()+"||"+ffDto.getSexamen()+"||"+ffDto.getMiva()+"||"+ffDto.getMtotal(), 1);
+				listHash.add(map); 
+			}
+			HashMap<String, Integer> contador = new HashMap<>();
+			for (HashMap<String, Integer> mapa : listHash) {
+	            for (String clave : mapa.keySet()) {
+	                int conteoActual = mapa.get(clave);
+	                contador.put(clave, contador.getOrDefault(clave, 0) + conteoActual);
+	            }
+	           
+	        }
+			int ind =0;
+			for (String clave : contador.keySet()) {
+				log.info("index: " +ind + " valor:" + clave.split("\\|\\|")[3]);
+				 FuncionFacturacionDto facturacionDto = new FuncionFacturacionDto();
+	                facturacionDto.setCconvenio(Integer.valueOf(clave.split("\\|\\|")[0]));
+	                facturacionDto.setMsubtotal(new BigDecimal(clave.split("\\|\\|")[1]));
+	                facturacionDto.setSexamen(clave.split("\\|\\|")[2]);
+	                facturacionDto.setCantidad( contador.get(clave).toString() );
+	                
+	                facturacionDto.setMiva(new BigDecimal(clave.split("\\|\\|")[3]));
+	                facturacionDto.setMtotal(new BigDecimal(clave.split("\\|\\|")[4]));
+	                listNew.add(facturacionDto) ;
+	                ind++;
+	        }
+			
+			for (FuncionFacturacionDto estudioDto : listNew) {
 				
 				Concepto concepto = new ObjectFactory().createComprobanteConceptosConcepto();
 								
@@ -789,11 +825,10 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 				concepto.setDescripcion(estudioDto.getSexamen());
 				concepto.setObjetoImp("02");
 				concepto.setValorUnitario(estudioDto.getMsubtotal());
-				concepto.setImporte(estudioDto.getMsubtotal()
-						.multiply(new BigDecimal(estudioDto.getCantidad())).setScale(2));
+				concepto.setImporte(estudioDto.getMsubtotal());
 				concepto.setImporte(concepto.getImporte().setScale(2));
 				
-				importePadre = importePadre.add(concepto.getImporte().setScale(4));
+				importePadre = importePadre.add(concepto.getImporte().setScale(4).multiply(concepto.getCantidad()));
 				
 				conceptos.getConcepto().add(concepto);
 				
@@ -815,9 +850,9 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 					importeRetencion = importeRetencion.add(retencion.getImporte().setScale(2, BigDecimal.ROUND_HALF_UP));
 				}
 				
-				traslado.setBase(concepto.getImporte().subtract(concepto.getDescuento()).setScale(2, 4));
+				traslado.setBase(concepto.getImporte().subtract(concepto.getDescuento()).setScale(2, 4).multiply(concepto.getCantidad()));
 //				traslado.setBase(concepto.getImporte());
-				traslado.setImporte(traslado.getBase().multiply(new BigDecimal(0.16)).setScale(2, BigDecimal.ROUND_HALF_UP));
+				traslado.setImporte(estudioDto.getMiva().multiply(new BigDecimal(estudioDto.getCantidad())));
 				importeBaseTotal = importeBaseTotal.add(traslado.getBase().setScale(2, BigDecimal.ROUND_HALF_UP));
 				importeTotal = importeTotal.add(traslado.getImporte().setScale(2, BigDecimal.ROUND_HALF_UP));
 				traslado.setImpuesto("002");
