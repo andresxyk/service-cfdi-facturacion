@@ -701,10 +701,11 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 		BigDecimal importePadre = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
 		BigDecimal importeTDescuento = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
 		BigDecimal importeRetencion = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
-		
+		BigDecimal mivaGlobal = BigDecimal.ZERO;
+		BigDecimal msubtotalGlobal = BigDecimal.ZERO;
+		BigDecimal mtotalGlobal = BigDecimal.ZERO;
 		if(tipofactura.equals(1) || tipofactura.equals(3)){
-			BigDecimal msubtotalGlobal = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
-			BigDecimal mivaGlobal = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+			
 			//List<EstudioDto> listEstudios = consultaService.getListEstudiosByKfactura(dto.getIdFactura());
 			
 			for (FuncionFacturacionDto estudioDto : list) {
@@ -766,10 +767,13 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 			List<FuncionFacturacionDto> listNew = new ArrayList<>();
 			List<HashMap<String, Integer>> listHash = new ArrayList<>();
 			for (FuncionFacturacionDto ffDto : list) {
+				
 				HashMap<String, Integer> map = new HashMap<>();
 				map.put(ffDto.getCexamen()+"||"+ffDto.getMsubtotal().toString()+"||"+ffDto.getSexamen()+"||"+ffDto.getMiva()+"||"+ffDto.getMtotal(), 1);
 				listHash.add(map); 
 			}
+			
+			log.info("mivaGlobal: " +mivaGlobal);
 			HashMap<String, Integer> contador = new HashMap<>();
 			for (HashMap<String, Integer> mapa : listHash) {
 	            for (String clave : mapa.keySet()) {
@@ -780,16 +784,23 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 	        }
 			int ind =0;
 			for (String clave : contador.keySet()) {
-				log.info("index: " +ind + " valor:" + clave.split("\\|\\|")[3]);
+				
 				 FuncionFacturacionDto facturacionDto = new FuncionFacturacionDto();
 	                facturacionDto.setCconvenio(Integer.valueOf(clave.split("\\|\\|")[0]));
 	                facturacionDto.setMsubtotal(new BigDecimal(clave.split("\\|\\|")[1]));
 	                facturacionDto.setSexamen(clave.split("\\|\\|")[2]);
 	                facturacionDto.setCantidad( contador.get(clave).toString() );
+	                /*Long iva = Long.valueOf(clave.split("\\|\\|")[3]);
+	                iva = iva +  Long.valueOf(facturacionDto.getCantidad());*/
+	                facturacionDto.setMiva(facturacionDto.getMsubtotal().multiply(new BigDecimal(facturacionDto.getCantidad())).multiply( new BigDecimal(0.16) ).setScale(6, RoundingMode.HALF_UP) );
+	                //facturacionDto.setMiva(new BigDecimal(clave.split("\\|\\|")[3]).multiply(new BigDecimal(facturacionDto.getCantidad()).setScale(6, RoundingMode.HALF_UP)));
+	                facturacionDto.setMtotal(new BigDecimal(clave.split("\\|\\|")[1]).multiply(new BigDecimal(facturacionDto.getCantidad()).setScale(6, RoundingMode.HALF_UP)));
 	                
-	                facturacionDto.setMiva(new BigDecimal(clave.split("\\|\\|")[3]).multiply(new BigDecimal(facturacionDto.getCantidad())).setScale(4, RoundingMode.DOWN ));
-	                facturacionDto.setMtotal(new BigDecimal(clave.split("\\|\\|")[4]));
+	                mivaGlobal = mivaGlobal.add(facturacionDto.getMiva());
+	                msubtotalGlobal = msubtotalGlobal.add(facturacionDto.getMsubtotal());
+	                mtotalGlobal = mtotalGlobal.add(facturacionDto.getMtotal());
 	                listNew.add(facturacionDto) ;
+	                log.info("Examen "+ind+": " + facturacionDto.getSexamen() + "Valor Unitario: " + facturacionDto.getMsubtotal() + " Cantidad:" + facturacionDto.getCantidad() + " IVA" + facturacionDto.getMiva() + " Importe " + facturacionDto.getMtotal() + " DTO: " + facturacionDto );
 	                ind++;
 	        }
 			
@@ -820,7 +831,57 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 			          }
 		          }
 				
+				/*************************************************************** nuevo metodo ************************/
 				importeTDescuento = importeTDescuento.add(concepto.getDescuento());
+				
+				concepto.setCantidad(new BigDecimal(estudioDto.getCantidad()));
+				concepto.setClaveProdServ("85121800");
+				concepto.setNoIdentificacion("No Aplica");
+				concepto.setClaveUnidad("E48");
+				concepto.setUnidad("Unidad de Servicio");
+				concepto.setDescripcion(estudioDto.getSexamen());
+				concepto.setObjetoImp("02");
+				concepto.setValorUnitario(estudioDto.getMsubtotal().setScale(6, RoundingMode.HALF_UP));
+				concepto.setImporte(estudioDto.getMtotal().setScale(6, RoundingMode.HALF_UP));
+				
+				
+				Impuestos impuestos = new ObjectFactory().createComprobanteConceptosConceptoImpuestos();
+				Traslados traslados = new ObjectFactory().createComprobanteConceptosConceptoImpuestosTraslados();
+				Traslado traslado = new ObjectFactory().createComprobanteConceptosConceptoImpuestosTrasladosTraslado();
+				Retenciones retenciones = new ObjectFactory().createComprobanteConceptosConceptoImpuestosRetenciones();
+				Retencion retencion = new ObjectFactory().createComprobanteConceptosConceptoImpuestosRetencionesRetencion();
+				
+				retencion.setImporte((estudioDto.getMtotal().subtract(concepto.getDescuento())).multiply(new BigDecimal(env.getProperty("cfdi.retencion.monto"))));
+				retencion.setImpuesto("002");
+				retencion.setTasaOCuota(new BigDecimal(0.06).setScale(6, RoundingMode.HALF_UP));
+				retencion.setTipoFactor(CTipoFactor.TASA);
+				retencion.setBase(estudioDto.getMtotal().subtract(concepto.getDescuento()));
+				if(isRetencion){
+					retenciones.getRetencion().add(retencion);
+					impuestos.setRetenciones(retenciones);
+					importeRetencion = importeRetencion.add(retencion.getImporte());
+				}
+				
+				traslado.setBase(estudioDto.getMtotal().setScale(6, RoundingMode.HALF_UP));
+				traslado.setImporte(estudioDto.getMiva().setScale(6, RoundingMode.HALF_UP));
+				traslado.setImpuesto("002");
+				traslado.setTipoFactor(CTipoFactor.TASA);
+				traslado.setTasaOCuota(new BigDecimal(0.16).setScale(6, RoundingMode.HALF_UP));
+				
+				traslados.getTraslado().add(traslado);
+				impuestos.setTraslados(traslados);
+				concepto.setImpuestos(impuestos);
+				comprobante.setConceptos(conceptos);
+				conceptos.getConcepto().add(concepto);
+				
+				
+				/*****************************************************************************************************/
+				
+				
+				
+				
+				
+				/*importeTDescuento = importeTDescuento.add(concepto.getDescuento());
 				
 				concepto.setCantidad(new BigDecimal(estudioDto.getCantidad()).setScale(0, RoundingMode.HALF_UP));
 				concepto.setClaveProdServ("85121800");
@@ -833,7 +894,7 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 				concepto.setImporte(estudioDto.getMsubtotal().multiply(concepto.getCantidad()));
 				concepto.setImporte(concepto.getImporte().setScale(2));
 				
-				importePadre = importePadre.add(concepto.getImporte().setScale(4));
+				importePadre = importePadre.add(concepto.getImporte().setScale(2, RoundingMode.DOWN));
 				
 				conceptos.getConcepto().add(concepto);
 				
@@ -843,10 +904,10 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 				Retenciones retenciones = new ObjectFactory().createComprobanteConceptosConceptoImpuestosRetenciones();
 				Retencion retencion = new ObjectFactory().createComprobanteConceptosConceptoImpuestosRetencionesRetencion();
 				
-				retencion.setImporte((concepto.getImporte().subtract(concepto.getDescuento()).setScale(2, 4)).multiply(new BigDecimal(env.getProperty("cfdi.retencion.monto")))
-						.setScale(2, RoundingMode.HALF_UP));
+				retencion.setImporte((concepto.getImporte().subtract(concepto.getDescuento()).setScale(2, RoundingMode.DOWN)).multiply(new BigDecimal(env.getProperty("cfdi.retencion.monto")))
+						.setScale(2, RoundingMode.DOWN));
 				retencion.setImpuesto("002");
-				retencion.setTasaOCuota(new BigDecimal(0.06).setScale(6, RoundingMode.HALF_UP));
+				retencion.setTasaOCuota(new BigDecimal(0.06).setScale(6, RoundingMode.DOWN));
 				retencion.setTipoFactor(CTipoFactor.TASA);
 				retencion.setBase(concepto.getImporte().subtract(concepto.getDescuento()).setScale(2, 4));
 				if(isRetencion){
@@ -855,12 +916,13 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 					importeRetencion = importeRetencion.add(retencion.getImporte().setScale(2, RoundingMode.HALF_UP));
 				}
 				
-				traslado.setBase(concepto.getImporte().subtract(concepto.getDescuento()).setScale(2, 4));
+				traslado.setBase(concepto.getImporte().subtract(concepto.getDescuento()).setScale(2, RoundingMode.DOWN));
 //				traslado.setBase(concepto.getImporte());
-				traslado.setImporte(estudioDto.getMiva().setScale(2, RoundingMode.HALF_UP));
+				traslado.setImporte(estudioDto.getMiva().setScale(2, RoundingMode.DOWN));
 				//traslado.setImporte(traslado.getBase().multiply(new BigDecimal(0.16)).setScale(2, RoundingMode.HALF_UP));
-				importeBaseTotal = importeBaseTotal.add(traslado.getBase().setScale(2, RoundingMode.HALF_UP));
-				importeTotal = importeTotal.add(traslado.getImporte().setScale(2, RoundingMode.HALF_UP));
+				importeBaseTotal = importeBaseTotal.add(traslado.getBase().setScale(2, RoundingMode.DOWN));
+				importeTotal = importeTotal.add(traslado.getImporte());
+				log.info("******************* iva acum " + importeTotal + " | " +  traslado.getImporte());
 				traslado.setImpuesto("002");
 				traslado.setTipoFactor(CTipoFactor.TASA);
 				traslado.setTasaOCuota(new BigDecimal(0.16).setScale(6, RoundingMode.HALF_UP));
@@ -868,7 +930,7 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 				traslados.getTraslado().add(traslado);
 				impuestos.setTraslados(traslados);
 				concepto.setImpuestos(impuestos);
-				comprobante.setConceptos(conceptos);
+				comprobante.setConceptos(conceptos);*/
 				
 				
 				
@@ -877,7 +939,19 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 			
 		}
 		
-		comprobante.setSubTotal(importePadre.setScale(2));		
+		
+		/***************************************************************************************************************/
+		comprobante.setSubTotal(mtotalGlobal.setScale(2, RoundingMode.HALF_UP));		
+		comprobante.setDescuento(importeTDescuento);
+		
+		if(isRetencion){
+			comprobante.setTotal(mtotalGlobal.add(mivaGlobal).subtract(importeRetencion).setScale(2, RoundingMode.HALF_UP));
+		}else{
+			comprobante.setTotal(mtotalGlobal.add(mivaGlobal).setScale(2, RoundingMode.HALF_UP));
+		}
+		/*******************************************************************************************************************/
+		
+	/*	comprobante.setSubTotal(importePadre.setScale(2));		
 		comprobante.setDescuento(importeTDescuento.setScale(2));
 		
 		BigDecimal total1 = comprobante.getSubTotal().subtract(comprobante.getDescuento()).setScale(2, 1);
@@ -890,31 +964,43 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 			comprobante.setTotal(comprobante.getTotal().subtract(importeRetencion).setScale(2, BigDecimal.ROUND_DOWN));
 		}else{
 			comprobante.setTotal(totalt.setScale(2));
-		}
-		
+		}*/
 		
 		consultaService.updateMontosFactura(comprobante.getTotal(), comprobante.getSubTotal(), importeTotal,comprobante.getDescuento(), dto.getIdFactura());
 		
 		mx.gob.sat.cfd._4.Comprobante.Impuestos impuestos = new ObjectFactory().createComprobanteImpuestos();
 		mx.gob.sat.cfd._4.Comprobante.Impuestos.Traslados traslados = new ObjectFactory().createComprobanteImpuestosTraslados();
 		mx.gob.sat.cfd._4.Comprobante.Impuestos.Traslados.Traslado trasladosTotales = new ObjectFactory().createComprobanteImpuestosTrasladosTraslado();
-		trasladosTotales.setBase(importeBaseTotal);
-		trasladosTotales.setImporte(importeTotal.setScale(2, BigDecimal.ROUND_DOWN));
+		/*trasladosTotales.setBase(importeBaseTotal);
+		trasladosTotales.setImporte(mivaGlobal.setScale(2, RoundingMode.HALF_UP));
 		trasladosTotales.setImpuesto("002");
 		trasladosTotales.setTasaOCuota(new BigDecimal(0.16).setScale(6, RoundingMode.HALF_UP));
 		trasladosTotales.setTipoFactor(CTipoFactor.TASA);
 		traslados.getTraslado().add(trasladosTotales);
 		impuestos.setTraslados(traslados);		
-		impuestos.setTotalImpuestosTrasladados(importeTotal.setScale(2, BigDecimal.ROUND_DOWN));
+		impuestos.setTotalImpuestosTrasladados(importeTotal.setScale(2, BigDecimal.ROUND_DOWN));*/
+		
+		
+		/*********************************************************************************************************************/
+		trasladosTotales.setBase(mtotalGlobal.setScale(2, RoundingMode.HALF_UP));
+		trasladosTotales.setImporte(mtotalGlobal.multiply(new BigDecimal(0.16)).setScale(2, RoundingMode.HALF_UP));
+		trasladosTotales.setImpuesto("002");
+		trasladosTotales.setTasaOCuota(new BigDecimal(0.16).setScale(6, RoundingMode.HALF_UP));
+		trasladosTotales.setTipoFactor(CTipoFactor.TASA);
+		traslados.getTraslado().add(trasladosTotales);
+		impuestos.setTraslados(traslados);		
+		impuestos.setTotalImpuestosTrasladados(mivaGlobal.setScale(2, RoundingMode.HALF_UP));
+		/*********************************************************************************************************************/
+		
 		
 		if(isRetencion){
 			mx.gob.sat.cfd._4.Comprobante.Impuestos.Retenciones retenciones = new ObjectFactory().createComprobanteImpuestosRetenciones();
 			mx.gob.sat.cfd._4.Comprobante.Impuestos.Retenciones.Retencion retencionTotales = new ObjectFactory().createComprobanteImpuestosRetencionesRetencion();
-			retencionTotales.setImporte(importeRetencion.setScale(2, BigDecimal.ROUND_DOWN));
+			retencionTotales.setImporte(importeRetencion);
 			retencionTotales.setImpuesto("002");
 			retenciones.getRetencion().add(retencionTotales);
 			impuestos.setRetenciones(retenciones);
-			impuestos.setTotalImpuestosRetenidos(importeRetencion.setScale(2, BigDecimal.ROUND_DOWN));
+			impuestos.setTotalImpuestosRetenidos(importeRetencion);
 		}
 		comprobante.setImpuestos(impuestos);
 		
