@@ -2,7 +2,12 @@ package com.gda.cfdi.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -12,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import com.gda.cfdi.controller.CfdiController;
 import com.gda.cfdi.dto.DatosFiscalesDto;
 import com.gda.cfdi.dto.DatosMarcaDto;
 import com.gda.cfdi.dto.EstudioDto;
@@ -33,6 +37,7 @@ import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Retenciones.Re
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados.Traslado;
 import mx.gob.sat.cfd._4.Comprobante.Emisor;
+import mx.gob.sat.cfd._4.Comprobante.InformacionGlobal;
 import mx.gob.sat.cfd._4.Comprobante.Receptor;
 import mx.gob.sat.cfd._4.ObjectFactory;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CMetodoPago;
@@ -44,7 +49,7 @@ import mx.gob.sat.sitio_internet.cfd.catalogos.CUsoCFDI;
 @Service
 public class CfdiCredito4Service {
 
-private static final Logger log = LoggerFactory.getLogger(CfdiController .class);
+private static final Logger log = LoggerFactory.getLogger(CfdiCredito4Service.class);
 	
 	@Autowired
 	private Environment env;
@@ -63,12 +68,12 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 			 String strnocuenta,  String strmetodopago,  String uuidSustitucion, boolean isSustitucion,  boolean isDescuento,  
 			 String descuentos, String notaDescuento,  boolean isRetencion,  Integer marca, String descripcionFactura) throws Exception {
 		
-		String sserie = marca.equals(1)?"A":marca.equals(4)?"AZ":marca.equals(5)?"AS":marca.equals(15)?"ASL":
-			marca.equals(7)?"AJP":marca.equals(8)?"AJL":marca.equals(19)?"AFN":marca.equals(20)?"AJK":marca.equals(21)?"AAS":
-				marca.equals(16)?"AIO":marca.equals(22)?"AIM":marca.equals(25)?"AMZ":marca.equals(26)?"AIN":null;
-			Integer csucursal = marca.equals(1)?1003:marca.equals(4)?1012:marca.equals(5)?1013:marca.equals(15)?1017:
-				marca.equals(7)?1014:marca.equals(8)?1015:marca.equals(19)?1020:marca.equals(20)?1021:
-				marca.equals(21)?1022:marca.equals(16)?1026:marca.equals(22)?1023:marca.equals(25)?1024:marca.equals(26)?1025:null;
+		String sserie = marca == 1?"A":marca == 4?"AZ":marca == 5?"AS":marca == 15?"ASL":
+			marca == 7?"AJP":marca == 8?"AJL":marca == 19?"AFN":marca == 20?"AJK":marca == 21?"AAS":
+				marca == 16?"AIO":marca == 22?"AIM":marca == 25?"AMZ":marca == 26?"AIN":null;
+			Integer csucursal = marca == 1?1003:marca == 4?1012:marca == 5?1013:marca == 15?1017:
+				marca == 7?1014:marca == 8?1015:marca == 19?1020:marca == 20?1021:
+				marca == 21?1022:marca == 16?1026:marca == 22?1023:marca == 25?1024:marca == 26?1025:null;
 		
 		DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosMarca(marca, 4);
 		
@@ -85,13 +90,13 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 				descripcionFactura, isRetencion, isDescuento, descuentos, notaDescuento,datosMarcaDto);
 		
 		String xml = utilsCfdi4Service.createXmlFromComprobante(comprobante);
-		log.info(xml);
+		System.out.println(xml);
 		comprobante.setCertificado(utilsService.getCertificadoB64(datosMarcaDto.getRutaCer()));
 		String cadenaOriginal = utilsService.createCadenaOriginal(xml, datosMarcaDto.getRutaCadenaOriginal());
 		comprobante.setSello(utilsService.createSello(cadenaOriginal, datosMarcaDto.getRutaKey(), datosMarcaDto.getPasword()));
 		
 		String xmlOriginalSello =  utilsCfdi4Service.createXmlFromComprobante(comprobante);
-		log.info(xmlOriginalSello);
+		System.out.println(xmlOriginalSello);
 		TFacturaEntityDto tfactura = new TFacturaEntityDto();
 		tfactura.setKfactura(dtoFac.getIdFactura());
 		tfactura.setMsubtotal(comprobante.getSubTotal());
@@ -111,13 +116,13 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 			 String strnocuenta,  String strmetodopago,  String uuidSustitucion, boolean isSustitucion,  boolean isDescuento,  
 			 String descuentos, String notaDescuento,  boolean isRetencion,  Integer marca, String descripcionFactura, List<FuncionFacturacionDto> list) throws Exception {
 		
-		String sserie = marca.equals(1)?"A":marca.equals(4)?"AZ":marca.equals(5)?"AS":marca.equals(15)?"ASL":
-			marca.equals(7)?"AJP":marca.equals(8)?"AJL":marca.equals(19)?"AFN":marca.equals(20)?"AJK":marca.equals(21)?"AAS":
-				marca.equals(16)?"AIO":marca.equals(22)?"AIM":marca.equals(25)?"AMZ":marca.equals(26)?"AIN":null;
-			Integer csucursal = marca.equals(1)?1003:marca.equals(4)?1012:marca.equals(5)?1013:marca.equals(15)?1017:
-				marca.equals(7)?1014:marca.equals(8)?1015:marca.equals(19)?1020:marca.equals(20)?1021:
-				marca.equals(21)?1022:marca.equals(16)?1026:marca.equals(22)?1023:marca.equals(25)?1024:marca.equals(26)?1025:null;
-		
+
+		String sserie = marca == 1?"A":marca == 4?"AZ":marca == 5?"AS":marca == 15?"ASL":
+			marca == 7?"AJP":marca == 8?"AJL":marca == 19?"AFN":marca == 20?"AJK":marca == 21?"AAS":
+				marca == 16?"AIO":marca == 22?"AIM":marca == 25?"AMZ":marca == 26?"AIN":null;
+			Integer csucursal = marca == 1?1003:marca == 4?1012:marca == 5?1013:marca == 15?1017:
+				marca == 7?1014:marca == 8?1015:marca == 19?1020:marca == 20?1021:
+				marca == 21?1022:marca == 16?1026:marca == 22?1023:marca == 25?1024:marca == 26?1025:null;		
 		DatosMarcaDto datosMarcaDto = utilsService.obtenerDatosMarca(marca, 4);
 		
 		TFacturaCreditoDto dtoFac = consultaService.getTFacturaCreditoDtoBySerieAndFolio(sserie, folio);
@@ -133,13 +138,13 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 				descripcionFactura, isRetencion, isDescuento, descuentos, notaDescuento,datosMarcaDto, list);
 		
 		String xml = utilsCfdi4Service.createXmlFromComprobante(comprobante);
-		log.info(xml);
+		System.out.println(xml);
 		comprobante.setCertificado(utilsService.getCertificadoB64(datosMarcaDto.getRutaCer()));
 		String cadenaOriginal = utilsService.createCadenaOriginal(xml, datosMarcaDto.getRutaCadenaOriginal());
 		comprobante.setSello(utilsService.createSello(cadenaOriginal, datosMarcaDto.getRutaKey(), datosMarcaDto.getPasword()));
 		
 		String xmlOriginalSello =  utilsCfdi4Service.createXmlFromComprobante(comprobante);
-		log.info(xmlOriginalSello);
+		System.out.println(xmlOriginalSello);
 		TFacturaEntityDto tfactura = new TFacturaEntityDto();
 		tfactura.setKfactura(dtoFac.getIdFactura());
 		tfactura.setMsubtotal(comprobante.getSubTotal());
@@ -165,45 +170,41 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 		comprobante.setExportacion("01");
 		comprobante.setFolio(ufoliofactura.toString());
 		comprobante.setTipoCambio(BigDecimal.valueOf(1));
-		if(marca.equals(15)){
-			comprobante.setFecha(utilsService.toXmlGregorianCalendar(utilsService.sumarORestarMinutosAFecha(dto.getDregistro(),-60), "yyyy-MM-dd'T'HH:mm:ss"));
-		}else{
-			
-			comprobante.setFecha(utilsService.toXmlGregorianCalendar(dto.getDregistro(), "yyyy-MM-dd'T'HH:mm:ss"));
+		System.out.println("************************************************************************marca:" + marca);
+		if (marca == 15) {
+			comprobante.setFecha(utilsService.toXmlGregorianCalendar(utilsService.sumarORestarMinutosAFecha(new Date(), -60),
+					"yyyy-MM-dd'T'HH:mm:ss"));
+			System.out.println("*************************************************************************fecha marca 15:" + comprobante.getFecha());
+		} else {
+
+			comprobante.setFecha(utilsService.toXmlGregorianCalendar(LocalDateTime.now(ZoneOffset.of("-06:00")), "yyyy-MM-dd'T'HH:mm:ss"));
+			System.out.println("*************************************************************************fecha marca <> 15:" + comprobante.getFecha());
 		}
 		
-		if(marca.equals(1)){			
-			if(dto.getIdConvenio().equals(1605) || dto.getIdConvenio().equals(226) || 
-					dto.getIdConvenio().equals(1224) || dto.getIdConvenio().equals(191) ||
-					dto.getIdConvenio().equals(1129) || dto.getIdConvenio().equals(1225) ||
-					dto.getIdConvenio().equals(8881) || dto.getIdConvenio().equals(200) ||
-					dto.getIdConvenio().equals(3760) || dto.getIdConvenio().equals(1227) ||
-					dto.getIdConvenio().equals(1228) || dto.getIdConvenio().equals(1610) ||
-					dto.getIdConvenio().equals(198) || dto.getIdConvenio().equals(1611) ||
-					dto.getIdConvenio().equals(197) || dto.getIdConvenio().equals(3759) ||
-					dto.getIdConvenio().equals(1604) || dto.getIdConvenio().equals(7922) ||
-					dto.getIdConvenio().equals(1464) || dto.getIdConvenio().equals(1609) ||
-					dto.getIdConvenio().equals(3080)
-					|| dto.getIdConvenio().equals(1189) || dto.getIdConvenio().equals(8344)
-					|| dto.getIdConvenio().equals(1971) || dto.getIdConvenio().equals(183)
-					|| dto.getIdConvenio().equals(1156) 
-					|| dto.getIdConvenio().equals(391) 
-					|| dto.getIdConvenio().equals(364)|| dto.getIdConvenio().equals(947)
-					|| dto.getIdConvenio().equals(12234)|| dto.getIdConvenio().equals(7986)
-					){
+		if(marca == 1){			
+			Integer idConvenio = dto.getIdConvenio();
+			if (idConvenio != null && (
+			    idConvenio == 1605 || idConvenio == 226 || idConvenio == 1224 || idConvenio == 191 ||
+			    idConvenio == 1129 || idConvenio == 1225 || idConvenio == 8881 || idConvenio == 200 ||
+			    idConvenio == 3760 || idConvenio == 1227 || idConvenio == 1228 || idConvenio == 1610 ||
+			    idConvenio == 198  || idConvenio == 1611 || idConvenio == 197  || idConvenio == 3759 ||
+			    idConvenio == 1604 || idConvenio == 7922 || idConvenio == 1464 || idConvenio == 1609 ||
+			    idConvenio == 3080 || idConvenio == 1189 || idConvenio == 8344 || idConvenio == 1971 ||
+			    idConvenio == 183  || idConvenio == 1156 || idConvenio == 391  || idConvenio == 364  ||
+			    idConvenio == 947  || idConvenio == 12234|| idConvenio == 7986)) {
 				
 				comprobante.setLugarExpedicion("57708");
 				
 			}else{				
 				comprobante.setLugarExpedicion("15710");
 			}
-		}else if(marca.equals(5)){
+		}else if(marca == 5){
 			comprobante.setLugarExpedicion("64040");
-		}else if(marca.equals(15)){
+		}else if(marca == 15){
 			comprobante.setLugarExpedicion("31203");
-		}else if(marca.equals(4) || marca.equals(7) || marca.equals(8)){
+		}else if(marca == 4 || marca == 7 || marca == 8){
 			comprobante.setLugarExpedicion("15710");
-		}else if(marca.equals(20)){
+		}else if(marca == 20){
 			comprobante.setLugarExpedicion("72197");
 		}else {
 			comprobante.setLugarExpedicion("57708");
@@ -293,7 +294,7 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 		Receptor receptor = new ObjectFactory().createComprobanteReceptor();
 		TDatoFiscalDto datoFiscalDto = consultaService.getTDatoFiscalById(dto.getIdDatoFiscal());
 		DatosCfdiDto datosCfdiDto = consultaService.getDatosCfdiByConvenio(dto.getIdConvenio());
-		receptor.setNombre(datoFiscalDto.getSrazonsocial());
+		receptor.setNombre(utilsService.darFormatoCFDI(datoFiscalDto.getSrazonsocial()));
 		receptor.setRfc(datoFiscalDto.getSrfc());
 //		List<TDatoFiscalDto> listDatos = consultaService.getListDatosFiscalesByRfc(datoFiscalDto.getSrfc());
 //		if(listDatos.size()>0){
@@ -324,6 +325,20 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 //		default:
 //			break;
 //		}
+		/***ABM*/
+		if(receptor.getRfc().equals("XAXX010101000")) {
+			receptor.setDomicilioFiscalReceptor(comprobante.getLugarExpedicion());
+			System.out.println("*************************************************************************receptor.getDomicilioFiscalReceptor:" + receptor.getDomicilioFiscalReceptor());
+			System.out.println("*************************************************************************comprobante.getLugarExpedicion():" + comprobante.getLugarExpedicion());
+			receptor.setRegimenFiscalReceptor("616");
+			//receptor.setUsoCFDI(CUsoCFDI.S_01);
+			LocalDate fecha = LocalDate.now();
+			InformacionGlobal informacionGlobal = new InformacionGlobal();
+			informacionGlobal.setPeriodicidad("01");
+			informacionGlobal.setAno(Short.parseShort(String.valueOf(fecha.getYear())));
+			informacionGlobal.setMeses(String.format("%02d", fecha.getMonthValue()));
+			comprobante.setInformacionGlobal(informacionGlobal);
+		}
 		
 		comprobante.setReceptor(receptor);
 		
@@ -405,12 +420,12 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 			        	  String [] splitDescuento = splitdesc[i].split("\\=");
 			        	  if(splitDescuento.length>0){
 			        		  System.out.println("splitDescuento[0]:"+splitDescuento[0]);
-			        		  log.info("==============================================");
-			        		  log.info(splitDescuento[0]);
-			        		  log.info(estudioDto.getCexamen().toString());
+			        		  System.out.println("==============================================");
+			        		  System.out.println(splitDescuento[0]);
+			        		  System.out.println(estudioDto.getCexamen().toString());
 			        		  if(splitDescuento[0].equals(estudioDto.getCexamen().toString())){
 			        			  concepto.setDescuento(new BigDecimal(splitDescuento[1]));
-			        			  log.info(splitDescuento[1]);
+			        			  System.out.println(splitDescuento[1]);
 //			        			  descuento = splitDescuento[1];
 			        		  }
 			        	  }
@@ -530,45 +545,41 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 		comprobante.setExportacion("01");
 		comprobante.setFolio(ufoliofactura.toString());
 		comprobante.setTipoCambio(BigDecimal.valueOf(1));
-		if(marca.equals(15)){
-			comprobante.setFecha(utilsService.toXmlGregorianCalendar(utilsService.sumarORestarMinutosAFecha(dto.getDregistro(),-60), "yyyy-MM-dd'T'HH:mm:ss"));
-		}else{
-			
-			comprobante.setFecha(utilsService.toXmlGregorianCalendar(dto.getDregistro(), "yyyy-MM-dd'T'HH:mm:ss"));
+		System.out.println("************************************************************************marca:" + marca);
+		if (marca == 15) {
+			comprobante.setFecha(utilsService.toXmlGregorianCalendar(utilsService.sumarORestarMinutosAFecha(new Date(), -60),
+					"yyyy-MM-dd'T'HH:mm:ss"));
+			System.out.println("*************************************************************************fecha marca 15:" + comprobante.getFecha());
+		} else {
+
+			comprobante.setFecha(utilsService.toXmlGregorianCalendar(LocalDateTime.now(ZoneId.of("-06:00")), "yyyy-MM-dd'T'HH:mm:ss"));
+			System.out.println("*************************************************************************fecha marca <> 15:" + comprobante.getFecha());
 		}
 		
-		if(marca.equals(1)){			
-			if(dto.getIdConvenio().equals(1605) || dto.getIdConvenio().equals(226) || 
-					dto.getIdConvenio().equals(1224) || dto.getIdConvenio().equals(191) ||
-					dto.getIdConvenio().equals(1129) || dto.getIdConvenio().equals(1225) ||
-					dto.getIdConvenio().equals(8881) || dto.getIdConvenio().equals(200) ||
-					dto.getIdConvenio().equals(3760) || dto.getIdConvenio().equals(1227) ||
-					dto.getIdConvenio().equals(1228) || dto.getIdConvenio().equals(1610) ||
-					dto.getIdConvenio().equals(198) || dto.getIdConvenio().equals(1611) ||
-					dto.getIdConvenio().equals(197) || dto.getIdConvenio().equals(3759) ||
-					dto.getIdConvenio().equals(1604) || dto.getIdConvenio().equals(7922) ||
-					dto.getIdConvenio().equals(1464) || dto.getIdConvenio().equals(1609) ||
-					dto.getIdConvenio().equals(3080)
-					|| dto.getIdConvenio().equals(1189) || dto.getIdConvenio().equals(8344)
-					|| dto.getIdConvenio().equals(1971) || dto.getIdConvenio().equals(183)
-					|| dto.getIdConvenio().equals(1156) 
-					|| dto.getIdConvenio().equals(391) 
-					|| dto.getIdConvenio().equals(364)|| dto.getIdConvenio().equals(947)
-					|| dto.getIdConvenio().equals(12234)|| dto.getIdConvenio().equals(7986)
-					){
+		if(marca == 1){			
+			Integer idConvenio = dto.getIdConvenio();
+			if (idConvenio != null && (
+			    idConvenio == 1605 || idConvenio == 226 || idConvenio == 1224 || idConvenio == 191 ||
+			    idConvenio == 1129 || idConvenio == 1225 || idConvenio == 8881 || idConvenio == 200 ||
+			    idConvenio == 3760 || idConvenio == 1227 || idConvenio == 1228 || idConvenio == 1610 ||
+			    idConvenio == 198  || idConvenio == 1611 || idConvenio == 197  || idConvenio == 3759 ||
+			    idConvenio == 1604 || idConvenio == 7922 || idConvenio == 1464 || idConvenio == 1609 ||
+			    idConvenio == 3080 || idConvenio == 1189 || idConvenio == 8344 || idConvenio == 1971 ||
+			    idConvenio == 183  || idConvenio == 1156 || idConvenio == 391  || idConvenio == 364  ||
+			    idConvenio == 947  || idConvenio == 12234|| idConvenio == 7986)) {
 				
 				comprobante.setLugarExpedicion("57708");
 				
 			}else{				
 				comprobante.setLugarExpedicion("15710");
 			}
-		}else if(marca.equals(5)){
+		}else if(marca == 5){
 			comprobante.setLugarExpedicion("64040");
-		}else if(marca.equals(15)){
+		}else if(marca == 15){
 			comprobante.setLugarExpedicion("31203");
-		}else if(marca.equals(4) || marca.equals(7) || marca.equals(8)){
+		}else if(marca == 4 || marca == 7 || marca == 8){
 			comprobante.setLugarExpedicion("15710");
-		}else if(marca.equals(20)){
+		}else if(marca == 20){
 			comprobante.setLugarExpedicion("72197");
 		}else {
 			comprobante.setLugarExpedicion("57708");
@@ -690,6 +701,21 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 //			break;
 //		}
 		
+		/***ABM*/
+		if(receptor.getRfc().equals("XAXX010101000")) {
+			receptor.setDomicilioFiscalReceptor(comprobante.getLugarExpedicion());
+			System.out.println("*************************************************************************receptor.getDomicilioFiscalReceptor:" + receptor.getDomicilioFiscalReceptor());
+			System.out.println("*************************************************************************comprobante.getLugarExpedicion():" + comprobante.getLugarExpedicion());
+			receptor.setRegimenFiscalReceptor("616");
+			//receptor.setUsoCFDI(CUsoCFDI.S_01);
+			LocalDate fecha = LocalDate.now();
+			InformacionGlobal informacionGlobal = new InformacionGlobal();
+			informacionGlobal.setPeriodicidad("01");
+			informacionGlobal.setAno(Short.parseShort(String.valueOf(fecha.getYear())));
+			informacionGlobal.setMeses(String.format("%02d", fecha.getMonthValue()));
+			comprobante.setInformacionGlobal(informacionGlobal);
+		}
+		
 		comprobante.setReceptor(receptor);
 		
 		/**
@@ -721,10 +747,8 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 			concepto.setUnidad("Unidad de Servicio");
 			concepto.setObjetoImp("02");
 			concepto.setDescripcion(descripcionFactura);
-			concepto.setValorUnitario(msubtotalGlobal);
-			concepto.setImporte(msubtotalGlobal);
-			
-			importePadre = importePadre.add(concepto.getImporte().setScale(4));
+			concepto.setValorUnitario(msubtotalGlobal.setScale(6, RoundingMode.HALF_UP));
+			concepto.setImporte(msubtotalGlobal.setScale(6, RoundingMode.HALF_UP));
 			
 			conceptos.getConcepto().add(concepto);
 			
@@ -747,10 +771,8 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 				importeRetencion = importeRetencion.add(retencion.getImporte().setScale(2, RoundingMode.HALF_UP));
 			}
 			
-//			traslado.setBase(concepto.getImporte().subtract(concepto.getDescuento()).setScale(2, 4));
-			traslado.setBase(concepto.getImporte().setScale(2, 4));
-			//traslado.setImporte(traslado.getBase().multiply(new BigDecimal(0.16)).setScale(2, RoundingMode.HALF_UP));
-			traslado.setImporte(mivaGlobal);
+			traslado.setBase(concepto.getImporte().setScale(2, RoundingMode.HALF_UP));
+			traslado.setImporte(mivaGlobal.setScale(2, RoundingMode.HALF_UP));
 			importeBaseTotal = importeBaseTotal.add(traslado.getBase().setScale(2, RoundingMode.HALF_UP));
 			importeTotal = importeTotal.add(traslado.getImporte().setScale(2, RoundingMode.HALF_UP));
 			traslado.setImpuesto("002");
@@ -761,9 +783,9 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 			impuestos.setTraslados(traslados);
 			concepto.setImpuestos(impuestos);
 			comprobante.setConceptos(conceptos);
+			mtotalGlobal = msubtotalGlobal;
 					
 		}else{
-			//List<EstudioDto> listEstudios = consultaService.getListEstudiosByKfactura(dto.getIdFactura());
 			List<FuncionFacturacionDto> listNew = new ArrayList<>();
 			List<HashMap<String, Integer>> listHash = new ArrayList<>();
 			for (FuncionFacturacionDto ffDto : list) {
@@ -790,10 +812,7 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 	                facturacionDto.setMsubtotal(new BigDecimal(clave.split("\\|\\|")[1]));
 	                facturacionDto.setSexamen(clave.split("\\|\\|")[2]);
 	                facturacionDto.setCantidad( contador.get(clave).toString() );
-	                /*Long iva = Long.valueOf(clave.split("\\|\\|")[3]);
-	                iva = iva +  Long.valueOf(facturacionDto.getCantidad());*/
 	                facturacionDto.setMiva(facturacionDto.getMsubtotal().multiply(new BigDecimal(facturacionDto.getCantidad())).multiply( new BigDecimal(0.16) ).setScale(6, RoundingMode.HALF_UP) );
-	                //facturacionDto.setMiva(new BigDecimal(clave.split("\\|\\|")[3]).multiply(new BigDecimal(facturacionDto.getCantidad()).setScale(6, RoundingMode.HALF_UP)));
 	                facturacionDto.setMtotal(new BigDecimal(clave.split("\\|\\|")[1]).multiply(new BigDecimal(facturacionDto.getCantidad()).setScale(6, RoundingMode.HALF_UP)));
 	                
 	                mivaGlobal = mivaGlobal.add(facturacionDto.getMiva());

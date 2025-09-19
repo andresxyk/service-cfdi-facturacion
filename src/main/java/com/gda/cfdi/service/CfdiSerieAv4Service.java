@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +43,7 @@ import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Retenciones.Re
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados.Traslado;
 import mx.gob.sat.cfd._4.Comprobante.Emisor;
+import mx.gob.sat.cfd._4.Comprobante.InformacionGlobal;
 import mx.gob.sat.cfd._4.Comprobante.Receptor;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CMetodoPago;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CMoneda;
@@ -190,35 +194,31 @@ public class CfdiSerieAv4Service {
 		cfdi33.setSerie(tFacturaEntity.getSserie());
 		cfdi33.setExportacion("01");
 		cfdi33.setTipoCambio(BigDecimal.valueOf(1));
-		if (cmarca.equals(15)) {
+		log.info("************************************************************************marca:" + cmarca);
+		if (cmarca == 15) {
 			cfdi33.setFecha(utilsService.toXmlGregorianCalendar(utilsService.sumarORestarMinutosAFecha(new Date(), -60),
 					"yyyy-MM-dd'T'HH:mm:ss"));
+			log.info("*************************************************************************fecha marca 15:" + cfdi33.getFecha());
 		} else {
 
-			cfdi33.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+			cfdi33.setFecha(utilsService.toXmlGregorianCalendar(LocalDateTime.now(ZoneId.of("-06:00")), "yyyy-MM-dd'T'HH:mm:ss"));
+			log.info("*************************************************************************fecha marca <> 15:" + cfdi33.getFecha());
 		}
 		cfdi33.setNoCertificado(datosMarcaDto.getNumeroCertificado());
 		cfdi33.setMoneda(CMoneda.MXN);
 		cfdi33.setTipoDeComprobante(CTipoDeComprobante.I);
 
-		if (cmarca == 1 || cmarca == 4 || cmarca == 7) {
-
-			if (tFacturaEntity.getCconvenio().equals(1605) || tFacturaEntity.getCconvenio().equals(226)
-					|| tFacturaEntity.getCconvenio().equals(1224) || tFacturaEntity.getCconvenio().equals(191)
-					|| tFacturaEntity.getCconvenio().equals(1129) || tFacturaEntity.getCconvenio().equals(1225)
-					|| tFacturaEntity.getCconvenio().equals(8881) || tFacturaEntity.getCconvenio().equals(200)
-					|| tFacturaEntity.getCconvenio().equals(3760) || tFacturaEntity.getCconvenio().equals(1227)
-					|| tFacturaEntity.getCconvenio().equals(1228) || tFacturaEntity.getCconvenio().equals(1610)
-					|| tFacturaEntity.getCconvenio().equals(198) || tFacturaEntity.getCconvenio().equals(1611)
-					|| tFacturaEntity.getCconvenio().equals(197) || tFacturaEntity.getCconvenio().equals(3759)
-					|| tFacturaEntity.getCconvenio().equals(1604) || tFacturaEntity.getCconvenio().equals(7922)
-					|| tFacturaEntity.getCconvenio().equals(1464) || tFacturaEntity.getCconvenio().equals(1609)
-					|| tFacturaEntity.getCconvenio().equals(3080) || tFacturaEntity.getCconvenio().equals(1189)
-					|| tFacturaEntity.getCconvenio().equals(8344) || tFacturaEntity.getCconvenio().equals(1971)
-					|| tFacturaEntity.getCconvenio().equals(183) || tFacturaEntity.getCconvenio().equals(1156)
-					|| tFacturaEntity.getCconvenio().equals(391) || tFacturaEntity.getCconvenio().equals(364)
-					|| tFacturaEntity.getCconvenio().equals(947) || tFacturaEntity.getCconvenio().equals(12234)
-					|| tFacturaEntity.getCconvenio().equals(7986)) {
+		if (cmarca == 1 || cmarca == 4 || cmarca == 7) {			
+			Integer idConvenio = tFacturaEntity.getCconvenio();
+			if (idConvenio != null && (
+			    idConvenio == 1605 || idConvenio == 226 || idConvenio == 1224 || idConvenio == 191 ||
+			    idConvenio == 1129 || idConvenio == 1225 || idConvenio == 8881 || idConvenio == 200 ||
+			    idConvenio == 3760 || idConvenio == 1227 || idConvenio == 1228 || idConvenio == 1610 ||
+			    idConvenio == 198  || idConvenio == 1611 || idConvenio == 197  || idConvenio == 3759 ||
+			    idConvenio == 1604 || idConvenio == 7922 || idConvenio == 1464 || idConvenio == 1609 ||
+			    idConvenio == 3080 || idConvenio == 1189 || idConvenio == 8344 || idConvenio == 1971 ||
+			    idConvenio == 183  || idConvenio == 1156 || idConvenio == 391  || idConvenio == 364  ||
+			    idConvenio == 947  || idConvenio == 12234|| idConvenio == 7986)) {
 
 				cfdi33.setLugarExpedicion("57708");
 
@@ -269,7 +269,7 @@ public class CfdiSerieAv4Service {
 		TDatoFiscalDto datoFiscalDto = consultaService.getTDatoFiscalById(datoFiscal.getKdatofiscal());
 		DatosCfdiDto datosCfdiDto = consultaService.getDatosCfdiByConvenio(tFacturaEntity.getCconvenio());
 		if (datoFiscal.getSrfc() != null) {
-			receptor.setNombre(datoFiscal.getSrazonsocial());
+			receptor.setNombre(utilsService.darFormatoCFDI(datoFiscal.getSrazonsocial()));
 			receptor.setRfc(datoFiscal.getSrfc());
 		} else {
 			convenioKdato = false;
@@ -283,6 +283,19 @@ public class CfdiSerieAv4Service {
 		receptor.setUsoCFDI(CUsoCFDI.fromValue(datosCfdiDto.getSclaveusocfdi()));
 		receptor.setRegimenFiscalReceptor(datoFiscalDto.getSclaveregimenfiscal());
 		receptor.setDomicilioFiscalReceptor(datoFiscalDto.getCpostalcliente());
+		
+		/***ABM*/
+		if(receptor.getRfc().equals("XAXX010101000")) {
+			receptor.setDomicilioFiscalReceptor(cfdi33.getLugarExpedicion());
+			receptor.setRegimenFiscalReceptor("616");
+			//receptor.setUsoCFDI(CUsoCFDI.S_01);
+			LocalDate fecha = LocalDate.now();
+			InformacionGlobal informacionGlobal = new InformacionGlobal();
+			informacionGlobal.setPeriodicidad("01");
+			informacionGlobal.setAno(Short.parseShort(String.valueOf(fecha.getYear())));
+			informacionGlobal.setMeses(String.format("%02d", fecha.getMonthValue()));
+			cfdi33.setInformacionGlobal(informacionGlobal);
+		}
 
 		cfdi33.setReceptor(receptor);
 

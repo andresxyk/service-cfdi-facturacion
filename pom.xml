@@ -108,7 +108,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
-		<finalName>facturacion_cfdi_1.0.20012025</finalName>
+		<finalName>facturacion_cfdi_1.0.12092025</finalName>
 	</build>
 
 </project>

@@ -2,6 +2,7 @@ package com.gda.cfdi.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +33,7 @@ import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Retenciones.Re
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados.Traslado;
 import mx.gob.sat.cfd._4.Comprobante.Emisor;
+import mx.gob.sat.cfd._4.Comprobante.InformacionGlobal;
 import mx.gob.sat.cfd._4.Comprobante.Receptor;
 import mx.gob.sat.cfd._4.ObjectFactory;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CMetodoPago;
@@ -175,6 +177,19 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 			receptor.setUsoCFDI(CUsoCFDI.G_02);
 			receptor.setRegimenFiscalReceptor(datoFiscalDto.getSclaveregimenfiscal());
 			receptor.setDomicilioFiscalReceptor(datoFiscalDto.getCpostalcliente());
+			
+			/***ABM*/
+			if(receptor.getRfc().equals("XAXX010101000")) {
+				receptor.setDomicilioFiscalReceptor(cfdi40.getLugarExpedicion());
+				receptor.setRegimenFiscalReceptor("616");
+				//receptor.setUsoCFDI(CUsoCFDI.S_01);
+				LocalDate fecha = LocalDate.now();
+				InformacionGlobal informacionGlobal = new InformacionGlobal();
+				informacionGlobal.setPeriodicidad("01");
+				informacionGlobal.setAno(Short.parseShort(String.valueOf(fecha.getYear())));
+				informacionGlobal.setMeses(String.format("%02d", fecha.getMonthValue()));
+				cfdi40.setInformacionGlobal(informacionGlobal);
+			}
 			
 			cfdi40.setReceptor(receptor);
 			
