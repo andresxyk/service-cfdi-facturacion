@@ -262,7 +262,7 @@ public class CfdiSerieBRfcService {
 		boolean convenioKdato = false;
 		DatosFiscales datoFiscal = consultaService
 				.obtenerDatosFiscalesByCConvenioAndBconvenio(tFacturaEntity.getKdatofiscal(), convenioKdato);
-		receptor.setNombre(utilsService.darFormatoCFDI(datoFiscal.getSrazonsocial()));
+		receptor.setNombre((datoFiscal.getSrazonsocial()));
 		receptor.setRfc(datoFiscal.getSrfc());
 		
 		log.info("cusoCfdi--->>>   " + usoCFDI);

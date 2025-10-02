@@ -269,7 +269,7 @@ public class CfdiSerieAv4Service {
 		TDatoFiscalDto datoFiscalDto = consultaService.getTDatoFiscalById(datoFiscal.getKdatofiscal());
 		DatosCfdiDto datosCfdiDto = consultaService.getDatosCfdiByConvenio(tFacturaEntity.getCconvenio());
 		if (datoFiscal.getSrfc() != null) {
-			receptor.setNombre(utilsService.darFormatoCFDI(datoFiscal.getSrazonsocial()));
+			receptor.setNombre((datoFiscal.getSrazonsocial()));
 			receptor.setRfc(datoFiscal.getSrfc());
 		} else {
 			convenioKdato = false;

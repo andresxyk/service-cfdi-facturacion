@@ -232,7 +232,7 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 		 */
 		Receptor receptor = new ObjectFactory().createComprobanteReceptor();
 		TDatoFiscalDto datoFiscalDto = consultaService.getTDatoFiscalById(dto.getIdDatoFiscal());
-		receptor.setNombre(utilsService.darFormatoCFDI(datoFiscalDto.getSrazonsocial()));
+		receptor.setNombre((datoFiscalDto.getSrazonsocial()));
 		receptor.setRfc(datoFiscalDto.getSrfc());
 		List<TDatoFiscalDto> listDatos = consultaService.getListDatosFiscalesByRfc(datoFiscalDto.getSrfc());
 		if(listDatos.size()>0){

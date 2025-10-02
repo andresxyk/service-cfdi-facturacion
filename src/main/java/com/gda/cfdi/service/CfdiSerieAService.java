@@ -256,7 +256,7 @@ public class CfdiSerieAService {
 		DatosFiscales datoFiscal = consultaService
 				.obtenerDatosFiscalesByCConvenioAndBconvenio(tFacturaEntity.getCconvenio(), convenioKdato);
 		if (datoFiscal.getSrfc() != null) {
-			receptor.setNombre(utilsService.darFormatoCFDI(datoFiscal.getSrazonsocial()));
+			receptor.setNombre((datoFiscal.getSrazonsocial()));
 			receptor.setRfc(datoFiscal.getSrfc());
 		} else {
 			convenioKdato = false;
