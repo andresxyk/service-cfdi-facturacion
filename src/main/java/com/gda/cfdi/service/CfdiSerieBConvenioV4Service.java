@@ -2,6 +2,9 @@ package com.gda.cfdi.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,6 +38,7 @@ import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Retenciones.Re
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados;
 import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto.Impuestos.Traslados.Traslado;
 import mx.gob.sat.cfd._4.Comprobante.Emisor;
+import mx.gob.sat.cfd._4.Comprobante.InformacionGlobal;
 import mx.gob.sat.cfd._4.Comprobante.Receptor;
 import mx.gob.sat.cfd._4.ObjectFactory;
 import mx.gob.sat.sitio_internet.cfd.catalogos.CMetodoPago;
@@ -186,12 +190,15 @@ public class CfdiSerieBConvenioV4Service {
 		cfdi33.setSerie(tFacturaEntity.getSserie());
 		cfdi33.setExportacion("01");
 		cfdi33.setTipoCambio(BigDecimal.valueOf(1));
-		if (cmarca.equals(15)) {
+		log.info("************************************************************************marca:" + cmarca);
+		if (cmarca == 15) {
 			cfdi33.setFecha(utilsService.toXmlGregorianCalendar(utilsService.sumarORestarMinutosAFecha(new Date(), -60),
 					"yyyy-MM-dd'T'HH:mm:ss"));
+			log.info("*************************************************************************fecha marca 15:" + cfdi33.getFecha());
 		} else {
 
-			cfdi33.setFecha(utilsService.toXmlGregorianCalendar(new Date(), "yyyy-MM-dd'T'HH:mm:ss"));
+			cfdi33.setFecha(utilsService.toXmlGregorianCalendar(LocalDateTime.now(ZoneId.of("-06:00")), "yyyy-MM-dd'T'HH:mm:ss"));
+			log.info("*************************************************************************fecha marca <> 15:" + cfdi33.getFecha());
 		}
 		cfdi33.setNoCertificado(datosMarcaDto.getNumeroCertificado());
 		cfdi33.setMoneda(CMoneda.MXN);
@@ -263,12 +270,25 @@ public class CfdiSerieBConvenioV4Service {
 				.obtenerDatosFiscalesByCConvenioAndBconvenio(tFacturaEntity.getKdatofiscal(), convenioKdato);
 		TDatoFiscalDto datoFiscalDto = consultaService.getTDatoFiscalById(datoFiscal.getKdatofiscal());
 		DatosCfdiDto datosCfdiDto = consultaService.getDatosCfdiByConvenio(tFacturaEntity.getCconvenio());
-		receptor.setNombre(datoFiscal.getSrazonsocial());
+		receptor.setNombre((datoFiscal.getSrazonsocial()));
 		receptor.setRfc(datoFiscal.getSrfc());
 		
 		receptor.setUsoCFDI(CUsoCFDI.fromValue(datosCfdiDto.getSclaveusocfdi()));
 		receptor.setRegimenFiscalReceptor(datoFiscalDto.getSclaveregimenfiscal());
 		receptor.setDomicilioFiscalReceptor(datoFiscalDto.getCpostalcliente());
+		
+		/***ABM*/
+		if(receptor.getRfc().equals("XAXX010101000")) {
+			receptor.setDomicilioFiscalReceptor(cfdi33.getLugarExpedicion());
+			receptor.setRegimenFiscalReceptor("616");
+			//receptor.setUsoCFDI(CUsoCFDI.S_01);
+			LocalDate fecha = LocalDate.now();
+			InformacionGlobal informacionGlobal = new InformacionGlobal();
+			informacionGlobal.setPeriodicidad("01");
+			informacionGlobal.setAno(Short.parseShort(String.valueOf(fecha.getYear())));
+			informacionGlobal.setMeses(String.format("%02d", fecha.getMonthValue()));
+			cfdi33.setInformacionGlobal(informacionGlobal);
+		}
 
 		cfdi33.setReceptor(receptor);
 
@@ -421,7 +441,7 @@ public class CfdiSerieBConvenioV4Service {
 				"(SELECT ccliente FROM c_convenio WHERE cconvenio="+convenio+")||',1007,1,'\r\n" + 
 				"||SUM ( "+subTotal+"/1.16)||',0.00,0.00,'||\r\n" + 
 				"SUM ( "+subTotal+" - ("+subTotal+" /1.16))||','||\r\n" + 
-				"SUM ( "+subTotal+")||',1,'||"+convenio+"||','' '','' '',1,sysdate,33,sysdate,'||1||','||1||', '' '','' '','' '', ''B'')  RETURNING kfactura;' AS query1,\r\n" + 
+				"SUM ( "+subTotal+")||',1,'||"+convenio+"||','' '','' '',1,sysdate,270,sysdate,'||1||','||1||', '' '','' '','' '', ''B'')  RETURNING kfactura;' AS query1,\r\n" + 
 				"'UPDATE c_control_folio SET ufolioactual='||(SELECT SUM(ufolioactual+1) FROM c_control_folio WHERE csucursal=1007 AND cestadoregistro=31)||\r\n" + 
 				"' WHERE csucursal=1007 AND cestadoregistro=31;' AS query2";
 		

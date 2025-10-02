@@ -2,6 +2,7 @@ package com.gda.cfdi.service;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAttribute;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import mx.gob.sat.addenda.AddendaEmpresa;
 import mx.gob.sat.cfd._4.Comprobante;
+import mx.gob.sat.cfd._4.Comprobante.InformacionGlobal;
 import mx.gob.sat.pagos20.Pagos;
 import mx.gob.sat.timbrefiscaldigital.TimbreFiscalDigital;
 
@@ -51,6 +54,27 @@ public class UtilsCfdi4Service {
 			}			
 		}
 		
+		if(comprobante.getInformacionGlobal()!=null) {
+		InformacionGlobal informacionGlobal = comprobante.getInformacionGlobal();
+		log.info("log de prueba 1: " + comprobante.toString());
+		for (Field field : InformacionGlobal.class.getDeclaredFields()) {
+		    XmlAttribute attr = field.getAnnotation(XmlAttribute.class);
+		    if (attr != null) {
+		        field.setAccessible(true);
+		        Object valor;
+				try {
+					valor = field.get(informacionGlobal);
+					String nombreAttr = !"##default".equals(attr.name()) ? attr.name() : field.getName();
+			        log.info("XmlAttribute [{}] = {}", nombreAttr, valor);
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		        // Aquí obtienes el name definido en la anotación
+		        
+		    }
+		}
+		}
 		classesMarshall.add(Comprobante.class);
 		classesMarshall.add(Pagos.class);
 		jaxbContext = JAXBContext.newInstance(classesMarshall.toArray(new Class<?>[classesMarshall.size()]));
@@ -63,7 +87,7 @@ public class UtilsCfdi4Service {
 		xml = sw.toString();
 		xml = StringUtils.replace(xml, "'", "&apos;").replace( "&amp;apos;", "&apos;");
 
-		log.info("log de prueba 1");
+		
 		return xml;
 	}
 	

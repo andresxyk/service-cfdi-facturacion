@@ -159,7 +159,7 @@ private static final Logger log = LoggerFactory.getLogger(CfdiController .class)
 			DatosFiscales datoFiscal = consultaService
 					.obtenerDatosFiscalesByCConvenioAndBconvenio(creditoEntityDto.getKdatofiscal(), convenioKdato);
 			log.info("datoFiscal.getSrazonsocial()::::   " + datoFiscal.getSrazonsocial());
-			receptor.setNombre(utilsService.darFormatoCFDI(datoFiscal.getSrazonsocial()));
+			receptor.setNombre((datoFiscal.getSrazonsocial()));
 			receptor.setRfc(datoFiscal.getSrfc());
 			receptor.setUsoCFDI(CUsoCFDI.G_02);
 			cfdi33.setReceptor(receptor);

@@ -6,8 +6,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -33,6 +35,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -302,8 +305,10 @@ public class UtilsService {
 
 		TransformerFactory tFactory = TransformerFactory.newInstance();
 		Transformer transformer = tFactory.newTransformer(sourceXSL);
+		transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		transformer.transform(sourceXML, new StreamResult(baos));
+		transformer.transform(sourceXML, new StreamResult(new OutputStreamWriter(baos, StandardCharsets.UTF_8)));
 		bytesOutput = baos.toString().getBytes("UTF-8");
 		cadenaOriginal = new String(bytesOutput);
 
@@ -381,6 +386,14 @@ public class UtilsService {
 	    return DatatypeFactory.newInstance().newXMLGregorianCalendar(new SimpleDateFormat(format).format(date));
 	}
 	
+	public  XMLGregorianCalendar toXmlGregorianCalendar(java.time.LocalDateTime ahora, String format) throws DatatypeConfigurationException {
+		
+	        java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern(format);
+	        
+	        String fechaCFDI = ahora.format(fmt);
+	        log.info("Fecha " + fechaCFDI);
+	    return DatatypeFactory.newInstance().newXMLGregorianCalendar(fechaCFDI);
+	}
 	
 	public String createXmlFromCancelacion(Cancelacion cancelacion) throws JAXBException {
 		String xml;
@@ -534,15 +547,15 @@ public class UtilsService {
 			razonSocialMarca = env.getProperty("razon.social.swisslab");
 			numeroCertificado = env.getProperty("numero.certificado.swisslab");
 			break;
-		case "LAB020416Q67":
-			log.info("**** FAMILYLABSNORTE *****");
-			rutaKey = env.getProperty("path.file.key.familylabsnorte");
-			rutaCer = env.getProperty("path.file.cer.familylabsnorte");		
-			pasword = env.getProperty("password.cer.familylabsnorte");	
-			rfcMarca = env.getProperty("rfc.marca.familylabsnorte");	
-			razonSocialMarca = env.getProperty("razon.social.familylabsnorte");
-			numeroCertificado = env.getProperty("numero.certificado.familylabsnorte");
-			break;
+//		case "LAB020416Q67":
+//			log.info("**** FAMILYLABSNORTE *****");
+//			rutaKey = env.getProperty("path.file.key.familylabsnorte");
+//			rutaCer = env.getProperty("path.file.cer.familylabsnorte");		
+//			pasword = env.getProperty("password.cer.familylabsnorte");	
+//			rfcMarca = env.getProperty("rfc.marca.familylabsnorte");	
+//			razonSocialMarca = env.getProperty("razon.social.familylabsnorte");
+//			numeroCertificado = env.getProperty("numero.certificado.familylabsnorte");
+//			break;
 		case "BRE9205181I1":
 			log.info("**** REFERENCIA *****");
 			rutaKey = env.getProperty("path.file.key.referencia");

@@ -1,5 +1,7 @@
 package com.gda.cfdi.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,7 @@ import com.gda.cfdi.service.CfdiService;
 import com.google.gson.Gson;
 
 import facturacion.domain.dto.FacturacionComprobanteDto;
+import facturacion.domain.dto.FuncionFacturacionDto;
 
 @RestController
 @RequestMapping(value = "/gda/service-cfdi")
@@ -146,6 +149,36 @@ public class CfdiController {
 				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else if(version.equals(4)){
 				cfdiDto = cfdiCredito4Service.generarCfdiOrden(folio, tipofactura, msubtotal, miva, mtotal, strnocuenta, strmetodopago, uuidSustitucion, sustitucion, descuento, descuentos, notaDescuento, retencion, marca, descripcionFactura);
+				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
+			}else {
+				ResponseErrorDto dto = new ResponseErrorDto();
+				dto.setCodigo("error");
+				dto.setDescripcion("La versión es incorrecta.");
+				return new ResponseEntity<ResponseErrorDto>(dto, HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			ResponseErrorDto dto = new ResponseErrorDto();
+			dto.setCodigo("error");
+			dto.setDescripcion(e.getMessage());
+			return new ResponseEntity<ResponseErrorDto>(dto, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@PostMapping("/cfdi-orden-credito-list")
+	public ResponseEntity<?> getXmlOrdenCreditolist(@RequestParam Integer folio,@RequestParam Integer tipofactura,
+			@RequestParam double msubtotal,@RequestParam double miva, @RequestParam double mtotal,
+			@RequestParam String strnocuenta, @RequestParam String strmetodopago, @RequestParam String uuidSustitucion,
+			@RequestParam boolean sustitucion, @RequestParam boolean descuento, @RequestParam String descuentos,
+			@RequestParam String notaDescuento, @RequestParam boolean retencion, @RequestParam Integer marca, 
+			@RequestParam String descripcionFactura, @RequestParam("version") Integer version, @RequestBody List<FuncionFacturacionDto> listFunFac){
+		try {
+			TFacturaEntityDto cfdiDto = null;
+			if(version.equals(3)) {
+				cfdiDto = cfdiCreditoService.generarCfdiOrden(folio, tipofactura, msubtotal, miva, mtotal, strnocuenta, strmetodopago, uuidSustitucion, sustitucion, descuento, descuentos, notaDescuento, retencion, marca, descripcionFactura);	
+				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
+			}else if(version.equals(4)){
+				cfdiDto = cfdiCredito4Service.generarCfdiOrdenList(folio, tipofactura, msubtotal, miva, mtotal, strnocuenta, strmetodopago, uuidSustitucion, sustitucion, descuento, descuentos, notaDescuento, retencion, marca, descripcionFactura, listFunFac);
 				return new ResponseEntity<TFacturaEntityDto>(cfdiDto, HttpStatus.OK);
 			}else {
 				ResponseErrorDto dto = new ResponseErrorDto();
