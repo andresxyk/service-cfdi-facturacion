@@ -872,7 +872,7 @@ private static final Logger log = LoggerFactory.getLogger(CfdiCredito4Service.cl
 				
 				retencion.setImporte((estudioDto.getMtotal().subtract(concepto.getDescuento())).multiply(new BigDecimal(env.getProperty("cfdi.retencion.monto"))));
 				retencion.setImpuesto("002");
-				retencion.setTasaOCuota(new BigDecimal(0.06).setScale(2, RoundingMode.HALF_UP));
+				retencion.setTasaOCuota(new BigDecimal(0.06).setScale(6, RoundingMode.HALF_UP));
 				retencion.setTipoFactor(CTipoFactor.TASA);
 				retencion.setBase(estudioDto.getMtotal().subtract(concepto.getDescuento()));
 				if(isRetencion){
@@ -881,8 +881,8 @@ private static final Logger log = LoggerFactory.getLogger(CfdiCredito4Service.cl
 					importeRetencion = importeRetencion.add(retencion.getImporte());
 				}
 				
-				traslado.setBase(estudioDto.getMtotal().setScale(2, RoundingMode.HALF_UP));
-				traslado.setImporte(estudioDto.getMiva().setScale(2, RoundingMode.HALF_UP));
+				traslado.setBase(estudioDto.getMtotal().setScale(6, RoundingMode.HALF_UP));
+				traslado.setImporte(estudioDto.getMiva().setScale(6, RoundingMode.HALF_UP));
 				traslado.setImpuesto("002");
 				traslado.setTipoFactor(CTipoFactor.TASA);
 				traslado.setTasaOCuota(new BigDecimal(0.16).setScale(6, RoundingMode.HALF_UP));
