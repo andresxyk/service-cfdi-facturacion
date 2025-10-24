@@ -724,7 +724,6 @@ private static final Logger log = LoggerFactory.getLogger(CfdiCredito4Service.cl
 		Conceptos conceptos = new ObjectFactory().createComprobanteConceptos();
 		BigDecimal importeTotal = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
 		BigDecimal importeBaseTotal = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
-		BigDecimal importePadre = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
 		BigDecimal importeTDescuento = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
 		BigDecimal importeRetencion = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
 		BigDecimal mivaGlobal = BigDecimal.ZERO;
@@ -791,7 +790,7 @@ private static final Logger log = LoggerFactory.getLogger(CfdiCredito4Service.cl
 			for (FuncionFacturacionDto ffDto : list) {
 				
 				HashMap<String, Integer> map = new HashMap<>();
-				map.put(ffDto.getCexamen()+"||"+ffDto.getMsubtotal().toString()+"||"+ffDto.getSexamen()+"||"+ffDto.getMiva()+"||"+ffDto.getMtotal(), 1);
+				map.put(ffDto.getCconvenio()+"||"+ffDto.getMsubtotal().toString()+"||"+ffDto.getSexamen()+"||"+ffDto.getMiva()+"||"+ffDto.getMtotal()+"||"+ffDto.getCexamen(), 1);
 				listHash.add(map); 
 			}
 			
@@ -811,6 +810,7 @@ private static final Logger log = LoggerFactory.getLogger(CfdiCredito4Service.cl
 	                facturacionDto.setCconvenio(Integer.valueOf(clave.split("\\|\\|")[0]));
 	                facturacionDto.setMsubtotal(new BigDecimal(clave.split("\\|\\|")[1]));
 	                facturacionDto.setSexamen(clave.split("\\|\\|")[2]);
+	                facturacionDto.setCexamen(Integer.valueOf(clave.split("\\|\\|")[5]));
 	                facturacionDto.setCantidad( contador.get(clave).toString() );
 	                facturacionDto.setMiva(facturacionDto.getMsubtotal().multiply(new BigDecimal(facturacionDto.getCantidad())).multiply( new BigDecimal(0.16) ).setScale(6, RoundingMode.HALF_UP) );
 	                facturacionDto.setMtotal(new BigDecimal(clave.split("\\|\\|")[1]).multiply(new BigDecimal(facturacionDto.getCantidad()).setScale(6, RoundingMode.HALF_UP)));
@@ -881,8 +881,8 @@ private static final Logger log = LoggerFactory.getLogger(CfdiCredito4Service.cl
 					importeRetencion = importeRetencion.add(retencion.getImporte());
 				}
 				
-				traslado.setBase(estudioDto.getMtotal().setScale(6, RoundingMode.HALF_UP));
-				traslado.setImporte(estudioDto.getMiva().setScale(6, RoundingMode.HALF_UP));
+				traslado.setBase(estudioDto.getMtotal().subtract(concepto.getDescuento()).setScale(6, RoundingMode.HALF_UP));
+				traslado.setImporte(traslado.getBase().multiply(new BigDecimal(0.16)).setScale(6, RoundingMode.HALF_UP));
 				traslado.setImpuesto("002");
 				traslado.setTipoFactor(CTipoFactor.TASA);
 				traslado.setTasaOCuota(new BigDecimal(0.16).setScale(6, RoundingMode.HALF_UP));
@@ -961,13 +961,16 @@ private static final Logger log = LoggerFactory.getLogger(CfdiCredito4Service.cl
 		
 		/***************************************************************************************************************/
 		comprobante.setSubTotal(mtotalGlobal.setScale(2, RoundingMode.HALF_UP));		
-		comprobante.setDescuento(importeTDescuento);
-		
+		comprobante.setDescuento(importeTDescuento.setScale(2, RoundingMode.HALF_UP));
+		mtotalGlobal = (mtotalGlobal.subtract(importeTDescuento).setScale(2, RoundingMode.HALF_UP));
+		mivaGlobal = mtotalGlobal.multiply(new BigDecimal(0.16));
+			
 		if(isRetencion){
 			comprobante.setTotal(mtotalGlobal.add(mivaGlobal).subtract(importeRetencion).setScale(2, RoundingMode.HALF_UP));
 		}else{
 			comprobante.setTotal(mtotalGlobal.add(mivaGlobal).setScale(2, RoundingMode.HALF_UP));
 		}
+
 		/*******************************************************************************************************************/
 		
 	/*	comprobante.setSubTotal(importePadre.setScale(2));		
@@ -1008,7 +1011,7 @@ private static final Logger log = LoggerFactory.getLogger(CfdiCredito4Service.cl
 		trasladosTotales.setTipoFactor(CTipoFactor.TASA);
 		traslados.getTraslado().add(trasladosTotales);
 		impuestos.setTraslados(traslados);		
-		impuestos.setTotalImpuestosTrasladados(mivaGlobal.setScale(2, RoundingMode.HALF_UP));
+		impuestos.setTotalImpuestosTrasladados(mtotalGlobal.multiply(new BigDecimal(0.16)).setScale(2, RoundingMode.HALF_UP));
 		/*********************************************************************************************************************/
 		
 		
