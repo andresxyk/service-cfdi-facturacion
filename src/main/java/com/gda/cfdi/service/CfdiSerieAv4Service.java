@@ -306,19 +306,19 @@ public class CfdiSerieAv4Service {
 		BigDecimal importePadre = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		BigDecimal importeRetencion = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		for (ConceptosExamenes tOrdenExamen : lstConcepto) {
-			log.info("Monto total--->>>   " + tOrdenExamen.getPrecioUnitario());
-			log.info("comparar---->>>   " + tOrdenExamen.getPrecioUnitario().compareTo(BigDecimal.valueOf(0.00)));
-			log.info("**********Importe:::   " + tOrdenExamen.getImporte());
-			log.info("CONCEPTOS INGRESADOS POR EL USUARIO");
+			//log.info("Monto total--->>>   " + tOrdenExamen.getPrecioUnitario());
+			//log.info("comparar---->>>   " + tOrdenExamen.getPrecioUnitario().compareTo(BigDecimal.valueOf(0.00)));
+			//log.info("**********Importe:::   " + tOrdenExamen.getImporte());
+			//log.info("CONCEPTOS INGRESADOS POR EL USUARIO");
 			Concepto concepto1 = new Concepto();
 			concepto1.setCantidad(new BigDecimal(tOrdenExamen.getCantidad()).setScale(0, BigDecimal.ROUND_HALF_UP));
-			log.info("tOrdenExamen.getMtotal()====  " + tOrdenExamen.getPrecioUnitario());
+			//log.info("tOrdenExamen.getMtotal()====  " + tOrdenExamen.getPrecioUnitario());
 			String claveProductoServicioSat = "";
 
-			log.info("tOrdenExamen.getCodigo()====  " + tOrdenExamen.getCodigo());
+			//log.info("tOrdenExamen.getCodigo()====  " + tOrdenExamen.getCodigo());
 
 			claveProductoServicioSat = tOrdenExamen.getCodigo();
-			log.info("lstCClaveProductoServicioSat--->>>>>>>    " + claveProductoServicioSat);
+			//log.info("lstCClaveProductoServicioSat--->>>>>>>    " + claveProductoServicioSat);
 
 			if (claveProductoServicioSat.equals(null) || claveProductoServicioSat.isEmpty()
 					|| claveProductoServicioSat.equals("NO APLICA")) {
@@ -335,12 +335,12 @@ public class CfdiSerieAv4Service {
 					|| tOrdenExamen.getUnidad().equals("NO APLICA")) ? "Examen" : tOrdenExamen.getUnidad());
 			concepto1.setDescripcion(utilsService.darFormatoCFDI(tOrdenExamen.getConcepto())); 
 			concepto1.setValorUnitario(tOrdenExamen.getPrecioUnitario()); //
-			log.info("concepto1.getValorUnitario()-->>  " + concepto1.getValorUnitario());
+			//log.info("concepto1.getValorUnitario()-->>  " + concepto1.getValorUnitario());
 			concepto1.setImporte(tOrdenExamen.getPrecioUnitario()); 
-			log.info("concepto1.getImporte()-->  " + concepto1.getImporte());
+			//log.info("concepto1.getImporte()-->  " + concepto1.getImporte());
 			concepto1.setImporte(
 					concepto1.getImporte().multiply(new BigDecimal(tOrdenExamen.getCantidad())).setScale(2)); /// concepto1.getCantidad()).setScale(2));
-			log.info("concepto1.getImporte()2-->  " + concepto1.getImporte());
+			//log.info("concepto1.getImporte()2-->  " + concepto1.getImporte());
 
 			importePadre = importePadre.add(concepto1.getImporte().setScale(2, BigDecimal.ROUND_HALF_UP));
 
@@ -371,13 +371,13 @@ public class CfdiSerieAv4Service {
 
 			traslado.setBase(concepto1.getImporte()); 
 
-			log.info("traslado.getBase()--->>>  " + traslado.getBase());
+			//log.info("traslado.getBase()--->>>  " + traslado.getBase());
 
-			traslado.setImporte(concepto1.getImporte().multiply(tOrdenExamen.getIva()).setScale(2, BigDecimal.ROUND_HALF_UP)); 
+			traslado.setImporte(concepto1.getImporte().multiply(tOrdenExamen.getIva()).setScale(4, BigDecimal.ROUND_HALF_UP)); 
 
-			log.info("traslado.getImporte()--->>>  " + traslado.getImporte());
+			//log.info("traslado.getImporte()--->>>  " + traslado.getImporte());
 
-			importeTotal = importeTotal.add(traslado.getImporte().setScale(2, BigDecimal.ROUND_HALF_UP));
+			importeTotal = importeTotal.add(traslado.getImporte().setScale(4, BigDecimal.ROUND_HALF_UP));
 			importeBaseTotal = importeBaseTotal.add(traslado.getBase().setScale(2, BigDecimal.ROUND_HALF_UP));
 			traslado.setImpuesto("002");
 			traslado.setTipoFactor(CTipoFactor.TASA);
@@ -386,6 +386,7 @@ public class CfdiSerieAv4Service {
 			impuestos.setTraslados(traslados);
 			concepto1.setImpuestos(impuestos);
 			cfdi33.setConceptos(conceptos);
+			System.out.println(traslado.getBase()+"|"+traslado.getImporte());
 
 		}
 		
@@ -393,10 +394,10 @@ public class CfdiSerieAv4Service {
 		cfdi33.setSubTotal(importePadre.setScale(2));
 		log.info("TotalFacrura:::  " + tFacturaEntity.getMtotal());
 		if(bRetencion){
-			cfdi33.setTotal(importePadre.add(importeTotal).setScale(2, BigDecimal.ROUND_DOWN));
-			cfdi33.setTotal(cfdi33.getTotal().subtract(importeRetencion).setScale(2, BigDecimal.ROUND_DOWN));
+			cfdi33.setTotal(importePadre.add(importeTotal).setScale(2, RoundingMode.HALF_UP));
+			cfdi33.setTotal(cfdi33.getTotal().subtract(importeRetencion).setScale(2, RoundingMode.HALF_UP));
 		}else{
-			cfdi33.setTotal(importePadre.add(importeTotal).setScale(2, BigDecimal.ROUND_DOWN)); 		
+			cfdi33.setTotal(importePadre.add(importeTotal).setScale(2, RoundingMode.HALF_UP)); 		
 		}
 		consultaService.updateMontosFactura(cfdi33.getTotal(), cfdi33.getSubTotal(), importeTotal, BigDecimal.ZERO, tFacturaEntity.getKfactura());
 		
@@ -408,7 +409,7 @@ public class CfdiSerieAv4Service {
 		mx.gob.sat.cfd._4.Comprobante.Impuestos.Traslados.Traslado trasladosTotales = new mx.gob.sat.cfd._4.Comprobante.Impuestos.Traslados.Traslado();
 		
 		trasladosTotales.setBase(importeBaseTotal);
-		trasladosTotales.setImporte(importeTotal.setScale(2, BigDecimal.ROUND_DOWN));
+		trasladosTotales.setImporte(importeTotal.setScale(2, RoundingMode.HALF_UP));
 
 		log.info("trasladosTotales.getImporte()-->>  " + trasladosTotales.getImporte());
 		trasladosTotales.setImpuesto("002");
@@ -418,16 +419,16 @@ public class CfdiSerieAv4Service {
 //		lstTrasladosTotales.add(trasladosTotales);
 		traslados.getTraslado().add(trasladosTotales);
 		impuestos.setTraslados(traslados);		
-		impuestos.setTotalImpuestosTrasladados(importeTotal.setScale(2, BigDecimal.ROUND_DOWN));
+		impuestos.setTotalImpuestosTrasladados(importeTotal.setScale(2, RoundingMode.HALF_UP));
 		
 		if(bRetencion){
 			mx.gob.sat.cfd._4.Comprobante.Impuestos.Retenciones retenciones = new ObjectFactory().createComprobanteImpuestosRetenciones();
 			mx.gob.sat.cfd._4.Comprobante.Impuestos.Retenciones.Retencion retencionTotales = new ObjectFactory().createComprobanteImpuestosRetencionesRetencion();
-			retencionTotales.setImporte(importeRetencion.setScale(2, BigDecimal.ROUND_DOWN));
+			retencionTotales.setImporte(importeRetencion.setScale(2, RoundingMode.HALF_UP));
 			retencionTotales.setImpuesto("002");
 			retenciones.getRetencion().add(retencionTotales);
 			impuestos.setRetenciones(retenciones);
-			impuestos.setTotalImpuestosRetenidos(importeRetencion.setScale(2, BigDecimal.ROUND_DOWN));			
+			impuestos.setTotalImpuestosRetenidos(importeRetencion.setScale(2, RoundingMode.HALF_UP));			
 		}		
 		
 		cfdi33.setImpuestos(impuestos);
